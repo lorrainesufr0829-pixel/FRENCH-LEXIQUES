@@ -78,53 +78,28 @@ function addVocabulary(word){
 
 }
 
-function saveImportedVocabulary(importedWords) {
+async function saveImportedVocabulary(words){
 
-    const words = getVocabulary();
-
-    importedWords.forEach(item => {
-
-        item.id = Date.now() + Math.random();
-
-        item.createdAt = new Date().toISOString();
-
-        words.push(item);
-
-    });
-
-    saveVocabulary(words);
-
-}
-function saveImportedVocabulary(newWords){
+    const { data, error } = await window.supabaseClient
+        .from("vocabulary")
+        .insert(words);
 
 
-const oldWords =
-getVocabulary();
+    if(error){
+
+        console.error(
+            "Import error:",
+            error
+        );
+
+        alert("Import failed");
+
+        return false;
+
+    }
 
 
-
-const merged =
-[
-...oldWords,
-...newWords
-];
-
-
-
-saveVocabulary(merged);
-
+    return true;
 
 }
 
-async function testDatabase(){
-
-    const words = await getVocabulary();
-
-    console.log(
-        "Supabase vocabulary:",
-        words
-    );
-
-}
-
-testDatabase();
