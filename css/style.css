@@ -906,3 +906,410 @@ text-align:left;
 
 
 }
+
+/* =================================
+   IMPORT PAGE
+   ================================= */
+
+
+
+.import-container {
+
+    max-width:1200px;
+
+    margin:0 auto;
+
+    padding:50px 40px;
+
+}
+
+
+
+
+
+/* Import Cards */
+
+.import-card {
+
+
+    background:white;
+
+    border:1px solid #ddd;
+
+    border-radius:20px;
+
+    padding:35px 40px;
+
+    margin-bottom:30px;
+
+
+    transition:all 0.25s ease;
+
+
+}
+
+
+
+
+
+.import-card:hover {
+
+
+    box-shadow:
+    0 8px 20px rgba(0,0,0,0.06);
+
+
+}
+
+
+
+
+
+.import-card h3 {
+
+
+    font-size:26px;
+
+    margin-top:0;
+
+    margin-bottom:15px;
+
+
+}
+
+
+
+
+.import-card p {
+
+
+    color:#666;
+
+    line-height:1.6;
+
+
+}
+
+
+
+
+
+
+
+
+
+/* ===============================
+   Upload Area
+   =============================== */
+
+
+.upload-box {
+
+
+    margin-top:30px;
+
+    padding:55px 30px;
+
+
+    border:2px dashed #ccc;
+
+    border-radius:25px;
+
+
+    text-align:center;
+
+
+    background:#fafafa;
+
+
+}
+
+
+
+
+
+
+
+
+/* Hide native input */
+
+
+.upload-button input {
+
+
+    display:none;
+
+
+}
+
+
+
+
+
+
+/* Modern Upload Button */
+
+
+.upload-button {
+
+
+    display:inline-flex;
+
+
+    align-items:center;
+
+    justify-content:center;
+
+
+    min-width:280px;
+
+    height:70px;
+
+
+    background:#222;
+
+
+    color:white;
+
+
+    border-radius:40px;
+
+
+    font-size:20px;
+
+
+    font-weight:600;
+
+
+    cursor:pointer;
+
+
+
+    user-select:none;
+
+
+
+    transition:
+
+    transform 0.2s ease,
+
+    box-shadow 0.2s ease,
+
+    background 0.2s ease;
+
+
+}
+
+
+
+
+
+
+
+/* Hover */
+
+.upload-button:hover {
+
+
+    background:#000;
+
+
+    transform:translateY(-5px);
+
+
+    box-shadow:
+
+    0 12px 25px rgba(0,0,0,0.18);
+
+
+}
+
+
+
+
+
+
+/* Click */
+
+.upload-button:active {
+
+
+    transform:scale(0.93);
+
+
+    box-shadow:
+
+    0 5px 10px rgba(0,0,0,0.15);
+
+
+}
+
+
+
+
+
+
+
+
+
+.upload-box p {
+
+
+    margin-top:25px;
+
+    font-size:14px;
+
+    color:#777;
+
+
+}
+
+
+
+
+
+
+
+
+
+/* ===============================
+   Data Format
+   =============================== */
+
+
+.format-list {
+
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:15px;
+
+    margin-top:25px;
+
+
+}
+
+
+
+
+
+.format-list div {
+
+
+    padding:12px 25px;
+
+
+    background:#f3f3f3;
+
+
+    border-radius:30px;
+
+
+    font-size:16px;
+
+
+    transition:all 0.2s ease;
+
+
+}
+
+
+
+
+.format-list div:hover {
+
+
+    background:#222;
+
+    color:white;
+
+
+}
+
+
+
+
+
+
+
+
+
+/* ===============================
+   Import History
+   =============================== */
+
+
+.history-empty {
+
+
+    padding:40px;
+
+
+    background:#fafafa;
+
+
+    border-radius:15px;
+
+
+    text-align:center;
+
+
+    color:#777;
+
+
+    font-size:16px;
+
+
+}
+
+
+
+
+
+
+
+
+
+/* ===============================
+   Responsive
+   =============================== */
+
+
+@media(max-width:900px){
+
+
+.import-container{
+
+
+    padding:30px 20px;
+
+
+}
+
+
+
+.import-card{
+
+
+    padding:25px;
+
+
+}
+
+
+
+.upload-button{
+
+
+    min-width:220px;
+
+    height:60px;
+
+    font-size:17px;
+
+
+}
+
+}
