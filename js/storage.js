@@ -2,7 +2,7 @@
 // LEXIQUE STORAGE
 // ================================
 
-
+console.log("storage.js loaded");
 const STORAGE_KEY = "lexique_vocabulary";
 
 
