@@ -74,3 +74,94 @@ function showImportMessage(filename){
 
 
 }
+// ================================
+// Add New Word
+// ================================
+
+
+const addButton = document.getElementById(
+"add-word-btn"
+);
+
+
+
+if(addButton){
+
+
+addButton.addEventListener(
+"click",
+()=>{
+
+
+const word =
+document.getElementById(
+"new-word"
+).value;
+
+
+
+const meaning =
+document.getElementById(
+"new-meaning"
+).value;
+
+
+
+const category =
+document.getElementById(
+"new-category"
+).value;
+
+
+
+const level =
+document.getElementById(
+"new-level"
+).value;
+
+
+
+
+
+if(!word || !meaning){
+
+alert(
+"Please complete word and meaning"
+);
+
+return;
+
+}
+
+
+
+
+
+addVocabulary({
+
+word,
+
+meaning,
+
+category,
+
+level
+
+});
+
+
+
+
+
+alert(
+"Vocabulary added successfully!"
+);
+
+
+
+}
+
+);
+
+
+}
