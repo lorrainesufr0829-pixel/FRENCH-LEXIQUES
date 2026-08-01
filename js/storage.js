@@ -72,6 +72,24 @@ function addVocabulary(word){
 
 }
 
+function saveImportedVocabulary(importedWords) {
+
+    const words = getVocabulary();
+
+    importedWords.forEach(item => {
+
+        item.id = Date.now() + Math.random();
+
+        item.createdAt = new Date().toISOString();
+
+        words.push(item);
+
+    });
+
+    saveVocabulary(words);
+
+}
+
 function saveImportedVocabulary(newWords){
 
 
