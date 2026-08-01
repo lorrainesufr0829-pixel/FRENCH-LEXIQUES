@@ -290,24 +290,17 @@ level:""
 
 
 
-                saveImportedVocabulary(
-                    importedWords
-                );
+              saveImportedVocabulary(
+    importedWords
+).then(function(){
 
+    alert(
+        importedWords.length
+        +
+        " words imported successfully!"
+    );
 
-
-
-
-
-                alert(
-
-                    importedWords.length
-                    +
-                    " words imported successfully!"
-
-                );
-
-
+});
 
 
             };
