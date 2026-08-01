@@ -69,7 +69,6 @@ function showImportMessage(filename){
     `;
 
 
-
     uploadBox.appendChild(message);
 
 
