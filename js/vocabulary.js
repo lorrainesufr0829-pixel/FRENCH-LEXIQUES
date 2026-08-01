@@ -165,3 +165,89 @@ alert(
 
 
 }
+
+// ================================
+// Display Library
+// ================================
+
+
+const wordList = document.getElementById(
+"word-list"
+);
+
+
+
+if(wordList){
+
+
+const words = getVocabulary();
+
+
+
+document.getElementById(
+"word-count"
+).innerText =
+`${words.length} Words`;
+
+
+
+
+words.forEach(item => {
+
+
+const row = document.createElement(
+"article"
+);
+
+
+row.className =
+"word-row";
+
+
+
+row.innerHTML = `
+
+
+<div class="word-info">
+
+<h3>
+${item.word}
+</h3>
+
+
+<p>
+${item.meaning}
+</p>
+
+
+</div>
+
+
+
+<div class="word-tag">
+
+<span>
+${item.level || ""}
+</span>
+
+
+<span>
+${item.category || ""}
+</span>
+
+
+</div>
+
+
+`;
+
+
+
+wordList.appendChild(row);
+
+
+
+});
+
+
+}
