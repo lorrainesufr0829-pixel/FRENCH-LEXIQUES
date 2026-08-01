@@ -1,3 +1,14 @@
+const SUPABASE_URL = "https://uccznppecrkdbgykrucx.supabase.co/rest/v1/";
+
+const SUPABASE_ANON_KEY = "sb_publishable_TWW6H1Xuq8gXp1xgDRKSbA_Gq2aNXwA";
+
+const supabase = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+);
+
+
+
 // ================================
 // LEXIQUE STORAGE
 // ================================
@@ -89,7 +100,6 @@ function saveImportedVocabulary(importedWords) {
     saveVocabulary(words);
 
 }
-
 function saveImportedVocabulary(newWords){
 
 
@@ -110,3 +120,15 @@ saveVocabulary(merged);
 
 
 }
+async function testConnection() {
+
+    const { data, error } = await supabase
+        .from("vocabulary")
+        .select("*")
+        .limit(1);
+
+    console.log("Supabase Test:", data, error);
+
+}
+
+testConnection();
