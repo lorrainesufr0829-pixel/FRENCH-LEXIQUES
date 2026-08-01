@@ -14,6 +14,7 @@ window.supabaseClient = window.supabase.createClient(
 );
 
 
+
 console.log(
     "Supabase client:",
     window.supabaseClient
