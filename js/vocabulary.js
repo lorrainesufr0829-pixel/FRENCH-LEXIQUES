@@ -1,37 +1,117 @@
-// ================================
-// Vocabulary Import
-// ================================
+// =================================
+// LEXIQUE Vocabulary Management
+// =================================
 
 
-const fileInput = document.getElementById("file-upload");
+// =================================
+// 1. Manual Add Vocabulary
+// =================================
 
 
-if(fileInput){
+const addButton = document.getElementById(
+    "add-word-btn"
+);
 
 
-    fileInput.addEventListener(
-        "change",
-        function(event){
+if (addButton) {
 
 
-            const file = event.target.files[0];
+    addButton.addEventListener(
+        "click",
+        function () {
 
 
-            if(!file){
+            const wordInput =
+                document.getElementById("new-word");
+
+
+            const meaningInput =
+                document.getElementById("new-meaning");
+
+
+            const categoryInput =
+                document.getElementById("new-category");
+
+
+            const levelInput =
+                document.getElementById("new-level");
+
+
+
+            const word =
+                wordInput.value.trim();
+
+
+            const meaning =
+                meaningInput.value.trim();
+
+
+            const category =
+                categoryInput.value;
+
+
+            const level =
+                levelInput.value;
+
+
+
+            if (!word || !meaning) {
+
+
+                alert(
+                    "Please complete word and meaning."
+                );
+
+
                 return;
+
             }
 
 
 
-            console.log("Selected file:", file.name);
+
+
+            addVocabulary({
+
+
+                word: word,
+
+
+                meaning: meaning,
+
+
+                category: category,
+
+
+                level: level
+
+
+            });
 
 
 
-            showImportMessage(file.name);
+
+
+            alert(
+                "Vocabulary added successfully!"
+            );
+
+
+
+            // clear input
+
+            wordInput.value = "";
+
+            meaningInput.value = "";
+
+            categoryInput.value = "";
+
+            levelInput.value = "";
 
 
 
         }
+
     );
 
 
@@ -40,329 +120,333 @@ if(fileInput){
 
 
 
-function showImportMessage(filename){
-
-
-    const uploadBox = document.querySelector(".upload-box");
-
-
-    if(!uploadBox){
-        return;
-    }
 
 
 
-    const message = document.createElement("p");
 
 
-    message.className = "upload-success";
+// =================================
+// 2. Excel / CSV Import
+// =================================
 
 
-    message.innerHTML = `
 
-    Selected File:
-
-    <strong>${filename}</strong>
-
-    `;
+const vocabularyFileInput =
+    document.getElementById(
+        "file-upload"
+    );
 
 
-    uploadBox.appendChild(message);
 
+if (vocabularyFileInput) {
+
+
+    vocabularyFileInput.addEventListener(
+
+        "change",
+
+        function(event){
+
+
+
+            const file =
+                event.target.files[0];
+
+
+
+            if (!file) {
+
+                return;
+
+            }
+
+
+
+
+            // Check SheetJS
+
+            if (typeof XLSX === "undefined") {
+
+
+                alert(
+                    "Excel import library is not loaded."
+                );
+
+
+                return;
+
+            }
+
+
+
+
+
+            const reader =
+                new FileReader();
+
+
+
+
+
+            reader.onload = function(e){
+
+
+
+                const data =
+                    new Uint8Array(
+                        e.target.result
+                    );
+
+
+
+
+
+                const workbook =
+                    XLSX.read(
+                        data,
+                        {
+                            type:"array"
+                        }
+                    );
+
+
+
+
+
+                const sheet =
+                    workbook.Sheets[
+                        workbook.SheetNames[0]
+                    ];
+
+
+
+
+
+                const rows =
+                    XLSX.utils.sheet_to_json(
+                        sheet
+                    );
+
+
+
+
+
+                if(rows.length === 0){
+
+
+                    alert(
+                        "No vocabulary found."
+                    );
+
+
+                    return;
+
+
+                }
+
+
+
+
+
+                const importedWords =
+                    rows.map(
+                        function(item){
+
+
+
+                            return {
+
+
+                                word:
+                                item.Word || "",
+
+
+                                meaning:
+                                item.Meaning || "",
+
+
+                                category:
+                                "",
+
+
+                                level:
+                                ""
+
+
+                            };
+
+
+                        }
+
+                    );
+
+
+
+
+
+
+
+                saveImportedVocabulary(
+                    importedWords
+                );
+
+
+
+
+
+
+                alert(
+
+                    importedWords.length
+                    +
+                    " words imported successfully!"
+
+                );
+
+
+
+
+            };
+
+
+
+
+
+            reader.readAsArrayBuffer(file);
+
+
+
+        }
+
+
+    );
 
 
 }
-// ================================
-// Add New Word
-// ================================
-
-
-const addButton = document.getElementById(
-"add-word-btn"
-);
-
-
-
-if(addButton){
-
-
-addButton.addEventListener(
-"click",
-()=>{
-
-
-const word =
-document.getElementById(
-"new-word"
-).value;
-
-
-
-const meaning =
-document.getElementById(
-"new-meaning"
-).value;
-
-
-
-const category =
-document.getElementById(
-"new-category"
-).value;
-
-
-
-const level =
-document.getElementById(
-"new-level"
-).value;
 
 
 
 
 
-if(!word || !meaning){
-
-alert(
-"Please complete word and meaning"
-);
-
-return;
-
-}
 
 
 
 
-
-addVocabulary({
-
-word,
-
-meaning,
-
-category,
-
-level
-
-});
+// =================================
+// 3. Library Display
+// =================================
 
 
 
-
-
-alert(
-"Vocabulary added successfully!"
-);
-
-
-
-}
-
-);
-
-
-}
-
-// ================================
-// Display Library
-// ================================
-
-
-const wordList = document.getElementById(
-"word-list"
-);
+const wordList =
+    document.getElementById(
+        "word-list"
+    );
 
 
 
 if(wordList){
 
 
-const words = getVocabulary();
 
+    const words =
+        getVocabulary();
 
 
-document.getElementById(
-"word-count"
-).innerText =
-`${words.length} Words`;
 
 
+    const count =
+        document.getElementById(
+            "word-count"
+        );
 
 
-words.forEach(item => {
 
+    if(count){
 
-const row = document.createElement(
-"article"
-);
 
+        count.innerText =
+            `${words.length} Words`;
 
-row.className =
-"word-row";
 
+    }
 
 
-row.innerHTML = `
 
 
-<div class="word-info">
 
-<h3>
-${item.word}
-</h3>
 
+    words.forEach(
 
-<p>
-${item.meaning}
-</p>
+        function(item){
 
 
-</div>
 
+            const row =
+                document.createElement(
+                    "article"
+                );
 
 
-<div class="word-tag">
 
-<span>
-${item.level || ""}
-</span>
+            row.className =
+                "word-row";
 
 
-<span>
-${item.category || ""}
-</span>
 
 
-</div>
 
+            row.innerHTML = `
 
-`;
 
+                <div class="word-info">
 
 
-wordList.appendChild(row);
+                    <h3>
+                    ${item.word}
+                    </h3>
 
 
+                    <p>
+                    ${item.meaning}
+                    </p>
 
-});
 
+                </div>
 
-}
 
-// ================================
-// Import Excel Vocabulary
-// ================================
 
 
+                <div class="word-tag">
 
-if(fileInput){
 
+                    <span>
+                    ${item.level || ""}
+                    </span>
 
-fileInput.addEventListener(
-"change",
-function(event){
 
+                    <span>
+                    ${item.category || ""}
+                    </span>
 
-const file =
-event.target.files[0];
 
+                </div>
 
-if(!file){
 
-return;
+            `;
 
-}
 
 
 
-const reader =
-new FileReader();
+            wordList.appendChild(row);
 
 
 
-reader.onload = function(e){
+        }
 
 
+    );
 
-const data =
-new Uint8Array(
-e.target.result
-);
-
-
-
-const workbook =
-XLSX.read(
-data,
-{
-type:"array"
-}
-);
-
-
-
-const sheet =
-workbook.Sheets[
-workbook.SheetNames[0]
-];
-
-
-
-const rows =
-XLSX.utils.sheet_to_json(
-sheet
-);
-
-
-
-
-
-const vocabularyList =
-rows.map(item=>({
-
-
-word:item.Word,
-
-
-meaning:item.Meaning,
-
-
-category:"",
-
-
-level:""
-
-
-}));
-
-
-
-
-
-saveImportedVocabulary(
-vocabularyList
-);
-
-
-
-alert(
-`${vocabularyList.length} words imported successfully!`
-);
-
-
-
-};
-
-
-
-reader.readAsArrayBuffer(file);
-
-
-
-}
-
-);
 
 
 }
