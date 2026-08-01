@@ -255,11 +255,6 @@ wordList.appendChild(row);
 // ================================
 
 
-const fileInput = document.getElementById(
-"file-upload"
-);
-
-
 
 if(fileInput){
 
