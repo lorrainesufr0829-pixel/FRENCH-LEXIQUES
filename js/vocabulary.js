@@ -1,184 +1,44 @@
-// =================================
-// LEXIQUE Vocabulary Management
-// =================================
+// =====================================
+// LEXIQUE VOCABULARY IMPORT
+// =====================================
 
 
-// =================================
-// 1. Manual Add Vocabulary
-// =================================
-
-
-const addButton = document.getElementById(
-    "add-word-btn"
-);
-
-
-if (addButton) {
-
-
-    addButton.addEventListener(
-        "click",
-        function () {
-
-
-            const wordInput =
-                document.getElementById("new-word");
-
-
-            const meaningInput =
-                document.getElementById("new-meaning");
-
-
-            const categoryInput =
-                document.getElementById("new-category");
-
-
-            const levelInput =
-                document.getElementById("new-level");
-
-
-
-            const word =
-                wordInput.value.trim();
-
-
-            const meaning =
-                meaningInput.value.trim();
-
-
-            const category =
-                categoryInput.value;
-
-
-            const level =
-                levelInput.value;
-
-
-
-            if (!word || !meaning) {
-
-
-                alert(
-                    "Please complete word and meaning."
-                );
-
-
-                return;
-
-            }
-
-
-
-
-
-            addVocabulary({
-
-
-                word: word,
-
-
-                meaning: meaning,
-
-
-                category: category,
-
-
-                level: level
-
-
-            });
-
-
-
-
-
-            alert(
-                "Vocabulary added successfully!"
-            );
-
-
-
-            // clear input
-
-            wordInput.value = "";
-
-            meaningInput.value = "";
-
-            categoryInput.value = "";
-
-            levelInput.value = "";
-
-
-
-        }
-
-    );
-
-
-}
-
-
-
-
-
-
-
-
-
-// =================================
-// 2. Excel / CSV Import
-// =================================
-
-
+// ================================
+// Excel Import
+// ================================
 
 const vocabularyFileInput =
-    document.getElementById(
-        "file-upload"
-    );
-
+    document.getElementById("file-upload");
 
 
 if (vocabularyFileInput) {
 
 
     vocabularyFileInput.addEventListener(
-
         "change",
-
         function(event){
-
 
 
             const file =
                 event.target.files[0];
 
 
-
-            if (!file) {
+            if(!file){
 
                 return;
 
             }
 
 
-
-
-            // Check SheetJS
-
-            if (typeof XLSX === "undefined") {
-
+            if(typeof XLSX === "undefined"){
 
                 alert(
                     "Excel import library is not loaded."
                 );
 
-
                 return;
 
             }
-
-
-
 
 
             const reader =
@@ -186,19 +46,13 @@ if (vocabularyFileInput) {
 
 
 
-
-
-            reader.onload = function(e){
-
+            reader.onload = async function(e){
 
 
                 const data =
                     new Uint8Array(
                         e.target.result
                     );
-
-
-
 
 
                 const workbook =
@@ -210,16 +64,10 @@ if (vocabularyFileInput) {
                     );
 
 
-
-
-
                 const sheet =
                     workbook.Sheets[
                         workbook.SheetNames[0]
                     ];
-
-
-
 
 
                 const rows =
@@ -229,221 +77,190 @@ if (vocabularyFileInput) {
 
 
 
-
-
                 if(rows.length === 0){
-
 
                     alert(
                         "No vocabulary found."
                     );
 
-
                     return;
+
+                }
+
+
+
+                const importedWords =
+                    rows.map(function(item){
+
+
+                        return {
+
+
+                            word:
+                                item.Word ||
+                                item.word ||
+                                "",
+
+
+                            meaning:
+                                item.Meaning ||
+                                item.meaning ||
+                                "",
+
+
+                            category:
+                                item.Category ||
+                                item.category ||
+                                "",
+
+
+                            level:
+                                item.Level ||
+                                item.level ||
+                                ""
+
+                        };
+
+
+                    });
+
+
+
+                const success =
+                    await saveImportedVocabulary(
+                        importedWords
+                    );
+
+
+
+                if(success){
+
+
+                    alert(
+                        importedWords.length +
+                        " words imported successfully!"
+                    );
 
 
                 }
 
 
 
-
-
-                const importedWords =
-rows.map(
-function(item){
-
-
-return {
-
-
-word:
-item.Word ||
-item.word ||
-item.French ||
-item.Vocabulary ||
-"",
-
-
-
-meaning:
-item.Meaning ||
-item.meaning ||
-item.Translation ||
-item.Chinese ||
-"",
-
-
-
-category:"",
-
-level:""
-
-
-};
-
-
-
-});
-
-
-
-
-
-
-              saveImportedVocabulary(
-    importedWords
-).then(function(){
-
-    alert(
-        importedWords.length
-        +
-        " words imported successfully!"
-    );
-
-});
-
-
             };
-
-
-
 
 
             reader.readAsArrayBuffer(file);
 
 
-
         }
-
-
     );
-
 
 }
 
 
 
+// ================================
+// Manual Add Vocabulary
+// ================================
 
 
-
-
-
-
-// =================================
-// 3. Library Display
-// =================================
-
-
-
-const wordList =
+const addButton =
     document.getElementById(
-        "word-list"
+        "add-word-btn"
     );
 
 
-
-if(wordList){
-
+if(addButton){
 
 
-    const words =
-        getVocabulary();
+    addButton.addEventListener(
+        "click",
+        async function(){
 
 
-
-
-    const count =
-        document.getElementById(
-            "word-count"
-        );
+            const word =
+                document.getElementById(
+                    "new-word"
+                ).value.trim();
 
 
 
-    if(count){
-
-
-        count.innerText =
-            `${words.length} Words`;
-
-
-    }
+            const meaning =
+                document.getElementById(
+                    "new-meaning"
+                ).value.trim();
 
 
 
+            const category =
+                document.getElementById(
+                    "new-category"
+                ).value;
 
 
 
-    words.forEach(
+            const level =
+                document.getElementById(
+                    "new-level"
+                ).value;
 
-        function(item){
+
+
+            if(!word || !meaning){
+
+                alert(
+                    "Please enter word and meaning."
+                );
+
+                return;
+
+            }
 
 
 
-            const row =
-                document.createElement(
-                    "article"
+            const success =
+                await saveImportedVocabulary([
+
+                    {
+
+                        word: word,
+
+                        meaning: meaning,
+
+                        category: category,
+
+                        level: level
+
+                    }
+
+                ]);
+
+
+
+            if(success){
+
+
+                alert(
+                    "Vocabulary added successfully!"
                 );
 
 
-
-            row.className =
-                "word-row";
-
-
+                document.getElementById(
+                    "new-word"
+                ).value = "";
 
 
-
-            row.innerHTML = `
-
-
-                <div class="word-info">
+                document.getElementById(
+                    "new-meaning"
+                ).value = "";
 
 
-                    <h3>
-                    ${item.word}
-                    </h3>
-
-
-                    <p>
-                    ${item.meaning}
-                    </p>
-
-
-                </div>
-
-
-
-
-                <div class="word-tag">
-
-
-                    <span>
-                    ${item.level || ""}
-                    </span>
-
-
-                    <span>
-                    ${item.category || ""}
-                    </span>
-
-
-                </div>
-
-
-            `;
-
-
-
-
-            wordList.appendChild(row);
+            }
 
 
 
         }
-
-
     );
-
 
 
 }
