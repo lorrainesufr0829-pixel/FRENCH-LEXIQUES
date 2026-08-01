@@ -6,24 +6,31 @@ console.log("storage.js loaded");
 const STORAGE_KEY = "lexique_vocabulary";
 
 
-function getVocabulary(){
+async function getVocabulary(){
+
+    const { data, error } = await window.supabaseClient
+        .from("vocabulary")
+        .select("*")
+        .order("created_at", {
+            ascending: false
+        });
 
 
-    const data = localStorage.getItem(STORAGE_KEY);
+    if(error){
 
-
-    if(!data){
+        console.error(
+            "Get vocabulary error:",
+            error
+        );
 
         return [];
 
     }
 
 
-    return JSON.parse(data);
-
+    return data || [];
 
 }
-
 
 
 
@@ -108,3 +115,16 @@ saveVocabulary(merged);
 
 
 }
+
+async function testDatabase(){
+
+    const words = await getVocabulary();
+
+    console.log(
+        "Supabase vocabulary:",
+        words
+    );
+
+}
+
+testDatabase();
