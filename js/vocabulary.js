@@ -249,37 +249,41 @@ if (vocabularyFileInput) {
 
 
                 const importedWords =
-                    rows.map(
-                        function(item){
+rows.map(
+function(item){
+
+
+return {
+
+
+word:
+item.Word ||
+item.word ||
+item.French ||
+item.Vocabulary ||
+"",
 
 
 
-                            return {
+meaning:
+item.Meaning ||
+item.meaning ||
+item.Translation ||
+item.Chinese ||
+"",
 
 
-                                word:
-                                item.Word || "",
+
+category:"",
+
+level:""
 
 
-                                meaning:
-                                item.Meaning || "",
+};
 
 
-                                category:
-                                "",
 
-
-                                level:
-                                ""
-
-
-                            };
-
-
-                        }
-
-                    );
-
+});
 
 
 
