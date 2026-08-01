@@ -251,3 +251,125 @@ wordList.appendChild(row);
 
 
 }
+
+// ================================
+// Import Excel Vocabulary
+// ================================
+
+
+const fileInput = document.getElementById(
+"file-upload"
+);
+
+
+
+if(fileInput){
+
+
+fileInput.addEventListener(
+"change",
+function(event){
+
+
+const file =
+event.target.files[0];
+
+
+if(!file){
+
+return;
+
+}
+
+
+
+const reader =
+new FileReader();
+
+
+
+reader.onload = function(e){
+
+
+
+const data =
+new Uint8Array(
+e.target.result
+);
+
+
+
+const workbook =
+XLSX.read(
+data,
+{
+type:"array"
+}
+);
+
+
+
+const sheet =
+workbook.Sheets[
+workbook.SheetNames[0]
+];
+
+
+
+const rows =
+XLSX.utils.sheet_to_json(
+sheet
+);
+
+
+
+
+
+const vocabularyList =
+rows.map(item=>({
+
+
+word:item.Word,
+
+
+meaning:item.Meaning,
+
+
+category:"",
+
+
+level:""
+
+
+}));
+
+
+
+
+
+saveImportedVocabulary(
+vocabularyList
+);
+
+
+
+alert(
+`${vocabularyList.length} words imported successfully!`
+);
+
+
+
+};
+
+
+
+reader.readAsArrayBuffer(file);
+
+
+
+}
+
+);
+
+
+}

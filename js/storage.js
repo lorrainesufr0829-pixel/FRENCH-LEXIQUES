@@ -73,3 +73,24 @@ function addVocabulary(word){
 
 
 }
+
+function saveImportedVocabulary(newWords){
+
+
+const oldWords =
+getVocabulary();
+
+
+
+const merged =
+[
+...oldWords,
+...newWords
+];
+
+
+
+saveVocabulary(merged);
+
+
+}
