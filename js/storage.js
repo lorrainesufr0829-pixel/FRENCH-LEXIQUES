@@ -7,8 +7,6 @@ const STORAGE_KEY = "lexique_vocabulary";
 
 
 
-
-
 function getVocabulary(){
 
 
