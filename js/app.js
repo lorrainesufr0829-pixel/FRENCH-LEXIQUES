@@ -10,16 +10,22 @@ async function loadLibrary() {
 
     document.getElementById("word-count").textContent =
         `${words.length} Words`;
-        
+
 
     words.forEach(word => {
 
-        wordList.innerHTML += `
-            <div class="word-card">
-                <h3>${word.word ?? ""}</h3>
-                <p>${word.meaning ?? ""}</p>
-            </div>
-        `;
+      const card = document.createElement("div");
+
+card.style.border = "1px solid red";
+card.style.padding = "10px";
+card.style.margin = "10px";
+
+card.innerHTML = `
+<h3>${word.word}</h3>
+<p>${word.meaning}</p>
+`;
+
+wordList.appendChild(card);
 
     });
 
