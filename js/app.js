@@ -6,10 +6,11 @@ async function loadLibrary() {
 
     const words = await getVocabulary();
 
+    console.log("WORDS:", words);
+
     document.getElementById("word-count").textContent =
         `${words.length} Words`;
-
-    wordList.innerHTML = "";
+        
 
     words.forEach(word => {
 
