@@ -2,33 +2,20 @@ async function loadLibrary() {
 
     const wordList = document.getElementById("word-list");
 
+    console.log("wordList =", wordList);
+
     if (!wordList) return;
 
     const words = await getVocabulary();
 
     console.log("WORDS:", words);
 
-    document.getElementById("word-count").textContent =
-        `${words.length} Words`;
+    // 先只测试插入一个元素
+    const card = document.createElement("div");
+    card.textContent = "TEST";
+    card.style.border = "1px solid red";
 
-
-    words.forEach(word => {
-
-      const card = document.createElement("div");
-
-card.style.border = "1px solid red";
-card.style.padding = "10px";
-card.style.margin = "10px";
-
-card.innerHTML = `
-<h3>${word.word}</h3>
-<p>${word.meaning}</p>
-`;
-
-wordList.appendChild(card);
-
-    });
-
+    wordList.appendChild(card);
 }
 
 document.addEventListener("DOMContentLoaded", loadLibrary);
