@@ -264,3 +264,38 @@ if(addButton){
 
 
 }
+// ===============================
+// Load Library
+// ===============================
+
+async function loadLibrary() {
+
+    const words = await getVocabulary();
+
+    const wordList = document.getElementById("word-list");
+    const wordCount = document.getElementById("word-count");
+
+    if (!wordList) return;
+
+    wordList.innerHTML = "";
+    wordCount.textContent = `${words.length} Words`;
+
+    words.forEach(word => {
+
+        const card = document.createElement("div");
+        card.className = "word-card";
+
+        card.innerHTML = `
+            <h3>${word.word || ""}</h3>
+            <p>${word.meaning || ""}</p>
+        `;
+
+        wordList.appendChild(card);
+
+    });
+
+}
+
+if (document.getElementById("word-list")) {
+    loadLibrary();
+}
