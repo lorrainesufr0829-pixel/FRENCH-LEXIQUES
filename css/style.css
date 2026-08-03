@@ -1460,16 +1460,58 @@ text-align:left;
 }
 
 
-/* =====================================
-   Statistics Only
-   ===================================== */
+/* ==========================
+   Statistics
+========================== */
 
 
-.statistics-page {
+.statistics-page{
 
     display:flex;
 
     flex-direction:column;
+
+    gap:50px;
+
+}
+
+
+
+.statistics-section{
+
+    padding-bottom:35px;
+
+    border-bottom:1px solid #e8e8e8;
+
+}
+
+
+
+.statistics-section h2{
+
+    font-size:28px;
+
+    margin-bottom:25px;
+
+}
+
+
+
+.statistics-number{
+
+    font-size:52px;
+
+    font-weight:700;
+
+}
+
+
+
+.statistics-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
 
     gap:30px;
 
@@ -1477,26 +1519,49 @@ text-align:left;
 
 
 
+.statistics-item{
 
-.progress-track {
-
-    width:100%;
-
-    height:16px;
-
-    background:#eeeeee;
-
-    border-radius:20px;
-
-    overflow:hidden;
-
-    margin-top:20px;
+    padding:20px 0;
 
 }
 
 
 
-.progress-value {
+.statistics-item span{
+
+    display:block;
+
+    color:#777;
+
+    margin-bottom:10px;
+
+}
+
+
+
+.statistics-item strong{
+
+    font-size:30px;
+
+}
+
+
+
+.progress-track{
+
+    width:100%;
+
+    height:12px;
+
+    background:#eee;
+
+    border-radius:10px;
+
+}
+
+
+
+.progress-value{
 
     width:20%;
 
@@ -1506,33 +1571,12 @@ text-align:left;
 
 
 
+@media(max-width:800px){
 
+.statistics-grid{
 
-.statistics-page .word-card p {
-
-    margin:10px 0;
-
-}
-
-
-
-
-.activity-row {
-
-    display:flex;
-
-    justify-content:space-between;
-
-    padding:15px 0;
-
-    border-bottom:1px solid #eee;
+grid-template-columns:1fr;
 
 }
-
-
-
-.activity-row:last-child {
-
-    border-bottom:none;
 
 }
