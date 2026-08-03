@@ -1,87 +1,61 @@
 // =====================================
 // LEXIQUE
-// Library Page
+// Global App
 // =====================================
 
-document.addEventListener("DOMContentLoaded", async function () {
+document.addEventListener("DOMContentLoaded", async () => {
 
-    const wordList = document.getElementById("word-list");
+    await updateProgress();
 
-    if (!wordList) {
-        return;
-    }
+});
 
-    const wordCount = document.getElementById("word-count");
+
+
+// =====================================
+// Update Top Progress
+// =====================================
+
+async function updateProgress() {
 
     try {
 
         const words = await getVocabulary();
 
-        console.log("WORDS:", words);
+        const totalWords = words.length;
 
-        wordCount.textContent = `${words.length} Words`;
+        // Words Learned
+        document.querySelectorAll("#words-learned")
+            .forEach(el => {
+                el.textContent = totalWords;
+            });
 
-        wordList.innerHTML = "";
+        // Today's Review（先固定）
+        document.querySelectorAll("#today-review")
+            .forEach(el => {
+                el.textContent = Math.min(20, totalWords) + " Words";
+            });
 
-        words.forEach(function (word) {
+        // Level（先根据数量计算）
+        document.querySelectorAll("#current-level")
+            .forEach(el => {
 
-            const card = document.createElement("div");
+                let level = "A1";
 
-            card.className = "word-card";
+                if (totalWords >= 300) level = "A2";
+                if (totalWords >= 600) level = "B1";
+                if (totalWords >= 1200) level = "B2";
+                if (totalWords >= 2000) level = "C1";
 
-            card.innerHTML = `
-                <h3>${word.word || ""}</h3>
-                <p>${word.meaning || ""}</p>
-                <div>
-                    ${word.category || ""}
-                    ${word.level || ""}
-                </div>
-            `;
+                el.textContent = level;
 
-            wordList.appendChild(card);
-
-        });
-
-
-        console.log(
-            "Rendered cards:",
-            wordList.children.length
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "Library loading error:",
-            error
-        );
+            });
 
     }
 
-});
+    catch(err){
 
+        console.error(err);
 
-// =====================================
-// Home Dashboard
-// Words Learned
-// =====================================
-
-async function loadWordsLearned() {
-
-    const wordsLearned = document.getElementById("words-learned");
-
-    if (!wordsLearned) {
-        return;
     }
-
-    const words = await getVocabulary();
-
-    wordsLearned.textContent = words.length;
 
 }
-
-
-document.addEventListener(
-    "DOMContentLoaded",
-    loadWordsLearned
-);
