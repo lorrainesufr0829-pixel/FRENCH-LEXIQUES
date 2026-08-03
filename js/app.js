@@ -59,3 +59,29 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
 });
+
+
+// =====================================
+// Home Dashboard
+// Words Learned
+// =====================================
+
+async function loadWordsLearned() {
+
+    const wordsLearned = document.getElementById("words-learned");
+
+    if (!wordsLearned) {
+        return;
+    }
+
+    const words = await getVocabulary();
+
+    wordsLearned.textContent = words.length;
+
+}
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    loadWordsLearned
+);
