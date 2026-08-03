@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const words = await getVocabulary();
 
-    console.log("WORDS:", words);
+    console.log("FIRST WORD:", words[0]);
 
     wordCount.textContent = `${words.length} Words`;
 
