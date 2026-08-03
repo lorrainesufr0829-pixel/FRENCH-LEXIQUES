@@ -19,7 +19,7 @@ console.log("storage.js loaded");
 
 async function getVocabulary() {
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from("vocabulary")
         .select("*")
         .order("created_at", { ascending: true });
@@ -48,7 +48,7 @@ async function getVocabulary() {
 async function addVocabulary(words) {
 
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from("vocabulary")
         .insert(words)
         .select();
@@ -78,7 +78,7 @@ async function addVocabulary(words) {
 async function deleteVocabulary(id) {
 
 
-    const { error } = await supabase
+    const { error } = await supabaseClient
         .from("vocabulary")
         .delete()
         .eq("id", id);
@@ -115,7 +115,7 @@ async function deleteVocabulary(id) {
 async function getUserProgress() {
 
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
 
         .from("user_progress")
 
@@ -174,7 +174,7 @@ async function updateUserProgress(updates) {
 
 
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
 
         .from("user_progress")
 

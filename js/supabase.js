@@ -1,21 +1,29 @@
 // =====================================
-// LEXIQUE
-// Supabase Configuration
+// Supabase Client
 // =====================================
 
-const SUPABASE_URL = "https://uccznppecrkdbgykrucx.supabase.co/";
 
-const SUPABASE_ANON_KEY = "sb_publishable_TWW6H1Xuq8gXp1xgDRKSbA_Gq2aNXwA";
+const SUPABASE_URL = 
+"https://uccznppecrkdbgykrucx.supabase.co";
 
 
-window.supabaseClient = window.supabase.createClient(
+const SUPABASE_KEY =
+"sb_publishable_TWW6H1Xuq8gXp1xgDRKSbA_Gq2aNXwA";
+
+
+
+const supabaseClient = window.supabase.createClient(
     SUPABASE_URL,
-    SUPABASE_ANON_KEY
+    SUPABASE_KEY
 );
+
+
+
+window.supabaseClient = supabaseClient;
 
 
 
 console.log(
     "Supabase client:",
-    window.supabaseClient
+    supabaseClient
 );
