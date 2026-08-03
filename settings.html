@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Settings | LEXIQUE</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+<!-- =====================================
+Header
+===================================== -->
+
+<header class="site-header">
+
+<h1>LEXIQUE</h1>
+
+<p>French Vocabulary Learning Platform</p>
+
+</header>
+
+
+
+
+
+<!-- =====================================
+Learning Progress
+===================================== -->
+
+<section class="learning-progress">
+
+<div class="progress-item">
+
+<span>Words Learned</span>
+
+<strong id="words-learned">0</strong>
+
+</div>
+
+<div class="progress-item">
+
+<span>Today's Review</span>
+
+<strong>20 Words</strong>
+
+</div>
+
+<div class="progress-item">
+
+<span>Memory Streak</span>
+
+<strong>12 Days</strong>
+
+</div>
+
+<div class="progress-item">
+
+<span>Level</span>
+
+<strong>B2 → C1</strong>
+
+</div>
+
+</section>
+
+
+
+
+
+<!-- =====================================
+Navigation
+===================================== -->
+
+<nav class="main-navigation">
+
+<ul>
+
+<li><a href="index.html">HOME</a></li>
+
+<li><a href="library.html">LIBRARY</a></li>
+
+<li><a href="study.html">STUDY</a></li>
+
+<li><a href="import.html">IMPORT</a></li>
+
+<li><a href="statistics.html">STATISTICS</a></li>
+
+<li><a href="settings.html" class="active">SETTINGS</a></li>
+
+</ul>
+
+</nav>
+
+
+
+
+
+<!-- =====================================
+Main
+===================================== -->
+
+<main class="main-content">
+
+<h2 class="page-title">Settings</h2>
+
+<div class="settings-layout">
+
+
+
+<!-- ==========================
+Sidebar
+========================== -->
+
+<aside class="settings-sidebar">
+
+<button class="settings-tab active"
+data-tab="appearance">
+
+🎨 Appearance
+
+</button>
+
+
+
+<button class="settings-tab"
+data-tab="language">
+
+🌐 Language
+
+</button>
+
+
+
+<button class="settings-tab"
+data-tab="display">
+
+🖥 Display
+
+</button>
+
+
+
+<button class="settings-tab"
+data-tab="learning">
+
+📚 Learning
+
+</button>
+
+
+
+<button class="settings-tab"
+data-tab="sync">
+
+☁ Synchronization
+
+</button>
+
+
+
+<button class="settings-tab"
+data-tab="library">
+
+💾 Library
+
+</button>
+
+
+
+<button class="settings-tab"
+data-tab="about">
+
+ℹ About
+
+</button>
+
+</aside>
+
+
+
+
+
+<!-- ==========================
+Content
+========================== -->
+
+<section class="settings-content">
+
+
+
+<!-- =====================================
+Appearance
+===================================== -->
+
+<div class="settings-panel active"
+id="appearance">
+
+<h3>Appearance</h3>
+
+<div class="setting-item">
+
+<label>Theme</label>
+
+<select id="theme-select">
+
+<option>Light</option>
+
+<option>Dark</option>
+
+</select>
+
+</div>
+
+
+
+<div class="setting-item">
+
+<label>Accent Color</label>
+
+<select id="accent-select">
+
+<option>Green</option>
+
+<option>Blue</option>
+
+<option>Purple</option>
+
+<option>Orange</option>
+
+</select>
+
+</div>
+
+
+
+<div class="setting-item">
+
+<label>English Font</label>
+
+<select>
+
+<option>Inter</option>
+
+<option>Poppins</option>
+
+<option>Roboto</option>
+
+</select>
+
+</div>
+
+
+
+<div class="setting-item">
+
+<label>French Font</label>
+
+<select>
+
+<option>EB Garamond</option>
+
+<option>Libre Baskerville</option>
+
+<option>Cormorant Garamond</option>
+
+</select>
+
+</div>
+
+
+
+<div class="setting-item">
+
+<label>Chinese Font</label>
+
+<select>
+
+<option>Noto Sans SC</option>
+
+<option>Source Han Sans</option>
+
+<option>LXGW WenKai</option>
+
+</select>
+
+</div>
+
+</div>
+
+
+
+<!-- =====================================
+Language
+===================================== -->
+
+<div class="settings-panel"
+id="language">
+
+<h3>Language</h3>
+
+<div class="setting-item">
+
+<label>Interface Language</label>
+
+<select id="language-select">
+
+<option>English</option>
+
+<option>Français</option>
+
+<option>中文</option>
+
+</select>
+
+</div>
+
+</div>
+
+
+
+<!-- =====================================
+Display
+===================================== -->
+
+<div class="settings-panel"
+id="display">
+
+<h3>Display</h3>
+
+<div class="setting-checkbox">
+
+<label>
+
+<input type="checkbox" checked>
+
+Show IPA
+
+</label>
+
+</div>
+
+<div class="setting-checkbox">
+
+<label>
+
+<input type="checkbox" checked>
+
+Show Part of Speech
+
+</label>
+
+</div>
+
+<div class="setting-checkbox">
+
+<label>
+
+<input type="checkbox" checked>
+
+Show Example Sentence
+
+</label>
+
+</div>
+
+<div class="setting-item">
+
+<label>Card Density</label>
+
+<select>
+
+<option>Comfortable</option>
+
+<option>Compact</option>
+
+</select>
+
+</div>
+
+</div>
+
+<!-- =====================================
+Learning
+===================================== -->
+
+<div class="settings-panel"
+id="learning">
+
+<h3>Learning</h3>
+
+<div class="setting-item">
+
+<label>Daily Goal</label>
+
+<input
+type="number"
+value="20"
+min="1"
+max="200">
+
+</div>
+
+
+
+<div class="setting-item">
+
+<label>Review Reminder</label>
+
+<select>
+
+<option>On</option>
+
+<option>Off</option>
+
+</select>
+
+</div>
+
+
+
+<div class="setting-item">
+
+<label>Review Order</label>
+
+<select>
+
+<option>Newest First</option>
+
+<option>Oldest First</option>
+
+<option>Random</option>
+
+</select>
+
+</div>
+
+</div>
+
+
+
+
+
+<!-- =====================================
+Synchronization
+===================================== -->
+
+<div class="settings-panel"
+id="sync">
+
+<h3>Synchronization</h3>
+
+<div class="setting-item">
+
+<label>Cloud Status</label>
+
+<span class="status-badge">
+
+🟢 Connected
+
+</span>
+
+</div>
+
+
+
+<div class="setting-item">
+
+<label>Last Sync</label>
+
+<span>
+
+Today · 14:32
+
+</span>
+
+</div>
+
+
+
+<div class="setting-item">
+
+<button class="primary-button">
+
+Sync Now
+
+</button>
+
+</div>
+
+</div>
+
+
+
+
+
+
+<!-- =====================================
+Library
+===================================== -->
+
+<div class="settings-panel"
+id="library">
+
+<h3>Library</h3>
+
+<div class="setting-item">
+
+<button class="secondary-button">
+
+Import Vocabulary
+
+</button>
+
+</div>
+
+
+
+<div class="setting-item">
+
+<button class="secondary-button">
+
+Export Vocabulary
+
+</button>
+
+</div>
+
+
+
+<div class="setting-item">
+
+<button class="secondary-button">
+
+Download Backup
+
+</button>
+
+</div>
+
+</div>
+
+
+
+
+
+
+
+<!-- =====================================
+About
+===================================== -->
+
+<div class="settings-panel"
+id="about">
+
+<h3>About</h3>
+
+<div class="setting-item">
+
+<label>Version</label>
+
+<span>
+
+1.0.0
+
+</span>
+
+</div>
+
+
+
+<div class="setting-item">
+
+<label>Vocabulary</label>
+
+<span id="settings-word-count">
+
+608 Words
+
+</span>
+
+</div>
+
+
+
+<div class="setting-item">
+
+<label>Platform</label>
+
+<span>
+
+Supabase
+
+</span>
+
+</div>
+
+
+
+<div class="setting-item">
+
+<label>Developer</label>
+
+<span>
+
+Lorraine
+
+</span>
+
+</div>
+
+</div>
+
+
+
+
+
+</section>
+
+</div>
+
+</main>
+
+
+
+
+
+<!-- =====================================
+Sidebar Switch
+===================================== -->
+
+<script>
+
+const tabs=document.querySelectorAll(".settings-tab");
+
+const panels=document.querySelectorAll(".settings-panel");
+
+tabs.forEach(tab=>{
+
+tab.addEventListener("click",()=>{
+
+tabs.forEach(t=>t.classList.remove("active"));
+
+panels.forEach(p=>p.classList.remove("active"));
+
+tab.classList.add("active");
+
+document
+
+.getElementById(tab.dataset.tab)
+
+.classList.add("active");
+
+});
+
+});
+
+</script>
+
+</body>
+
+</html>
