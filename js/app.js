@@ -1,61 +1,174 @@
 // =====================================
 // LEXIQUE
-// Global App
+// Global Progress Controller
 // =====================================
 
-document.addEventListener("DOMContentLoaded", async () => {
 
-    await updateProgress();
+document.addEventListener(
+    "DOMContentLoaded",
+    async function(){
 
-});
+        await updateProgress();
+
+    }
+);
+
 
 
 
 // =====================================
-// Update Top Progress
+// Update Header Progress
 // =====================================
 
-async function updateProgress() {
 
-    try {
+async function updateProgress(){
 
-        const words = await getVocabulary();
 
-        const totalWords = words.length;
+    try{
 
+
+        const progress = await getUserProgress();
+
+
+
+        if(!progress){
+
+            console.warn(
+                "No user progress found"
+            );
+
+            return;
+
+        }
+
+
+
+
+        // -------------------------------
         // Words Learned
-        document.querySelectorAll("#words-learned")
-            .forEach(el => {
-                el.textContent = totalWords;
-            });
+        // -------------------------------
 
-        // Today's Review（先固定）
-        document.querySelectorAll("#today-review")
-            .forEach(el => {
-                el.textContent = Math.min(20, totalWords) + " Words";
-            });
+        document
+        .querySelectorAll("#words-learned")
+        .forEach(function(el){
 
-        // Level（先根据数量计算）
-        document.querySelectorAll("#current-level")
-            .forEach(el => {
+            el.textContent =
+            progress.learned_today;
 
-                let level = "A1";
+        });
 
-                if (totalWords >= 300) level = "A2";
-                if (totalWords >= 600) level = "B1";
-                if (totalWords >= 1200) level = "B2";
-                if (totalWords >= 2000) level = "C1";
 
-                el.textContent = level;
 
-            });
+
+
+        // -------------------------------
+        // Today's Review
+        // -------------------------------
+
+        document
+        .querySelectorAll("#today-review")
+        .forEach(function(el){
+
+            el.textContent =
+            progress.reviewed_today
+            + " Words";
+
+        });
+
+
+
+
+
+
+        // -------------------------------
+        // Memory Streak
+        // -------------------------------
+
+        document
+        .querySelectorAll("#memory-streak")
+        .forEach(function(el){
+
+            el.textContent =
+            progress.streak
+            + " Days";
+
+        });
+
+
+
+
+
+
+        // -------------------------------
+        // Level
+        // -------------------------------
+
+
+        let level = "A1";
+
+
+        if(progress.mastered_words >= 300){
+
+            level = "A2";
+
+        }
+
+
+        if(progress.mastered_words >= 600){
+
+            level = "B1";
+
+        }
+
+
+        if(progress.mastered_words >= 1200){
+
+            level = "B2";
+
+        }
+
+
+        if(progress.mastered_words >= 2000){
+
+            level = "C1";
+
+        }
+
+
+
+
+        document
+        .querySelectorAll("#current-level")
+        .forEach(function(el){
+
+            el.textContent = level;
+
+        });
+
+
+
+
+        console.log(
+            "Progress Loaded:",
+            progress
+        );
+
+
 
     }
 
-    catch(err){
 
-        console.error(err);
+    catch(error){
+
+
+        console.error(
+            "Progress update failed:",
+            error
+        );
+
 
     }
+
+
 
 }
