@@ -1460,153 +1460,30 @@ text-align:left;
 }
 
 
-/* ==========================
-   Statistics
-========================== */
-
-
-.statistics-page{
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:50px;
-
-}
-
-
-
-.statistics-section{
-
-    padding-bottom:35px;
-
-    border-bottom:1px solid #e8e8e8;
-
-}
-
-
-
-.statistics-section h2{
-
-    font-size:28px;
-
-    margin-bottom:25px;
-
-}
-
-
-
-.statistics-number{
-
-    font-size:52px;
-
-    font-weight:700;
-
-}
-
-
-
-.statistics-grid{
-
-    display:grid;
-
-    grid-template-columns:repeat(3,1fr);
-
-    gap:30px;
-
-}
-
-
-
-.statistics-item{
-
-    padding:20px 0;
-
-}
-
-
-
-.statistics-item span{
-
-    display:block;
-
-    color:#777;
-
-    margin-bottom:10px;
-
-}
-
-
-
-.statistics-item strong{
-
-    font-size:30px;
-
-}
-
-
-
-.progress-track{
-
-    width:100%;
-
-    height:12px;
-
-    background:#eee;
-
-    border-radius:10px;
-
-}
-
-
-
-.progress-value{
-
-    width:20%;
-
-    height:100%;
-
-}
-
-
-
-@media(max-width:800px){
-
-.statistics-grid{
-
-grid-template-columns:1fr;
-
-}
-
-}
-
-/* =====================================
-   Statistics Layout
-===================================== */
+/* ===============================
+   STATISTICS LAYOUT FIX
+================================ */
 
 
 .statistics-page {
 
-    display:flex;
-
-    flex-direction:column;
-
-    gap:40px;
+    width:100%;
 
 }
 
 
 
-/* Top 3 statistics cards */
+/* First row */
 
 .statistics-overview {
 
-    display:grid;
+    display:grid !important;
 
-    grid-template-columns:repeat(3, 1fr);
+    grid-template-columns:repeat(3, 1fr) !important;
 
     gap:25px;
+
+    margin-top:30px;
 
 }
 
@@ -1614,53 +1491,26 @@ grid-template-columns:1fr;
 
 .statistics-module {
 
-    background:white;
-
     padding:30px;
+
+    background:white;
 
     border-radius:15px;
 
-    box-shadow:
-    0 5px 20px rgba(0,0,0,0.08);
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:15px;
-
-}
-
-
-
-.statistics-module span {
-
-    color:#777;
-
-    font-size:16px;
-
-}
-
-
-
-.statistics-module strong {
-
-    font-size:40px;
-
 }
 
 
 
 
 
+/* Distribution */
 
-/* Vocabulary Distribution */
 
 .distribution-grid {
 
-    display:grid;
+    display:grid !important;
 
-    grid-template-columns:repeat(2,1fr);
+    grid-template-columns:repeat(2, 1fr) !important;
 
     gap:25px;
 
@@ -1676,22 +1526,20 @@ grid-template-columns:1fr;
 
     border-radius:15px;
 
-    box-shadow:
-    0 5px 20px rgba(0,0,0,0.08);
-
 }
 
 
 
 
 
-/* Learning Activity */
+/* Activity */
+
 
 .activity-grid {
 
-    display:grid;
+    display:grid !important;
 
-    grid-template-columns:repeat(3,1fr);
+    grid-template-columns:repeat(3, 1fr) !important;
 
     gap:25px;
 
@@ -1707,12 +1555,6 @@ grid-template-columns:1fr;
 
     border-radius:15px;
 
-    display:flex;
-
-    flex-direction:column;
-
-    gap:10px;
-
 }
 
 
@@ -1721,24 +1563,21 @@ grid-template-columns:1fr;
 
 @media(max-width:900px){
 
-    .statistics-overview {
 
-        grid-template-columns:1fr;
+.statistics-overview,
+.activity-grid{
 
-    }
+    grid-template-columns:1fr !important;
 
-
-    .distribution-grid {
-
-        grid-template-columns:1fr;
-
-    }
+}
 
 
-    .activity-grid {
 
-        grid-template-columns:1fr;
+.distribution-grid{
 
-    }
+    grid-template-columns:1fr !important;
+
+}
+
 
 }
