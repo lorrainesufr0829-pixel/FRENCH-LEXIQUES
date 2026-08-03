@@ -1461,108 +1461,36 @@ text-align:left;
 
 
 /* =====================================
-   STATISTICS PAGE
+   Statistics Only
    ===================================== */
 
 
-/* Main statistics layout */
-
 .statistics-page {
 
-    display: flex;
+    display:flex;
 
-    flex-direction: column;
+    flex-direction:column;
 
-    gap: 35px;
-
-}
-
-
-
-/* Statistics section */
-
-.statistics-page .featured-word {
-
-    background: white;
-
-    padding: 35px;
-
-    border-radius: 18px;
-
-    box-shadow:
-    0 8px 25px rgba(0,0,0,0.08);
+    gap:30px;
 
 }
 
 
-
-.statistics-page .featured-word h2 {
-
-    margin-top: 0;
-
-    margin-bottom: 25px;
-
-    font-size: 28px;
-
-}
-
-
-
-
-
-/* Word cards inside statistics */
-
-.statistics-page .word-card {
-
-    background: #fafafa;
-
-    padding: 30px;
-
-    border-radius: 15px;
-
-}
-
-
-
-
-
-.statistics-page .word-card h3 {
-
-    font-size: 32px;
-
-    margin-top: 0;
-
-}
-
-
-
-.statistics-page .word-card p {
-
-    font-size: 18px;
-
-    line-height: 1.6;
-
-}
-
-
-
-
-
-
-/* Progress bar */
 
 
 .progress-track {
 
     width:100%;
 
-    height:18px;
+    height:16px;
 
     background:#eeeeee;
 
     border-radius:20px;
 
     overflow:hidden;
+
+    margin-top:20px;
 
 }
 
@@ -1574,15 +1502,20 @@ text-align:left;
 
     height:100%;
 
-    border-radius:20px;
-
 }
 
 
 
 
 
-/* Activity */
+.statistics-page .word-card p {
+
+    margin:10px 0;
+
+}
+
+
+
 
 
 .activity-row {
@@ -1593,34 +1526,14 @@ text-align:left;
 
     padding:15px 0;
 
-    border-bottom:1px solid #eeeeee;
+    border-bottom:1px solid #eee;
 
 }
 
 
 
-.activity-row strong {
+.activity-row:last-child {
 
-    font-size:18px;
-
-}
-
-
-
-
-
-
-/* Statistics responsive */
-
-
-@media(max-width:800px){
-
-
-    .statistics-page .word-card h3 {
-
-        font-size:24px;
-
-    }
-
+    border-bottom:none;
 
 }
