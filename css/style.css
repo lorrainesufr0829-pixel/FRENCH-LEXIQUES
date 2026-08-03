@@ -1465,7 +1465,7 @@ text-align:left;
    ===================================== */
 
 
-/* Main container */
+/* Main statistics layout */
 
 .statistics-page {
 
@@ -1473,7 +1473,36 @@ text-align:left;
 
     flex-direction: column;
 
-    gap: 40px;
+    gap: 35px;
+
+}
+
+
+
+/* Statistics section */
+
+.statistics-page .featured-word {
+
+    background: white;
+
+    padding: 35px;
+
+    border-radius: 18px;
+
+    box-shadow:
+    0 8px 25px rgba(0,0,0,0.08);
+
+}
+
+
+
+.statistics-page .featured-word h2 {
+
+    margin-top: 0;
+
+    margin-bottom: 25px;
+
+    font-size: 28px;
 
 }
 
@@ -1481,49 +1510,15 @@ text-align:left;
 
 
 
-/* Progress bar */
-
-.progress-track {
-
-    width: 100%;
-
-    height: 16px;
-
-    background: #eeeeee;
-
-    border-radius: 20px;
-
-    overflow: hidden;
-
-    margin-top: 20px;
-
-}
-
-
-
-.progress-value {
-
-    width: 20%;
-
-    height: 100%;
-
-    border-radius: 20px;
-
-}
-
-
-
-
-
-/* Statistics word cards */
+/* Word cards inside statistics */
 
 .statistics-page .word-card {
 
-    display: flex;
+    background: #fafafa;
 
-    flex-direction: column;
+    padding: 30px;
 
-    gap: 15px;
+    border-radius: 15px;
 
 }
 
@@ -1535,46 +1530,17 @@ text-align:left;
 
     font-size: 32px;
 
-    margin-bottom: 10px;
+    margin-top: 0;
 
 }
-
-
 
 
 
 .statistics-page .word-card p {
 
-    margin: 5px 0;
-
     font-size: 18px;
 
-}
-
-
-
-
-
-/* Level / Category lists */
-
-
-.statistics-page .word-card ul {
-
-    list-style: none;
-
-    padding: 0;
-
-    margin: 0;
-
-}
-
-
-
-.statistics-page .word-card li {
-
-    padding: 12px 0;
-
-    border-bottom: 1px solid #eeeeee;
+    line-height: 1.6;
 
 }
 
@@ -1582,20 +1548,33 @@ text-align:left;
 
 
 
-/* Activity rows */
+
+/* Progress bar */
 
 
-.activity-item {
+.progress-track {
 
-    display: flex;
+    width:100%;
 
-    justify-content: space-between;
+    height:18px;
 
-    align-items: center;
+    background:#eeeeee;
 
-    padding: 15px 0;
+    border-radius:20px;
 
-    border-bottom: 1px solid #eeeeee;
+    overflow:hidden;
+
+}
+
+
+
+.progress-value {
+
+    width:20%;
+
+    height:100%;
+
+    border-radius:20px;
 
 }
 
@@ -1603,9 +1582,26 @@ text-align:left;
 
 
 
-.activity-item strong {
+/* Activity */
 
-    font-size: 18px;
+
+.activity-row {
+
+    display:flex;
+
+    justify-content:space-between;
+
+    padding:15px 0;
+
+    border-bottom:1px solid #eeeeee;
+
+}
+
+
+
+.activity-row strong {
+
+    font-size:18px;
 
 }
 
@@ -1613,22 +1609,16 @@ text-align:left;
 
 
 
-/* Responsive */
+
+/* Statistics responsive */
 
 
-@media(max-width:768px){
-
-
-    .statistics-page {
-
-        gap:25px;
-
-    }
+@media(max-width:800px){
 
 
     .statistics-page .word-card h3 {
 
-        font-size:26px;
+        font-size:24px;
 
     }
 
