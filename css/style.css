@@ -1465,73 +1465,15 @@ text-align:left;
    ===================================== */
 
 
-/* Page Layout */
+/* Main container */
 
 .statistics-page {
 
-    padding: 40px;
-
-}
-
-
-
-
-/* =====================================
-   Summary Section
-   Reuse Home progress-item style
-   ===================================== */
-
-
-.progress-section {
-
-    display: grid;
-
-    grid-template-columns: repeat(4, 1fr);
-
-    gap: 25px;
-
-    margin-bottom: 50px;
-
-}
-
-
-
-.progress-item {
-
-    background: white;
-
-    padding: 30px;
-
-    border-radius: 15px;
-
-    box-shadow:
-    0 5px 20px rgba(0,0,0,0.08);
-
     display: flex;
 
     flex-direction: column;
 
-    gap: 12px;
-
-}
-
-
-
-.progress-item span {
-
-    font-size: 16px;
-
-    opacity: 0.7;
-
-}
-
-
-
-.progress-item strong {
-
-    font-size: 36px;
-
-    font-weight: 700;
+    gap: 40px;
 
 }
 
@@ -1539,64 +1481,13 @@ text-align:left;
 
 
 
+/* Progress bar */
 
-/* =====================================
-   Statistics Sections
-   ===================================== */
-
-
-.statistics-section {
-
-    background: white;
-
-    padding: 35px;
-
-    border-radius: 15px;
-
-    margin-bottom: 35px;
-
-    box-shadow:
-    0 5px 20px rgba(0,0,0,0.08);
-
-}
-
-
-
-.statistics-section h2 {
-
-    margin-top: 0;
-
-    margin-bottom: 25px;
-
-}
-
-
-
-
-
-
-/* =====================================
-   Progress Bar
-   ===================================== */
-
-
-.progress-box {
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 15px;
-
-}
-
-
-
-.progress-bar {
+.progress-track {
 
     width: 100%;
 
-    height: 18px;
+    height: 16px;
 
     background: #eeeeee;
 
@@ -1604,11 +1495,13 @@ text-align:left;
 
     overflow: hidden;
 
+    margin-top: 20px;
+
 }
 
 
 
-.progress-fill {
+.progress-value {
 
     width: 20%;
 
@@ -1622,73 +1515,9 @@ text-align:left;
 
 
 
+/* Statistics word cards */
 
-/* =====================================
-   Vocabulary Overview
-   ===================================== */
-
-
-.statistics-grid {
-
-    display: grid;
-
-    grid-template-columns: repeat(2,1fr);
-
-    gap: 25px;
-
-}
-
-
-
-.statistics-card {
-
-    padding: 25px;
-
-    border-radius: 12px;
-
-    background: #fafafa;
-
-}
-
-
-
-.statistics-card h3 {
-
-    margin-top: 0;
-
-}
-
-
-
-.statistics-card ul {
-
-    list-style: none;
-
-    padding: 0;
-
-}
-
-
-
-.statistics-card li {
-
-    padding: 10px 0;
-
-    border-bottom: 1px solid #eeeeee;
-
-}
-
-
-
-
-
-
-/* =====================================
-   Activity
-   ===================================== */
-
-
-.activity-list {
+.statistics-page .word-card {
 
     display: flex;
 
@@ -1700,25 +1529,73 @@ text-align:left;
 
 
 
-.activity-list div {
+
+
+.statistics-page .word-card h3 {
+
+    font-size: 32px;
+
+    margin-bottom: 10px;
+
+}
+
+
+
+
+
+.statistics-page .word-card p {
+
+    margin: 5px 0;
+
+    font-size: 18px;
+
+}
+
+
+
+
+
+/* Level / Category lists */
+
+
+.statistics-page .word-card ul {
+
+    list-style: none;
+
+    padding: 0;
+
+    margin: 0;
+
+}
+
+
+
+.statistics-page .word-card li {
+
+    padding: 12px 0;
+
+    border-bottom: 1px solid #eeeeee;
+
+}
+
+
+
+
+
+/* Activity rows */
+
+
+.activity-item {
 
     display: flex;
 
     justify-content: space-between;
 
-    padding: 15px 20px;
+    align-items: center;
 
-    background: #fafafa;
+    padding: 15px 0;
 
-    border-radius: 10px;
-
-}
-
-
-
-.activity-list span {
-
-    font-weight: bold;
+    border-bottom: 1px solid #eeeeee;
 
 }
 
@@ -1726,45 +1603,32 @@ text-align:left;
 
 
 
-/* =====================================
-   Responsive
-   ===================================== */
+.activity-item strong {
 
-
-@media(max-width:900px){
-
-
-    .progress-section {
-
-        grid-template-columns: repeat(2,1fr);
-
-    }
-
-
-    .statistics-grid {
-
-        grid-template-columns: 1fr;
-
-    }
-
+    font-size: 18px;
 
 }
 
 
 
-@media(max-width:600px){
+
+
+/* Responsive */
+
+
+@media(max-width:768px){
 
 
     .statistics-page {
 
-        padding:20px;
+        gap:25px;
 
     }
 
 
-    .progress-section {
+    .statistics-page .word-card h3 {
 
-        grid-template-columns:1fr;
+        font-size:26px;
 
     }
 
