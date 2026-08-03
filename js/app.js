@@ -13,31 +13,49 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const wordCount = document.getElementById("word-count");
 
-    const words = await getVocabulary();
+    try {
 
-    console.log("FIRST WORD:", words[0]);
+        const words = await getVocabulary();
 
-    wordCount.textContent = `${words.length} Words`;
+        console.log("WORDS:", words);
 
-    wordList.innerHTML = "";
+        wordCount.textContent = `${words.length} Words`;
 
-    words.forEach((word, index) => {
+        wordList.innerHTML = "";
 
-        console.log(index, word);
+        words.forEach(function (word) {
 
-        const card = document.createElement("div");
+            const card = document.createElement("div");
 
-        card.style.border = "1px solid #ddd";
-        card.style.padding = "12px";
-        card.style.marginBottom = "10px";
-        card.style.borderRadius = "8px";
-        card.style.background = "#fff";
+            card.className = "word-card";
 
-        // 这里只输出 word，先确认字段
-        card.textContent = word.word;
+            card.innerHTML = `
+                <h3>${word.word || ""}</h3>
+                <p>${word.meaning || ""}</p>
+                <div>
+                    ${word.category || ""}
+                    ${word.level || ""}
+                </div>
+            `;
 
-        wordList.appendChild(card);
+            wordList.appendChild(card);
 
-    });
+        });
+
+
+        console.log(
+            "Rendered cards:",
+            wordList.children.length
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Library loading error:",
+            error
+        );
+
+    }
 
 });
