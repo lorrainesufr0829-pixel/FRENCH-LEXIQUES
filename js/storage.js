@@ -110,203 +110,118 @@ async function deleteVocabulary(id) {
 // User Progress
 // =====================================
 
-
-
 async function getUserProgress() {
-
-
     const { data, error } = await supabaseClient
-
         .from("user_progress")
-
         .select("*")
-
         .limit(1)
-
-        .single();
-
-
+        .maybeSingle();
 
     if (error) {
-
-
-        console.error(
-            "Get progress failed:",
-            error
-        );
-
-
-        return {
-
-            learned_today:0,
-
-            reviewed_today:0,
-
-            streak:0,
-
-            mastered_words:0,
-
-            daily_goal:20
-
-        };
-
-
+        console.error("Get progress failed:", error);
+        return null;
     }
 
-
     return data;
-
-
 }
-
-
-
-
-
-
-
 
 async function updateUserProgress(updates) {
-
-
-
     const progress = await getUserProgress();
 
-
-
-    const { data, error } = await supabaseClient
-
-        .from("user_progress")
-
-        .update(updates)
-
-        .eq("id", progress.id)
-
-        .select()
-
-        .single();
-
-
-
-
-    if (error) {
-
-
-        console.error(
-            "Update progress failed:",
-            error
-        );
-
-
+    if (!progress || !progress.id) {
+        console.error("Cannot update progress: user_progress row or id is missing.");
         return null;
-
-
     }
 
+    const { data, error } = await supabaseClient
+        .from("user_progress")
+        .update(updates)
+        .eq("id", progress.id)
+        .select()
+        .single();
 
+    if (error) {
+        console.error("Update progress failed:", error);
+        return null;
+    }
 
     return data;
-
-
 }
 
-
-
-
-
-
-
-// =====================================
-// Learning Actions
-// =====================================
-
-
-
-async function increaseLearnedToday(number = 1) {
-
+// Record one completed flashcard rating in Supabase.
+// updated_at is used as the last study date, so no extra date column is needed.
+async function recordStudyReview(word, rating) {
+    if (!word || !word.id || !["again", "hard", "good", "easy"].includes(rating)) {
+        throw new Error("Invalid study review.");
+    }
 
     const progress = await getUserProgress();
+    if (!progress || !progress.id) {
+        throw new Error("The user_progress row could not be found.");
+    }
 
+    const now = new Date();
+    const localDateKey = date => {
+        const d = new Date(date);
+        return d.getFullYear() + "-" +
+            String(d.getMonth() + 1).padStart(2, "0") + "-" +
+            String(d.getDate()).padStart(2, "0");
+    };
 
+    const today = localDateKey(now);
+    const lastStudyDate = progress.updated_at ? localDateKey(progress.updated_at) : null;
+    const yesterdayDate = new Date(now);
+    yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+    const yesterday = localDateKey(yesterdayDate);
+    const isNewStudyDay = lastStudyDate !== today;
 
-    return updateUserProgress({
+    let newlyMastered = false;
 
-        learned_today:
-        progress.learned_today + number,
+    if (rating === "easy" && word.is_mastered !== true) {
+        const { data, error } = await supabaseClient
+            .from("vocabulary")
+            .update({ is_mastered: true })
+            .eq("id", word.id)
+            .eq("is_mastered", false)
+            .select("id");
 
+        if (error) {
+            console.error("Mark vocabulary as mastered failed:", error);
+            throw error;
+        }
 
-        mastered_words:
-        progress.mastered_words + number,
+        newlyMastered = Array.isArray(data) && data.length > 0;
+        if (newlyMastered) word.is_mastered = true;
+    }
 
+    const updates = {
+        reviewed_today: (isNewStudyDay ? 0 : Number(progress.reviewed_today || 0)) + 1,
+        learned_today: (isNewStudyDay ? 0 : Number(progress.learned_today || 0)) + (newlyMastered ? 1 : 0),
+        mastered_words: Number(progress.mastered_words || 0) + (newlyMastered ? 1 : 0),
+        streak: isNewStudyDay
+            ? (lastStudyDate === yesterday ? Number(progress.streak || 0) + 1 : 1)
+            : Number(progress.streak || 0),
+        updated_at: now.toISOString()
+    };
 
-        updated_at:
-        new Date()
+    const { data, error } = await supabaseClient
+        .from("user_progress")
+        .update(updates)
+        .eq("id", progress.id)
+        .select()
+        .single();
 
-    });
+    if (error) {
+        console.error("Save study progress failed:", error);
+        throw error;
+    }
 
-
+    return { progress: data, newlyMastered };
 }
 
-
-
-
-
-
-
-
-async function increaseReviewedToday(number = 1) {
-
-
-    const progress = await getUserProgress();
-
-
-
-    return updateUserProgress({
-
-        reviewed_today:
-        progress.reviewed_today + number,
-
-
-        updated_at:
-        new Date()
-
-    });
-
-
-}
-
-
-
-
-
-
-
-
-async function updateStreak() {
-
-
-    const progress = await getUserProgress();
-
-
-
-    return updateUserProgress({
-
-        streak:
-        progress.streak + 1,
-
-
-        updated_at:
-        new Date()
-
-    });
-
-
-}
-
-
-
-
-
+window.getUserProgress = getUserProgress;
+window.updateUserProgress = updateUserProgress;
+window.recordStudyReview = recordStudyReview;
 
 // =====================================
 // Export (Global)
