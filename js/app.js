@@ -53,7 +53,7 @@ async function updateProgress(){
         .forEach(function(el){
 
             el.textContent =
-            progress.learned_today;
+            progress.mastered_words ?? 0;
 
         });
 
