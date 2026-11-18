@@ -194,39 +194,13 @@ LIBRARY
 
 
 
-<ul>
-
-
-<li class="active">
-All Vocabulary
-</li>
-
-
-<li>
-DALF C1
-</li>
-
-
-<li>
-DALF B2
-</li>
-
-
-<li>
-Legal French
-</li>
-
-
-<li>
-Business French
-</li>
-
-
-<li>
-Daily French
-</li>
-
-
+<ul id="library-category-list">
+<li class="active" data-category="all"><button type="button">All Vocabulary</button></li>
+<li data-category="DALF C1"><button type="button">DALF C1</button></li>
+<li data-category="DALF B2"><button type="button">DALF B2</button></li>
+<li data-category="Legal French"><button type="button">Legal French</button></li>
+<li data-category="Business French"><button type="button">Business French</button></li>
+<li data-category="Daily French"><button type="button">Daily French</button></li>
 </ul>
 
 
@@ -257,9 +231,10 @@ Daily French
 <div class="library-search">
 
 
-<input 
-type="text"
+<input id="library-search" 
+type="search"
 placeholder="Search vocabulary..."
+aria-label="Search vocabulary"
 >
 
 
