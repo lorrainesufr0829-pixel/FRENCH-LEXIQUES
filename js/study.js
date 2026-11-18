@@ -1,6 +1,5 @@
 // =====================================
-// LEXIQUE — Study session
-// Flashcard-first vocabulary practice
+// LEXIQUE — Minimal flashcard study
 // =====================================
 
 (() => {
@@ -15,28 +14,26 @@
     const complete = document.getElementById("study-complete");
     const revealButton = document.getElementById("reveal-answer-btn");
     const ratingPanel = document.getElementById("study-rating");
+    const byId = id => document.getElementById(id);
 
     let vocabulary = [];
     let queue = [];
-    let currentIndex = 0;
+    let currentWord = null;
     let completedCount = 0;
     let sessionTotal = 0;
-    let currentWord = null;
     let sessionRatings = { again: 0, hard: 0, good: 0, easy: 0 };
-
-    const byId = id => document.getElementById(id);
 
     async function loadStudyVocabulary() {
         startButton.disabled = true;
         loadMessage.textContent = "Loading your vocabulary…";
         try {
-            vocabulary = await getVocabulary();
-            vocabulary = Array.isArray(vocabulary) ? vocabulary.filter(item =>
+            const words = await getVocabulary();
+            vocabulary = Array.isArray(words) ? words.filter(item =>
                 String(item.word || "").trim() && String(item.meaning || "").trim()
             ) : [];
             loadMessage.textContent = vocabulary.length
-                ? vocabulary.length + " words ready to study."
-                : "No vocabulary found yet. Add words in Import or Library first.";
+                ? vocabulary.length + " words available"
+                : "No vocabulary yet. Add words in Import to begin.";
         } catch (error) {
             console.error("Study vocabulary loading failed:", error);
             loadMessage.textContent = "Unable to load vocabulary. Please refresh and try again.";
@@ -46,26 +43,27 @@
     }
 
     function startSession() {
-        const selectedCategory = categorySelect.value;
-        const filtered = selectedCategory === "all"
+        const category = categorySelect.value;
+        const filtered = category === "all"
             ? [...vocabulary]
-            : vocabulary.filter(item => String(item.category || "").trim().toLowerCase() === selectedCategory.toLowerCase());
+            : vocabulary.filter(item =>
+                String(item.category || "").trim().toLowerCase() === category.toLowerCase()
+            );
 
         if (!filtered.length) {
-            loadMessage.textContent = selectedCategory === "all"
-                ? "No vocabulary is available for this session."
-                : "No words found in this collection yet.";
+            loadMessage.textContent = category === "all"
+                ? "No vocabulary is available for study."
+                : "There are no words in this collection yet.";
             return;
         }
 
-        const requestedCount = countSelect.value === "all" ? filtered.length : Number(countSelect.value);
-        queue = filtered.slice(0, requestedCount);
-        currentIndex = 0;
-        completedCount = 0;
+        const amount = countSelect.value === "all" ? filtered.length : Number(countSelect.value);
+        queue = filtered.slice(0, amount);
         sessionTotal = queue.length;
+        completedCount = 0;
         sessionRatings = { again: 0, hard: 0, good: 0, easy: 0 };
 
-        byId("session-category-label").textContent = selectedCategory === "all" ? "ALL VOCABULARY" : selectedCategory.toUpperCase();
+        byId("session-category-label").textContent = category === "all" ? "ALL VOCABULARY" : category.toUpperCase();
         setup.hidden = true;
         complete.hidden = true;
         session.hidden = false;
@@ -79,56 +77,51 @@
         }
 
         currentWord = queue[0];
-        byId("study-word").textContent = currentWord.word || "";
-        byId("study-meaning").textContent = currentWord.meaning || "";
+        byId("study-word").textContent = currentWord.word;
+        byId("study-meaning").textContent = currentWord.meaning;
         byId("study-word-level").textContent = currentWord.level || "VOCABULARY";
         byId("study-word-category").textContent = currentWord.category || "GENERAL";
         byId("study-card-front").hidden = false;
         byId("study-card-back").hidden = true;
-        ratingPanel.hidden = true;
         revealButton.hidden = false;
+        ratingPanel.hidden = true;
 
-        const position = completedCount + 1;
-        byId("study-progress-label").textContent = position + " / " + sessionTotal;
-        byId("study-progress-fill").style.width = (completedCount / sessionTotal * 100) + "%";
+        const displayedPosition = Math.min(completedCount + 1, sessionTotal);
+        byId("study-progress-label").textContent = displayedPosition + " / " + sessionTotal;
+        byId("study-progress-fill").style.width = (Math.min(completedCount, sessionTotal) / sessionTotal * 100) + "%";
     }
 
     function revealAnswer() {
+        if (!currentWord) return;
         byId("study-card-back").hidden = false;
         revealButton.hidden = true;
         ratingPanel.hidden = false;
     }
 
     function rateCard(rating) {
-        if (!currentWord) return;
+        if (!currentWord || !Object.prototype.hasOwnProperty.call(sessionRatings, rating)) return;
+
         sessionRatings[rating]++;
-
-        if (rating === "again") {
-            queue.push(currentWord);
-        }
-
+        const reviewedWord = currentWord;
         queue.shift();
+
+        if (rating === "again") queue.push(reviewedWord);
+
         completedCount++;
         currentWord = null;
-
-        if (completedCount >= sessionTotal && queue.length === 0) {
-            finishSession();
-            return;
-        }
-
-        // An "Again" card returns to the end; the session remains finite.
         renderCard();
     }
 
     function finishSession() {
         session.hidden = true;
         complete.hidden = false;
-        const rated = Object.values(sessionRatings).reduce((sum, value) => sum + value, 0);
+
+        const totalRatings = Object.values(sessionRatings).reduce((sum, value) => sum + value, 0);
         byId("study-complete-summary").textContent =
-            "You reviewed " + rated + " cards: " +
-            sessionRatings.again + " again, " +
-            sessionRatings.hard + " hard, " +
-            sessionRatings.good + " good and " +
+            "You reviewed " + totalRatings + " cards. " +
+            sessionRatings.again + " again · " +
+            sessionRatings.hard + " hard · " +
+            sessionRatings.good + " good · " +
             sessionRatings.easy + " easy.";
         byId("study-progress-fill").style.width = "100%";
     }
@@ -137,7 +130,7 @@
         session.hidden = true;
         complete.hidden = true;
         setup.hidden = false;
-        loadMessage.textContent = vocabulary.length + " words ready to study.";
+        loadMessage.textContent = vocabulary.length + " words available";
     }
 
     startButton.addEventListener("click", startSession);
@@ -147,6 +140,20 @@
 
     ratingPanel.querySelectorAll("[data-rating]").forEach(button => {
         button.addEventListener("click", () => rateCard(button.dataset.rating));
+    });
+
+    // Keyboard controls: Space reveals; 1–4 selects a rating after reveal.
+    document.addEventListener("keydown", event => {
+        if (session.hidden || event.repeat || event.target.matches("input, textarea, select")) return;
+        if (event.code === "Space" && !revealButton.hidden) {
+            event.preventDefault();
+            revealAnswer();
+            return;
+        }
+        if (!ratingPanel.hidden && ["1", "2", "3", "4"].includes(event.key)) {
+            const rating = ["again", "hard", "good", "easy"][Number(event.key) - 1];
+            rateCard(rating);
+        }
     });
 
     loadStudyVocabulary();
