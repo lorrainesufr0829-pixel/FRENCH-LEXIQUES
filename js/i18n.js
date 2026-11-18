@@ -95,27 +95,39 @@
 
   const storageKey = "lexique_language";
   const current = () => localStorage.getItem(storageKey) || "en";
-  function translateNode(node) {
+  const originalText = new WeakMap();
+  const originalAttributes = new WeakMap();
+  function translateNode(node, language) {
     if (!node || node.nodeType !== Node.TEXT_NODE) return;
-    const original = node.nodeValue;
+    if (!originalText.has(node)) originalText.set(node, node.nodeValue);
+    const original = originalText.get(node);
     const trimmed = original.trim();
     if (!trimmed) return;
-    const dict = dictionaries[current()];
-    if (!dict || !Object.prototype.hasOwnProperty.call(dict, trimmed)) return;
-    node.nodeValue = original.replace(trimmed, dict[trimmed]);
+    const dict = dictionaries[language];
+    const translated = dict && dict[trimmed] ? dict[trimmed] : trimmed;
+    node.nodeValue = original.replace(trimmed, translated);
+  }
+  function translateTree(root, language) {
+    if (root.nodeType === Node.TEXT_NODE) { translateNode(root, language); return; }
+    if (root.nodeType !== Node.ELEMENT_NODE && root !== document) return;
+    root.childNodes.forEach(child => translateTree(child, language));
+    if (root.nodeType === Node.ELEMENT_NODE) {
+      ["placeholder", "aria-label", "title"].forEach(attr => {
+        if (!originalAttributes.has(root)) originalAttributes.set(root, {});
+        const saved = originalAttributes.get(root);
+        if (root.hasAttribute(attr) && saved[attr] === undefined) saved[attr] = root.getAttribute(attr);
+        if (saved[attr] !== undefined) {
+          const value = saved[attr];
+          root.setAttribute(attr, dictionaries[language]?.[value] || value);
+        }
+      });
+    }
   }
   function applyLanguage(language = current()) {
     const lang = ["en", "fr", "zh"].includes(language) ? language : "en";
     localStorage.setItem(storageKey, lang);
     document.documentElement.lang = lang === "zh" ? "zh-CN" : lang;
-    document.querySelectorAll("body *").forEach(element => {
-      element.childNodes.forEach(translateNode);
-      ["placeholder", "aria-label", "title"].forEach(attr => {
-        const value = element.getAttribute(attr);
-        const dict = dictionaries[lang];
-        if (value && dict && dict[value]) element.setAttribute(attr, dict[value]);
-      });
-    });
+    translateTree(document.body, lang);
     const selector = document.getElementById("language-select");
     if (selector) selector.value = lang;
   }
@@ -126,12 +138,7 @@
   });
   const observer = new MutationObserver(records => {
     for (const record of records) {
-      record.addedNodes.forEach(node => {
-        if (node.nodeType === Node.TEXT_NODE) translateNode(node);
-        else if (node.nodeType === Node.ELEMENT_NODE) {
-          node.childNodes.forEach(translateNode);
-        }
-      });
+      record.addedNodes.forEach(node => translateTree(node, current()));
     }
   });
   observer.observe(document.body, { childList: true, subtree: true });
