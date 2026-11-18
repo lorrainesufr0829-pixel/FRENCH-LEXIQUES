@@ -1,407 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>LEXIQUE - Study</title>
-
-
 <link rel="stylesheet" href="css/style.css">
-
 <link rel="stylesheet" href="css/theme.css">
-
-
 </head>
-
-
-
 <body>
-
-
-<!-- Header -->
-
 <header class="site-header">
-
-<h1>
-LEXIQUE
-</h1>
-
-<p>
-French Vocabulary Learning Platform
-</p>
-
+  <h1>LEXIQUE</h1>
+  <p>French Vocabulary Learning Platform</p>
 </header>
 
-
-
-
-
-<!-- Learning Progress -->
-
 <section class="learning-progress">
-
-
-<div class="progress-item">
-
-<span>
-Words Learned
-</span>
-
-<strong id="words-learned">0</strong>
-
-</div>
-
-
-
-<div class="progress-item">
-
-<span>
-Today's Review
-</span>
-
-<strong id="today-review">
-20
-</strong>
-
-</div>
-
-
-
-
-
-<div class="progress-item">
-
-<span>
-Memory Streak
-</span>
-
-<strong id="memory-streak">
-12 Days
-</strong>
-
-</div>
-
-
-
-
-
-<div class="progress-item">
-
-<span>
-Level
-</span>
-
-<strong id="current-level">
-B2 → C1
-</strong>
-
-</div>
-
-
-
+  <div class="progress-item"><span>Words Learned</span><strong id="words-learned">0</strong></div>
+  <div class="progress-item"><span>Today's Review</span><strong id="today-review">0 Words</strong></div>
+  <div class="progress-item"><span>Memory Streak</span><strong id="memory-streak">0 Days</strong></div>
+  <div class="progress-item"><span>Level</span><strong id="current-level">A1</strong></div>
 </section>
-
-
-
-
-
-
-
-<!-- Navigation -->
 
 <nav class="main-navigation">
-
-
-<ul>
-
-
-<li>
-<a href="index.html">
-HOME
-</a>
-</li>
-
-
-<li>
-<a href="library.html">
-LIBRARY
-</a>
-</li>
-
-
-<li>
-<a href="study.html">
-STUDY
-</a>
-</li>
-
-
-<li>
-<a href="import.html">
-IMPORT
-</a>
-</li>
-
-
-<li>
-<a href="statistics.html">
-STATISTICS
-</a>
-</li>
-
-
-<li>
-<a href="settings.html">
-SETTINGS
-</a>
-</li>
-
-
-</ul>
-
-
+  <ul>
+    <li><a href="index.html">HOME</a></li>
+    <li><a href="library.html">LIBRARY</a></li>
+    <li><a href="study.html" aria-current="page">STUDY</a></li>
+    <li><a href="import.html">IMPORT</a></li>
+    <li><a href="statistics.html">STATISTICS</a></li>
+    <li><a href="settings.html">SETTINGS</a></li>
+  </ul>
 </nav>
 
-
-
-
-
-
-
-
-<!-- Study Main Content -->
-
 <main class="study-container">
-
-
-<!-- Page Title -->
-
-
-<section class="page-title">
-
-
-<h2>
-STUDY
-</h2>
-
-
-<p>
-Your daily French vocabulary training plan.
-</p>
-
-
-</section>
-
-
-
-
-
-<!-- Study Plan -->
-
-
-<section class="study-plan">
-
-
-<div class="plan-item">
-
-
-<span>
-Today's Plan
-</span>
-
-
-<strong>
-20 Words
-</strong>
-
-
-</div>
-
-
-
-
-<div class="plan-item">
-
-
-<span>
-Estimated Time
-</span>
-
-
-<strong>
-30 Minutes
-</strong>
-
-
-</div>
-
-
-
-<div class="plan-item">
-
-
-<span>
-Review Mode
-</span>
-
-
-<strong>
-Spaced Repetition
-</strong>
-
-
-</div>
-
-
-
-</section>
-
-
-
-
-
-
-
-<!-- Vocabulary Card -->
-
-
-<section class="vocabulary-card">
-
-
-
-<div class="word-header">
-
-
-<h1>
-Persévérant
-</h1>
-
-
-<p class="phonetic">
-
-/pɛʁ.se.ve.ʁɑ̃/
-
-</p>
-
-
-
-<div class="word-meta">
-
-
-<span>
-Difficulty: C1
-</span>
-
-
-<span>
-Category: DALF Vocabulary
-</span>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-
-<div class="word-explanation">
-
-
-<div class="detail-block">
-
-
-<h3>
-Meaning
-</h3>
-
-
-<p>
-Persistent; persevering; determined.
-</p>
-
-
-</div>
-
-
-
-
-<div class="detail-block">
-
-
-<h3>
-Example
-</h3>
-
-
-<p>
-Elle est très persévérante dans ses études.
-</p>
-
-
-</div>
-
-
-
-</div>
-
-
-
-</section>
-
-
-
-
-
-
-<!-- Review -->
-
-
-<section class="review-actions">
-
-
-<button>
-Again
-</button>
-
-
-<button>
-Hard
-</button>
-
-
-<button>
-Good
-</button>
-
-
-<button>
-Easy
-</button>
-
-
-</section>
-
-
-
-
+  <section class="study-heading">
+    <p class="study-eyebrow">YOUR DAILY PRACTICE</p>
+    <h2>STUDY</h2>
+    <p>Build lasting vocabulary, one word at a time.</p>
+  </section>
+
+  <section class="study-setup" id="study-setup">
+    <div class="study-setup-copy">
+      <h3>Ready to study?</h3>
+      <p>Choose a collection and set the length of your session.</p>
+    </div>
+    <div class="study-setup-controls">
+      <label for="study-category">Collection</label>
+      <select id="study-category">
+        <option value="all">All Vocabulary</option>
+        <option value="DALF C1">DALF C1</option>
+        <option value="DALF B2">DALF B2</option>
+        <option value="Legal French">Legal French</option>
+        <option value="Business French">Business French</option>
+        <option value="Daily French">Daily French</option>
+      </select>
+      <label for="study-count">Words per session</label>
+      <select id="study-count">
+        <option value="10">10 words</option>
+        <option value="20" selected>20 words</option>
+        <option value="all">All available words</option>
+      </select>
+      <button class="study-primary-button" id="start-study-btn" type="button">Start studying</button>
+    </div>
+    <p class="study-message" id="study-load-message" role="status">Loading your vocabulary…</p>
+  </section>
+
+  <section class="study-session" id="study-session" hidden>
+    <div class="study-session-top">
+      <div>
+        <p class="study-eyebrow" id="session-category-label">ALL VOCABULARY</p>
+        <h3>Flashcards</h3>
+      </div>
+      <button class="study-text-button" id="exit-study-btn" type="button">Exit session</button>
+    </div>
+
+    <div class="study-progress-line">
+      <div class="study-progress-track"><div id="study-progress-fill"></div></div>
+      <span id="study-progress-label">1 / 20</span>
+    </div>
+
+    <article class="study-flashcard" id="study-flashcard">
+      <div class="study-card-topline">
+        <span id="study-word-level">VOCABULARY</span>
+        <span id="study-word-category">GENERAL</span>
+      </div>
+      <div class="study-card-front" id="study-card-front">
+        <p class="study-card-hint">FRENCH WORD</p>
+        <h1 id="study-word">—</h1>
+        <button class="study-reveal-button" id="reveal-answer-btn" type="button">Reveal meaning</button>
+      </div>
+      <div class="study-card-back" id="study-card-back" hidden>
+        <div class="study-card-divider"></div>
+        <p class="study-card-hint">MEANING</p>
+        <p class="study-meaning" id="study-meaning"></p>
+      </div>
+    </article>
+
+    <section class="study-rating" id="study-rating" hidden>
+      <p>How well did you remember this word?</p>
+      <div class="study-rating-buttons">
+        <button type="button" data-rating="again" class="rating-again">Again</button>
+        <button type="button" data-rating="hard" class="rating-hard">Hard</button>
+        <button type="button" data-rating="good" class="rating-good">Good</button>
+        <button type="button" data-rating="easy" class="rating-easy">Easy</button>
+      </div>
+      <span class="study-rating-note">Your rating guides the next card in this session.</span>
+    </section>
+  </section>
+
+  <section class="study-complete" id="study-complete" hidden>
+    <p class="study-eyebrow">SESSION COMPLETE</p>
+    <h3>Well done.</h3>
+    <p id="study-complete-summary">You have finished this study session.</p>
+    <button class="study-primary-button" id="study-again-btn" type="button">Study again</button>
+  </section>
 </main>
-
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/app.js"></script>
 <script src="js/settings.js"></script>
-
+<script src="js/study.js"></script>
 </body>
-
 </html>
