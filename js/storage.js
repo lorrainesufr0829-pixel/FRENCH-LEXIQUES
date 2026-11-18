@@ -121,13 +121,11 @@ async function getUserProgress() {
         console.error("Get progress failed:", error);
         return null;
     }
-
     return data;
 }
 
 async function updateUserProgress(updates) {
     const progress = await getUserProgress();
-
     if (!progress || !progress.id) {
         console.error("Cannot update progress: user_progress row or id is missing.");
         return null;
@@ -144,12 +142,11 @@ async function updateUserProgress(updates) {
         console.error("Update progress failed:", error);
         return null;
     }
-
     return data;
 }
 
-// Record one completed flashcard rating in Supabase.
-// updated_at is used as the last study date, so no extra date column is needed.
+// Each vocabulary item contributes at most once to Today's Review per local day.
+// Re-rating an Again card does not count the same word twice.
 async function recordStudyReview(word, rating) {
     if (!word || !word.id || !["again", "hard", "good", "easy"].includes(rating)) {
         throw new Error("Invalid study review.");
@@ -161,46 +158,60 @@ async function recordStudyReview(word, rating) {
     }
 
     const now = new Date();
-    const localDateKey = date => {
+    const dateKey = date => {
         const d = new Date(date);
         return d.getFullYear() + "-" +
             String(d.getMonth() + 1).padStart(2, "0") + "-" +
             String(d.getDate()).padStart(2, "0");
     };
-
-    const today = localDateKey(now);
-    const lastStudyDate = progress.updated_at ? localDateKey(progress.updated_at) : null;
+    const today = dateKey(now);
     const yesterdayDate = new Date(now);
     yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-    const yesterday = localDateKey(yesterdayDate);
-    const isNewStudyDay = lastStudyDate !== today;
+    const yesterday = dateKey(yesterdayDate);
 
-    let newlyMastered = false;
+    // Read the latest database state rather than relying on the initially loaded card.
+    const { data: latestWord, error: readWordError } = await supabaseClient
+        .from("vocabulary")
+        .select("id,is_mastered,last_reviewed_date")
+        .eq("id", word.id)
+        .single();
 
-    if (rating === "easy" && word.is_mastered !== true) {
-        const { data, error } = await supabaseClient
-            .from("vocabulary")
-            .update({ is_mastered: true })
-            .eq("id", word.id)
-            .eq("is_mastered", false)
-            .select("id");
-
-        if (error) {
-            console.error("Mark vocabulary as mastered failed:", error);
-            throw error;
-        }
-
-        newlyMastered = Array.isArray(data) && data.length > 0;
-        if (newlyMastered) word.is_mastered = true;
+    if (readWordError || !latestWord) {
+        console.error("Read vocabulary review state failed:", readWordError);
+        throw readWordError || new Error("Vocabulary word not found.");
     }
 
+    const newlyReviewed = latestWord.last_reviewed_date !== today;
+    const newlyMastered = rating === "easy" && latestWord.is_mastered !== true;
+
+    const wordUpdates = {};
+    if (newlyReviewed) wordUpdates.last_reviewed_date = today;
+    if (newlyMastered) wordUpdates.is_mastered = true;
+
+    if (Object.keys(wordUpdates).length) {
+        const { error: wordUpdateError } = await supabaseClient
+            .from("vocabulary")
+            .update(wordUpdates)
+            .eq("id", word.id);
+
+        if (wordUpdateError) {
+            console.error("Update vocabulary study state failed:", wordUpdateError);
+            throw wordUpdateError;
+        }
+    }
+
+    // Dedicated date field avoids confusing a database maintenance update with a study day.
+    const lastStudyDate = progress.last_study_date || null;
+    const isNewStudyDay = lastStudyDate !== today;
+
     const updates = {
-        reviewed_today: (isNewStudyDay ? 0 : Number(progress.reviewed_today || 0)) + 1,
+        reviewed_today: (isNewStudyDay ? 0 : Number(progress.reviewed_today || 0)) + (newlyReviewed ? 1 : 0),
         learned_today: (isNewStudyDay ? 0 : Number(progress.learned_today || 0)) + (newlyMastered ? 1 : 0),
         mastered_words: Number(progress.mastered_words || 0) + (newlyMastered ? 1 : 0),
         streak: isNewStudyDay
             ? (lastStudyDate === yesterday ? Number(progress.streak || 0) + 1 : 1)
             : Number(progress.streak || 0),
+        last_study_date: today,
         updated_at: now.toISOString()
     };
 
@@ -216,7 +227,10 @@ async function recordStudyReview(word, rating) {
         throw error;
     }
 
-    return { progress: data, newlyMastered };
+    word.is_mastered = latestWord.is_mastered === true || newlyMastered;
+    word.last_reviewed_date = newlyReviewed ? today : latestWord.last_reviewed_date;
+
+    return { progress: data, newlyMastered, newlyReviewed };
 }
 
 window.getUserProgress = getUserProgress;
@@ -227,20 +241,6 @@ window.recordStudyReview = recordStudyReview;
 // Export (Global)
 // =====================================
 
-
 window.getVocabulary = getVocabulary;
-
 window.addVocabulary = addVocabulary;
-
 window.deleteVocabulary = deleteVocabulary;
-
-
-window.getUserProgress = getUserProgress;
-
-window.updateUserProgress = updateUserProgress;
-
-window.increaseLearnedToday = increaseLearnedToday;
-
-window.increaseReviewedToday = increaseReviewedToday;
-
-window.updateStreak = updateStreak;
