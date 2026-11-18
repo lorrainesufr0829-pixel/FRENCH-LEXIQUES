@@ -2123,3 +2123,250 @@ body[data-theme="dark"] .study-setup-controls select { background: #2b3038; colo
     .study-card-front { min-height: 250px; }
     .study-rating-buttons { grid-template-columns: repeat(2, 1fr); }
 }
+
+
+
+/* =====================================
+   STUDY — refined minimal interface
+===================================== */
+.study-container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 38px 28px 84px;
+}
+.study-heading {
+    margin: 14px 0 42px;
+    text-align: center;
+}
+.study-heading h2 {
+    margin: 8px 0 9px;
+    font-size: 36px;
+    font-weight: 650;
+    letter-spacing: 3px;
+}
+.study-heading > p:last-child { color: var(--lexique-muted, #707070); }
+.study-eyebrow, .study-card-hint {
+    margin: 0;
+    color: var(--lexique-muted, #858585);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+.study-setup, .study-complete {
+    max-width: 690px;
+    margin: 0 auto;
+    padding: 34px 38px;
+    background: var(--lexique-surface, #fff);
+    border: 1px solid var(--lexique-border, #e5e5e5);
+    border-radius: 14px;
+}
+.study-setup-copy h3, .study-complete h3 {
+    margin: 0 0 8px;
+    font-size: 24px;
+    font-weight: 600;
+}
+.study-setup-copy p, .study-complete > p { color: var(--lexique-muted, #707070); }
+.study-setup-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 11px 18px;
+    margin-top: 27px;
+}
+.study-setup-controls label {
+    align-self: end;
+    color: var(--lexique-text, #333);
+    font-size: 13px;
+    font-weight: 600;
+}
+.study-setup-controls select {
+    width: 100%;
+    min-height: 48px;
+    padding: 0 14px;
+    border: 1px solid var(--lexique-border, #dedede);
+    border-radius: 8px;
+    background: var(--lexique-surface, #fff);
+    color: var(--lexique-text, #222);
+    font: inherit;
+}
+.study-primary-button {
+    grid-column: 1 / -1;
+    min-height: 49px;
+    margin-top: 12px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--lexique-accent, #1d8f5a);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .2s ease, transform .2s ease;
+}
+.study-primary-button:hover { opacity: .9; transform: translateY(-1px); }
+.study-primary-button:disabled { opacity: .45; cursor: not-allowed; }
+.study-message {
+    margin: 18px 0 0;
+    color: var(--lexique-muted, #777);
+    font-size: 12px;
+}
+.study-session { max-width: 760px; margin: 0 auto; }
+.study-session-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 25px;
+}
+.study-session-top h3 { margin: 6px 0 0; font-size: 24px; font-weight: 600; }
+.study-text-button {
+    padding: 8px 0 8px 12px;
+    border: 0;
+    background: transparent;
+    color: var(--lexique-muted, #777);
+    font-size: 13px;
+    cursor: pointer;
+}
+.study-text-button:hover { color: var(--lexique-text, #222); }
+.study-progress-line {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+.study-progress-track {
+    flex: 1;
+    height: 4px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: var(--lexique-border, #e5e5e5);
+}
+#study-progress-fill {
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--lexique-accent, #1d8f5a);
+    transition: width .25s ease;
+}
+#study-progress-label {
+    min-width: 48px;
+    color: var(--lexique-muted, #777);
+    font-size: 12px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+.study-flashcard {
+    min-height: 400px;
+    padding: 25px 32px 32px;
+    border: 1px solid var(--lexique-border, #e3e3e3);
+    border-radius: 14px;
+    background: var(--lexique-surface, #fff);
+    box-shadow: 0 10px 32px rgba(0,0,0,.035);
+}
+.study-card-topline {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--lexique-muted, #888);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+}
+.study-card-front {
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+.study-card-front h1 {
+    max-width: 100%;
+    margin: 18px 0 32px;
+    color: var(--lexique-text, #222);
+    font-size: clamp(38px, 7vw, 56px);
+    font-weight: 600;
+    letter-spacing: -.9px;
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+}
+.study-reveal-button {
+    min-height: 43px;
+    padding: 0 22px;
+    border: 1px solid var(--lexique-border, #d9d9d9);
+    border-radius: 24px;
+    background: transparent;
+    color: var(--lexique-text, #333);
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color .2s ease, color .2s ease;
+}
+.study-reveal-button:hover {
+    border-color: var(--lexique-accent, #1d8f5a);
+    color: var(--lexique-accent, #1d8f5a);
+}
+.study-card-divider { height: 1px; margin: 8px 0 25px; background: var(--lexique-border, #e5e5e5); }
+.study-card-back { padding: 0 5px 10px; }
+.study-meaning {
+    margin: 13px 0 4px;
+    color: var(--lexique-text, #292929);
+    font-size: 21px;
+    line-height: 1.65;
+    white-space: pre-wrap;
+}
+.study-rating { padding: 25px 0 0; text-align: center; }
+.study-rating > p {
+    margin: 0 0 15px;
+    color: var(--lexique-muted, #666);
+    font-size: 13px;
+}
+.study-rating-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+.study-rating-buttons button {
+    min-height: 46px;
+    border: 1px solid var(--lexique-border, #dedede);
+    border-radius: 8px;
+    background: var(--lexique-surface, #fff);
+    color: var(--lexique-text, #333);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color .2s ease, background .2s ease;
+}
+.study-rating-buttons button:hover {
+    border-color: var(--lexique-accent, #1d8f5a);
+    background: var(--lexique-accent-soft, #f1f8f4);
+}
+.study-rating-note {
+    display: block;
+    margin-top: 12px;
+    color: var(--lexique-muted, #888);
+    font-size: 10px;
+}
+.study-complete { text-align: center; }
+.study-complete .study-primary-button { width: 100%; }
+body[data-theme="dark"] .study-setup,
+body[data-theme="dark"] .study-flashcard,
+body[data-theme="dark"] .study-complete,
+body[data-theme="dark"] .study-rating-buttons button {
+    border-color: var(--lexique-border);
+    background: var(--lexique-surface);
+    color: var(--lexique-text);
+}
+body[data-theme="dark"] .study-setup-controls select {
+    border-color: var(--lexique-border);
+    background: var(--lexique-surface);
+    color: var(--lexique-text);
+}
+@media (max-width: 650px) {
+    .study-container { padding: 27px 16px 55px; }
+    .study-heading { margin-bottom: 30px; }
+    .study-heading h2 { font-size: 31px; }
+    .study-setup { padding: 25px 20px; }
+    .study-setup-controls { grid-template-columns: 1fr; }
+    .study-setup-controls label { margin-top: 7px; }
+    .study-flashcard { min-height: 350px; padding: 20px; }
+    .study-card-front { min-height: 260px; }
+    .study-rating-buttons { grid-template-columns: repeat(2, 1fr); }
+}
