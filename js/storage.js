@@ -213,7 +213,7 @@ async function recordStudyReview(word, rating) {
         mastered_words: Number(progress.mastered_words || 0) + (newlyMastered ? 1 : 0),
         streak: isNewStudyDay
             ? (lastStudyDate === yesterday ? Number(progress.streak || 0) + 1 : 1)
-            : Number(progress.streak || 0),
+            : (Number(progress.streak || 0) === 0 ? 1 : Number(progress.streak || 0)),
         last_study_date: today,
         updated_at: now.toISOString()
     };
