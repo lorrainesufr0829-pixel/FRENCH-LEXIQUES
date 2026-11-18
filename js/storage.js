@@ -146,7 +146,7 @@ async function updateUserProgress(updates) {
 }
 
 // Each vocabulary item contributes at most once to Today's Review per local day.
-// Re-rating an Again card does not count the same word twice.
+// A failed progress write rolls back the vocabulary markers so retrying is safe.
 async function recordStudyReview(word, rating) {
     if (!word || !word.id || !["again", "hard", "good", "easy"].includes(rating)) {
         throw new Error("Invalid study review.");
@@ -169,7 +169,6 @@ async function recordStudyReview(word, rating) {
     yesterdayDate.setDate(yesterdayDate.getDate() - 1);
     const yesterday = dateKey(yesterdayDate);
 
-    // Read the latest database state rather than relying on the initially loaded card.
     const { data: latestWord, error: readWordError } = await supabaseClient
         .from("vocabulary")
         .select("id,is_mastered,last_reviewed_date")
@@ -183,27 +182,31 @@ async function recordStudyReview(word, rating) {
 
     const newlyReviewed = latestWord.last_reviewed_date !== today;
     const newlyMastered = rating === "easy" && latestWord.is_mastered !== true;
-
     const wordUpdates = {};
     if (newlyReviewed) wordUpdates.last_reviewed_date = today;
     if (newlyMastered) wordUpdates.is_mastered = true;
 
+    let updatedWord = latestWord;
     if (Object.keys(wordUpdates).length) {
-        const { error: wordUpdateError } = await supabaseClient
+        const { data, error } = await supabaseClient
             .from("vocabulary")
             .update(wordUpdates)
-            .eq("id", word.id);
+            .eq("id", word.id)
+            .select("id,is_mastered,last_reviewed_date")
+            .maybeSingle();
 
-        if (wordUpdateError) {
-            console.error("Update vocabulary study state failed:", wordUpdateError);
-            throw wordUpdateError;
+        if (error) {
+            console.error("Update vocabulary study state failed:", error);
+            throw error;
         }
+        if (!data) {
+            throw new Error("Vocabulary update was blocked or no row was updated. Check the vocabulary UPDATE policy.");
+        }
+        updatedWord = data;
     }
 
-    // Dedicated date field avoids confusing a database maintenance update with a study day.
     const lastStudyDate = progress.last_study_date || null;
     const isNewStudyDay = lastStudyDate !== today;
-
     const updates = {
         reviewed_today: (isNewStudyDay ? 0 : Number(progress.reviewed_today || 0)) + (newlyReviewed ? 1 : 0),
         learned_today: (isNewStudyDay ? 0 : Number(progress.learned_today || 0)) + (newlyMastered ? 1 : 0),
@@ -215,22 +218,33 @@ async function recordStudyReview(word, rating) {
         updated_at: now.toISOString()
     };
 
-    const { data, error } = await supabaseClient
+    const { data: savedProgress, error: progressError } = await supabaseClient
         .from("user_progress")
         .update(updates)
         .eq("id", progress.id)
         .select()
-        .single();
+        .maybeSingle();
 
-    if (error) {
-        console.error("Save study progress failed:", error);
-        throw error;
+    if (progressError || !savedProgress) {
+        console.error("Save study progress failed:", progressError);
+        // Restore the per-word markers; otherwise a retry would be incorrectly treated as a duplicate.
+        if (Object.keys(wordUpdates).length) {
+            const rollback = {
+                is_mastered: latestWord.is_mastered,
+                last_reviewed_date: latestWord.last_reviewed_date
+            };
+            const { error: rollbackError } = await supabaseClient
+                .from("vocabulary")
+                .update(rollback)
+                .eq("id", word.id);
+            if (rollbackError) console.error("Study marker rollback failed:", rollbackError);
+        }
+        throw progressError || new Error("No user_progress row was updated.");
     }
 
-    word.is_mastered = latestWord.is_mastered === true || newlyMastered;
-    word.last_reviewed_date = newlyReviewed ? today : latestWord.last_reviewed_date;
-
-    return { progress: data, newlyMastered, newlyReviewed };
+    word.is_mastered = updatedWord.is_mastered === true;
+    word.last_reviewed_date = updatedWord.last_reviewed_date;
+    return { progress: savedProgress, newlyMastered, newlyReviewed };
 }
 
 window.getUserProgress = getUserProgress;
