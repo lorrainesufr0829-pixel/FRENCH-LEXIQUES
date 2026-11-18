@@ -193,31 +193,113 @@ if (fileInput) {
     });
 }
 
-// Library rendering
+// Library rendering and category filtering
+let libraryWords = [];
+let activeLibraryCategory = "all";
+let librarySearchTerm = "";
+
 async function loadLibrary() {
     const wordList = document.getElementById("word-list");
-    const wordCount = document.getElementById("word-count");
     if (!wordList) return;
 
     try {
-        const words = await getVocabulary();
-        wordList.innerHTML = "";
-        if (wordCount) wordCount.textContent = `${words.length} Words`;
-
-        words.forEach(word => {
-            const card = document.createElement("div");
-            card.className = "word-card";
-            const heading = document.createElement("h3");
-            heading.textContent = word.word || "";
-            const meaning = document.createElement("p");
-            meaning.textContent = word.meaning || "";
-            card.append(heading, meaning);
-            wordList.appendChild(card);
-        });
+        libraryWords = await getVocabulary();
+        if (!Array.isArray(libraryWords)) libraryWords = [];
+        renderLibrary();
+        setupLibraryFilters();
     } catch (error) {
         console.error("Library loading failed:", error);
         wordList.textContent = "Unable to load vocabulary. Please refresh and try again.";
     }
+}
+
+function setupLibraryFilters() {
+    const categoryList = document.getElementById("library-category-list");
+    const searchInput = document.getElementById("library-search");
+
+    if (categoryList && !categoryList.dataset.bound) {
+        categoryList.dataset.bound = "true";
+        categoryList.addEventListener("click", event => {
+            const item = event.target.closest("li[data-category]");
+            if (!item) return;
+
+            activeLibraryCategory = item.dataset.category;
+            categoryList.querySelectorAll("li").forEach(li => {
+                li.classList.toggle("active", li === item);
+            });
+            renderLibrary();
+        });
+    }
+
+    if (searchInput && !searchInput.dataset.bound) {
+        searchInput.dataset.bound = "true";
+        searchInput.addEventListener("input", () => {
+            librarySearchTerm = searchInput.value.trim().toLocaleLowerCase();
+            renderLibrary();
+        });
+    }
+}
+
+function renderLibrary() {
+    const wordList = document.getElementById("word-list");
+    const wordCount = document.getElementById("word-count");
+    const title = document.querySelector(".library-header h2");
+    if (!wordList) return;
+
+    const filteredWords = libraryWords.filter(word => {
+        const category = String(word.category || "").trim().toLocaleLowerCase();
+        const matchesCategory = activeLibraryCategory === "all" ||
+            category === activeLibraryCategory.toLocaleLowerCase();
+        const searchable = [word.word, word.meaning, word.category, word.level]
+            .map(value => String(value || "").toLocaleLowerCase())
+            .join(" ");
+        return matchesCategory && searchable.includes(librarySearchTerm);
+    });
+
+    if (wordCount) wordCount.textContent = filteredWords.length + " Words";
+    if (title) {
+        const activeItem = document.querySelector("#library-category-list li.active");
+        const categoryTitle = activeItem?.dataset.category === "all"
+            ? "All Vocabulary"
+            : (activeItem?.dataset.category || "Vocabulary");
+        title.textContent = categoryTitle;
+    }
+
+    wordList.innerHTML = "";
+    if (!filteredWords.length) {
+        const empty = document.createElement("p");
+        empty.className = "library-empty-state";
+        empty.textContent = librarySearchTerm
+            ? "No words match your search in this category."
+            : "There are no words in this category yet.";
+        wordList.appendChild(empty);
+        return;
+    }
+
+    filteredWords.forEach(word => {
+        const row = document.createElement("article");
+        row.className = "word-row";
+
+        const info = document.createElement("div");
+        info.className = "word-info";
+
+        const heading = document.createElement("h3");
+        heading.textContent = word.word || "";
+        const meaning = document.createElement("p");
+        meaning.textContent = word.meaning || "";
+        info.append(heading, meaning);
+
+        const meta = document.createElement("div");
+        meta.className = "library-word-meta";
+        [word.category, word.level].filter(Boolean).forEach(value => {
+            const tag = document.createElement("span");
+            tag.textContent = value;
+            meta.appendChild(tag);
+        });
+
+        row.append(info, meta);
+        wordList.appendChild(row);
+    });
 }
 
 if (document.getElementById("word-list")) loadLibrary();
