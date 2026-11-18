@@ -2370,3 +2370,60 @@ body[data-theme="dark"] .study-setup-controls select {
     .study-card-front { min-height: 260px; }
     .study-rating-buttons { grid-template-columns: repeat(2, 1fr); }
 }
+
+
+/* =====================================
+   STATISTICS — refined editorial layout
+===================================== */
+.statistics-main { max-width: 1180px; padding: 48px 42px 80px; }
+.statistics-page { width: 100%; }
+.statistics-heading { display:flex; align-items:flex-end; justify-content:space-between; gap:30px; margin:4px 0 34px; }
+.statistics-heading h2 { margin:7px 0 8px; font-size:34px; letter-spacing:-.6px; }
+.statistics-eyebrow { margin:0; color:var(--lexique-accent,#1d8f5a); font-size:10px; font-weight:700; letter-spacing:2px; }
+.statistics-subtitle { margin:0; color:var(--lexique-muted,#777); font-size:14px; }
+.statistics-level { min-width:220px; padding:17px 21px; border-left:2px solid var(--lexique-accent,#1d8f5a); background:var(--lexique-surface,#fff); }
+.statistics-level span,.statistics-level small { display:block; color:var(--lexique-muted,#777); font-size:10px; letter-spacing:1px; }
+.statistics-level strong { display:block; margin:6px 0 3px; font-size:25px; letter-spacing:1px; }
+.statistics-level strong i { color:var(--lexique-accent,#1d8f5a); font-style:normal; padding:0 4px; }
+.statistics-overview { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin:0 0 42px; }
+.statistics-module { min-height:150px; padding:24px 25px; border:1px solid var(--lexique-border,#e2e2e2); border-radius:12px; background:var(--lexique-surface,#fff); }
+.statistics-label { display:block; color:var(--lexique-muted,#777); font-size:12px; }
+.statistics-module>strong { display:block; margin:14px 0 6px; font-size:34px; font-weight:600; letter-spacing:-.8px; font-variant-numeric:tabular-nums; }
+.statistics-module p { margin:0; color:var(--lexique-muted,#888); font-size:12px; }
+.statistics-goal-track,.statistics-breakdown-track { height:5px; margin-top:15px; overflow:hidden; border-radius:10px; background:var(--lexique-border,#e5e5e5); }
+.statistics-goal-track span,.statistics-breakdown-track i { display:block; height:100%; border-radius:inherit; background:var(--lexique-accent,#1d8f5a); }
+.statistics-section { margin-top:40px; }
+.statistics-section-heading { display:flex; justify-content:space-between; align-items:flex-end; gap:20px; margin-bottom:18px; }
+.statistics-section-heading h3 { margin:5px 0 0; font-size:22px; font-weight:600; }
+.statistics-section-note { color:var(--lexique-muted,#888); font-size:11px; }
+.distribution-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.distribution-item { min-width:0; padding:25px; border:1px solid var(--lexique-border,#e2e2e2); border-radius:12px; background:var(--lexique-surface,#fff); }
+.distribution-item h4 { margin:0 0 22px; font-size:15px; font-weight:600; }
+.statistics-breakdown { display:grid; gap:15px; }
+.statistics-breakdown-row { min-width:0; }
+.statistics-breakdown-label { display:flex; align-items:center; gap:9px; font-size:12px; }
+.statistics-breakdown-label span { width:6px; height:6px; flex:0 0 6px; border-radius:50%; background:var(--lexique-accent,#1d8f5a); }
+.statistics-breakdown-label strong { flex:1; min-width:0; font-weight:500; overflow-wrap:anywhere; }
+.statistics-breakdown-label b { color:var(--lexique-muted,#777); font-weight:500; font-variant-numeric:tabular-nums; }
+.statistics-breakdown-track { height:4px; margin:7px 0 0 15px; }
+.statistics-empty { color:var(--lexique-muted,#888); font-size:12px; }
+.activity-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
+.activity-grid article { padding:22px 24px; border:1px solid var(--lexique-border,#e2e2e2); border-radius:12px; background:var(--lexique-surface,#fff); }
+.activity-grid article span { color:var(--lexique-muted,#777); font-size:12px; }
+.activity-grid article strong { display:block; margin:12px 0 5px; font-size:28px; font-weight:600; font-variant-numeric:tabular-nums; }
+.activity-grid article p { margin:0; color:var(--lexique-muted,#888); font-size:11px; }
+.statistics-message { margin-top:20px; color:var(--lexique-muted,#888); font-size:12px; }
+body[data-theme="dark"] .statistics-level,body[data-theme="dark"] .statistics-module,body[data-theme="dark"] .distribution-item,body[data-theme="dark"] .activity-grid article { background:var(--lexique-surface); border-color:var(--lexique-border); color:var(--lexique-text); }
+@media(max-width:800px) {
+ .statistics-main { padding:34px 22px 60px; }
+ .statistics-heading { align-items:flex-start; flex-direction:column; }
+ .statistics-level { width:100%; }
+ .statistics-overview { grid-template-columns:1fr 1fr; }
+ .activity-grid { grid-template-columns:1fr; }
+}
+@media(max-width:560px) {
+ .statistics-main { padding:28px 16px 50px; }
+ .statistics-heading h2 { font-size:29px; }
+ .statistics-overview,.distribution-grid { grid-template-columns:1fr; }
+ .statistics-module { min-height:130px; }
+}
