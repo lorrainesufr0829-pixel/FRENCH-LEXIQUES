@@ -47,10 +47,8 @@
       <label for="study-category">Collection</label>
       <select id="study-category">
         <option value="all">All Vocabulary</option>
-        <option value="DALF C1">DALF C1</option>
-        <option value="DALF B2">DALF B2</option>
-        <option value="Legal French">Legal French</option>
         <option value="Business French">Business French</option>
+        <option value="Legal French">Legal French</option>
         <option value="Daily French">Daily French</option>
       </select>
       <label for="study-count">Words per session</label>
@@ -83,12 +81,12 @@
         <span id="study-word-level">VOCABULARY</span>
         <span id="study-word-category">GENERAL</span>
       </div>
-      <div class="study-card-front" id="study-card-front">
+      <div class="study-card-front" id="study-card-front" aria-live="polite">
         <p class="study-card-hint">FRENCH WORD</p>
         <h1 id="study-word">—</h1>
         <button class="study-reveal-button" id="reveal-answer-btn" type="button">Reveal meaning</button>
       </div>
-      <div class="study-card-back" id="study-card-back" hidden>
+      <div class="study-card-back" id="study-card-back" aria-live="polite" hidden>
         <div class="study-card-divider"></div>
         <p class="study-card-hint">MEANING</p>
         <p class="study-meaning" id="study-meaning"></p>
