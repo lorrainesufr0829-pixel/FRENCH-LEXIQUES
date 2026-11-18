@@ -172,3 +172,34 @@ async function updateProgress(){
 
 
 }
+
+
+// =====================================
+// Cross-page progress synchronization
+// =====================================
+
+window.updateProgress = updateProgress;
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Realtime updates are delivered to other open pages when Supabase
+    // Realtime is enabled for the user_progress table.
+    if (window.supabaseClient) {
+        window.supabaseClient
+            .channel("lexique-user-progress")
+            .on(
+                "postgres_changes",
+                { event: "*", schema: "public", table: "user_progress" },
+                function () { updateProgress(); }
+            )
+            .subscribe();
+    }
+
+    // Fallback refresh also keeps pages in sync if Realtime is not enabled.
+    window.setInterval(function () {
+        if (document.visibilityState === "visible") updateProgress();
+    }, 30000);
+
+    document.addEventListener("visibilitychange", function () {
+        if (document.visibilityState === "visible") updateProgress();
+    });
+});
