@@ -2435,3 +2435,37 @@ body[data-theme="dark"] .statistics-level,body[data-theme="dark"] .statistics-mo
 @media(max-width:560px) {
     .statistics-overview,.distribution-grid { grid-template-columns:1fr !important; }
 }
+
+
+/* =====================================
+   LIBRARY — category navigation & results
+===================================== */
+.library-sidebar li { padding:0; margin:0 0 7px; list-style:none; }
+.library-sidebar li button {
+    display:block; width:100%; padding:13px 15px; border:0; border-radius:8px;
+    background:transparent; color:var(--lexique-text,#444); text-align:left;
+    font:inherit; font-size:14px; cursor:pointer; transition:background .18s ease,color .18s ease;
+}
+.library-sidebar li button:hover { background:var(--lexique-accent-soft,#f2f2f2); }
+.library-sidebar li.active button {
+    background:var(--lexique-text,#222); color:var(--lexique-surface,#fff);
+}
+.library-sidebar li.active { background:transparent; color:inherit; }
+.library-word-meta { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:7px; }
+.library-word-meta span {
+    padding:5px 9px; border-radius:20px; background:var(--lexique-accent-soft,#f1f7f3);
+    color:var(--lexique-accent,#1d8f5a); font-size:11px; white-space:nowrap;
+}
+.library-empty-state { padding:36px 10px; color:var(--lexique-muted,#777); text-align:center; font-size:14px; }
+body[data-theme="dark"] .library-sidebar li button { color:var(--lexique-text); }
+body[data-theme="dark"] .library-sidebar li.active button { color:var(--lexique-surface); }
+@media(max-width:760px) {
+    .library-container { padding:30px 18px; }
+    .library-layout { grid-template-columns:1fr; gap:22px; }
+    .library-sidebar { min-height:0; border-right:0; border-bottom:1px solid var(--lexique-border,#ddd); padding:0 0 18px; }
+    .library-sidebar h2 { margin-bottom:14px; }
+    .library-sidebar ul { display:flex; gap:7px; overflow-x:auto; padding-bottom:5px; }
+    .library-sidebar li { flex:0 0 auto; margin:0; }
+    .library-sidebar li button { white-space:nowrap; }
+    .word-row { align-items:flex-start; gap:14px; }
+}
