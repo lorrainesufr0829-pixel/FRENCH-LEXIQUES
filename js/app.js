@@ -99,53 +99,13 @@ async function updateProgress(){
 
 
 
-        // -------------------------------
-        // Level
-        // -------------------------------
-
-
-        let level = "A1";
-
-
-        if(progress.mastered_words >= 300){
-
-            level = "A2";
-
-        }
-
-
-        if(progress.mastered_words >= 600){
-
-            level = "B1";
-
-        }
-
-
-        if(progress.mastered_words >= 1200){
-
-            level = "B2";
-
-        }
-
-
-        if(progress.mastered_words >= 2000){
-
-            level = "C1";
-
-        }
-
-
-
-
+        // Current learning path is a personal study target, not an
+        // automatically inferred CEFR level from the number of mastered words.
         document
         .querySelectorAll("#current-level")
         .forEach(function(el){
-
-            el.textContent = level;
-
+            el.textContent = "B2 → C1";
         });
-
-
 
 
         console.log(
