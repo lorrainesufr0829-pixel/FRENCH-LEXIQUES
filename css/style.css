@@ -2469,3 +2469,226 @@ body[data-theme="dark"] .library-sidebar li.active button { color:var(--lexique-
     .library-sidebar li button { white-space:nowrap; }
     .word-row { align-items:flex-start; gap:14px; }
 }
+
+
+/* =====================================
+   LEXIQUE — Global responsive refinements
+   ===================================== */
+@media (max-width: 760px) {
+    html, body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .site-header {
+        padding: 26px 16px;
+    }
+
+    .site-header h1 {
+        font-size: clamp(34px, 9vw, 48px);
+        letter-spacing: 5px;
+    }
+
+    .site-header p {
+        font-size: 14px;
+    }
+
+    .learning-progress {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0;
+        padding: 12px 10px;
+    }
+
+    .progress-item {
+        width: auto;
+        min-width: 0;
+        padding: 12px 6px;
+        border-right: 0;
+    }
+
+    .progress-item:nth-child(odd) {
+        border-right: 1px solid var(--lexique-border, #ddd);
+    }
+
+    .progress-item:nth-child(-n+2) {
+        border-bottom: 1px solid var(--lexique-border, #ddd);
+    }
+
+    .progress-item span {
+        font-size: 11px;
+        line-height: 1.35;
+    }
+
+    .progress-item strong {
+        font-size: 21px;
+    }
+
+    .main-navigation {
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .main-navigation ul {
+        justify-content: flex-start;
+        gap: 0;
+        padding: 12px 10px;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .main-navigation ul::-webkit-scrollbar {
+        display: none;
+    }
+
+    .main-navigation li {
+        flex: 0 0 auto;
+    }
+
+    .main-navigation a {
+        display: block;
+        padding: 8px 12px;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    .main-content,
+    .library-container,
+    .import-container,
+    .statistics-main,
+    .study-container {
+        width: 100%;
+        max-width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 28px 16px 48px;
+    }
+
+    .featured-word h2 {
+        font-size: 25px;
+    }
+
+    .word-card {
+        padding: 22px;
+    }
+
+    .import-actions {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 18px;
+    }
+
+    .library-layout,
+    .settings-layout {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 22px;
+    }
+
+    .library-sidebar {
+        min-width: 0;
+        min-height: 0;
+    }
+
+    .settings-sidebar {
+        position: static;
+        min-width: 0;
+        flex-direction: row;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .settings-tab {
+        flex: 0 0 auto;
+        white-space: nowrap;
+    }
+
+    .settings-content {
+        min-width: 0;
+        padding: 20px 16px;
+    }
+
+    .statistics-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .statistics-level {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .statistics-overview,
+    .distribution-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .activity-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .study-setup,
+    .study-complete,
+    .study-flashcard {
+        width: 100%;
+        min-width: 0;
+        padding: 22px 18px;
+    }
+
+    img, video, iframe {
+        max-width: 100%;
+    }
+
+    input, select, textarea, button {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .site-header h1 {
+        font-size: 32px;
+        letter-spacing: 4px;
+    }
+
+    .progress-item strong {
+        font-size: 19px;
+    }
+
+    .main-content,
+    .library-container,
+    .import-container,
+    .statistics-main,
+    .study-container {
+        padding-left: 13px;
+        padding-right: 13px;
+    }
+
+    .statistics-overview,
+    .distribution-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .statistics-module {
+        min-height: 0;
+        padding: 20px;
+    }
+
+    .study-setup-controls {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .study-rating-buttons {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .setting-item {
+        min-width: 0;
+    }
+
+    .setting-item select,
+    .setting-item input[type="number"] {
+        width: 100%;
+        min-width: 0;
+    }
+}
