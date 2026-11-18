@@ -98,18 +98,35 @@
         ratingPanel.hidden = false;
     }
 
-    function rateCard(rating) {
+    async function rateCard(rating) {
         if (!currentWord || !Object.prototype.hasOwnProperty.call(sessionRatings, rating)) return;
 
-        sessionRatings[rating]++;
         const reviewedWord = currentWord;
-        queue.shift();
+        const ratingButtons = [...ratingPanel.querySelectorAll("[data-rating]")];
+        ratingButtons.forEach(button => button.disabled = true);
 
-        if (rating === "again") queue.push(reviewedWord);
+        try {
+            await recordStudyReview(reviewedWord, rating);
+            sessionRatings[rating]++;
+            queue.shift();
 
-        completedCount++;
-        currentWord = null;
-        renderCard();
+            if (rating === "again") queue.push(reviewedWord);
+
+            completedCount++;
+            currentWord = null;
+
+            if (typeof window.updateProgress === "function") {
+                await window.updateProgress();
+            }
+
+            renderCard();
+        } catch (error) {
+            console.error("Unable to save this study review:", error);
+            loadMessage.textContent = "Your review could not be synced. Please try again.";
+            alert("Your review was not saved. Please check your connection and try again.");
+        } finally {
+            ratingButtons.forEach(button => button.disabled = false);
+        }
     }
 
     function finishSession() {
