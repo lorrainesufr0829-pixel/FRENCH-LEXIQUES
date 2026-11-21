@@ -247,12 +247,26 @@ function renderLibrary() {
     if (!wordList) return;
 
     const filteredWords = libraryWords.filter(word => {
-        const category = String(word.category || "").trim().toLocaleLowerCase();
+        const categoryNames = Array.isArray(word.category_names)
+            ? word.category_names
+            : [word.category].filter(Boolean);
+        const levelNames = Array.isArray(word.level_names)
+            ? word.level_names
+            : [word.level].filter(Boolean);
+        const allCategoryNames = [...categoryNames, ...levelNames]
+            .map(value => String(value || "").trim().toLocaleLowerCase())
+            .filter(Boolean);
+
         const matchesCategory = activeLibraryCategory === "all" ||
-            category === activeLibraryCategory.toLocaleLowerCase();
-        const searchable = [word.word, word.meaning, word.category, word.level]
-            .map(value => String(value || "").toLocaleLowerCase())
-            .join(" ");
+            allCategoryNames.includes(activeLibraryCategory.toLocaleLowerCase());
+
+        const searchable = [
+            word.word,
+            word.meaning,
+            ...categoryNames,
+            ...levelNames
+        ].map(value => String(value || "").toLocaleLowerCase()).join(" ");
+
         return matchesCategory && searchable.includes(librarySearchTerm);
     });
 
@@ -291,11 +305,16 @@ function renderLibrary() {
 
         const meta = document.createElement("div");
         meta.className = "library-word-meta";
-        [word.category, word.level].filter(Boolean).forEach(value => {
-            const tag = document.createElement("span");
-            tag.textContent = value;
-            meta.appendChild(tag);
-        });
+        const categoryTags = [
+            ...(Array.isArray(word.category_names) ? word.category_names : [word.category]),
+            ...(Array.isArray(word.level_names) ? word.level_names : [word.level])
+        ];
+        [...new Set(categoryTags.map(value => String(value || "").trim()).filter(Boolean))]
+            .forEach(value => {
+                const tag = document.createElement("span");
+                tag.textContent = value;
+                meta.appendChild(tag);
+            });
 
         row.append(info, meta);
         wordList.appendChild(row);
