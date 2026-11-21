@@ -100,8 +100,27 @@ async function attachWordCategories(wordId, item, categoryMap) {
         throw error;
     }
 
+    // Verify persisted rows instead of assuming an upsert request means success.
+    const categoryIds = links.map(link => link.category_id);
+    const { data: savedLinks, error: verifyError } = await supabaseClient
+        .from("vocabulary_category_links")
+        .select("vocabulary_id,category_id")
+        .eq("vocabulary_id", wordId)
+        .in("category_id", categoryIds);
+
+    if (verifyError) {
+        console.error("Verify vocabulary category links failed:", verifyError);
+        throw verifyError;
+    }
+
+    const savedIds = new Set((savedLinks || []).map(link => link.category_id));
+    const missingLinks = links.filter(link => !savedIds.has(link.category_id));
+    if (missingLinks.length) {
+        throw new Error("Some category links were not persisted. Check vocabulary_category_links RLS policies and foreign keys.");
+    }
+
     return {
-        linked: links.length,
+        linked: savedIds.size,
         missing: requested.filter(entry =>
             !categoryMap.has(entry.type + ":" + entry.name)
         ).map(entry => entry.name)
