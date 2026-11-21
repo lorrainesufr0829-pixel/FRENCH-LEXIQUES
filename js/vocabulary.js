@@ -39,8 +39,8 @@ function showDuplicateStatus(message, duplicate = false) {
         wordInput.insertAdjacentElement("afterend", duplicateMessage);
     }
     duplicateMessage.textContent = message;
-    duplicateMessage.style.color = duplicate ? "#c0392b" : "#1d8f5a";
-    if (addButton) addButton.disabled = duplicate;
+    duplicateMessage.style.color = duplicate ? "#9a6700" : "#1d8f5a";
+    if (addButton) addButton.disabled = false;
 }
 
 if (wordInput) {
@@ -48,16 +48,14 @@ if (wordInput) {
         const value = wordInput.value.trim();
         if (!value) {
             showDuplicateStatus("");
-            if (addButton) addButton.disabled = false;
             return;
         }
         try {
             if (!knownWordsLoaded) await loadKnownWords();
             if (isDuplicate(value)) {
-                showDuplicateStatus("您已记录这个单词！", true);
+                showDuplicateStatus("该单词已存在；保存时会为它添加所选分类。", true);
             } else {
                 showDuplicateStatus("");
-                if (addButton) addButton.disabled = false;
             }
         } catch (error) {
             console.error("Duplicate check failed:", error);
@@ -66,50 +64,132 @@ if (wordInput) {
     });
 }
 
+// Resolve existing shared category IDs and attach category links to a user's word.
+async function attachWordCategories(wordId, item, categoryMap) {
+    const requested = [
+        { name: String(item.category || "").trim(), type: "collection" },
+        { name: String(item.level || "").trim(), type: "level" }
+    ].filter(entry => entry.name);
+
+    const links = requested
+        .map(entry => categoryMap.get(entry.type + ":" + entry.name))
+        .filter(Boolean)
+        .map(categoryId => ({
+            vocabulary_id: wordId,
+            category_id: categoryId
+        }));
+
+    if (!links.length) {
+        return {
+            linked: 0,
+            missing: requested.filter(entry =>
+                !categoryMap.has(entry.type + ":" + entry.name)
+            ).map(entry => entry.name)
+        };
+    }
+
+    const { error } = await supabaseClient
+        .from("vocabulary_category_links")
+        .upsert(links, {
+            onConflict: "vocabulary_id,category_id",
+            ignoreDuplicates: true
+        });
+
+    if (error) {
+        console.error("Attach vocabulary categories failed:", error);
+        throw error;
+    }
+
+    return {
+        linked: links.length,
+        missing: requested.filter(entry =>
+            !categoryMap.has(entry.type + ":" + entry.name)
+        ).map(entry => entry.name)
+    };
+}
+
 async function saveWordsToSupabase(words) {
     const cleanWords = words
         .map(item => ({
             word: String(item.word || "").trim(),
             meaning: String(item.meaning || "").trim(),
-            category: String(item.category || "").trim() || null,
-            level: String(item.level || "").trim() || null
+            category: String(item.category || "").trim(),
+            level: String(item.level || "").trim()
         }))
         .filter(item => item.word && item.meaning);
 
     if (!cleanWords.length) {
-        return { inserted: 0, duplicates: 0, invalid: words.length };
+        return { inserted: 0, duplicates: 0, linked: 0, invalid: words.length, missingCategories: [] };
     }
 
     if (!knownWordsLoaded) await loadKnownWords();
 
-    const seen = new Set(knownWords.map(item => normalizeWord(item.word)));
-    const uniqueWords = [];
+    const existingByWord = new Map(
+        knownWords.map(item => [normalizeWord(item.word), item])
+    );
+    const newWords = [];
+    const pendingLinks = [];
     let duplicates = 0;
 
     for (const item of cleanWords) {
-        const key = normalizeWord(item.word);
-        if (seen.has(key)) {
+        const existing = existingByWord.get(normalizeWord(item.word));
+        if (existing) {
             duplicates++;
-            continue;
+            pendingLinks.push({ wordId: existing.id, item });
+        } else {
+            newWords.push(item);
+            // Prevent duplicate rows within the same uploaded file.
+            existingByWord.set(normalizeWord(item.word), { pending: true, item });
         }
-        seen.add(key);
-        uniqueWords.push(item);
     }
 
-    if (!uniqueWords.length) {
-        return { inserted: 0, duplicates, invalid: words.length - cleanWords.length };
+    const inserted = newWords.length ? await addVocabulary(newWords) : [];
+    if (newWords.length && (!Array.isArray(inserted) || inserted.length !== newWords.length)) {
+        throw new Error("Supabase did not confirm that all new vocabulary entries were saved.");
     }
 
-    const inserted = await addVocabulary(uniqueWords);
-    if (!Array.isArray(inserted) || inserted.length !== uniqueWords.length) {
-        throw new Error("Supabase did not confirm that all vocabulary entries were saved.");
+    const insertedByWord = new Map(
+        (inserted || []).map(item => [normalizeWord(item.word), item])
+    );
+
+    // Include new words in the same category-linking pass.
+    for (const item of newWords) {
+        const saved = insertedByWord.get(normalizeWord(item.word));
+        if (saved) pendingLinks.push({ wordId: saved.id, item });
     }
 
-    knownWords.push(...inserted);
+    if (inserted?.length) knownWords.push(...inserted);
+
+    const { data: categories, error: categoryError } = await supabaseClient
+        .from("vocabulary_categories")
+        .select("id,name,category_type");
+
+    if (categoryError) {
+        console.error("Load category directory failed:", categoryError);
+        throw categoryError;
+    }
+
+    const categoryMap = new Map(
+        (categories || []).map(category => [
+            category.category_type + ":" + category.name,
+            category.id
+        ])
+    );
+
+    let linked = 0;
+    const missingCategories = new Set();
+    for (const entry of pendingLinks) {
+        const result = await attachWordCategories(entry.wordId, entry.item, categoryMap);
+        linked += result.linked;
+        result.missing.forEach(name => missingCategories.add(name));
+    }
+
     return {
-        inserted: inserted.length,
+        inserted: inserted?.length || 0,
         duplicates,
-        invalid: words.length - cleanWords.length
+        linked,
+        invalid: words.length - cleanWords.length,
+        missingCategories: [...missingCategories]
     };
 }
 
@@ -125,12 +205,6 @@ if (addButton) {
 
         addButton.disabled = true;
         try {
-            if (!knownWordsLoaded) await loadKnownWords();
-            if (isDuplicate(word)) {
-                showDuplicateStatus("您已记录这个单词！", true);
-                return;
-            }
-
             const result = await saveWordsToSupabase([{
                 word,
                 meaning,
@@ -138,14 +212,20 @@ if (addButton) {
                 level: document.getElementById("new-level")?.value || ""
             }]);
 
-            if (result.inserted) {
-                alert("Vocabulary added successfully!");
+            if (result.inserted || result.linked) {
+                const messages = [];
+                if (result.inserted) messages.push("新增 " + result.inserted + " 个单词");
+                if (result.duplicates) messages.push("已有单词 " + result.duplicates + " 个");
+                if (result.linked) messages.push("添加分类关联 " + result.linked + " 条");
+                if (result.missingCategories.length) {
+                    messages.push("未匹配到分类目录：" + result.missingCategories.join("、"));
+                }
+                alert(messages.join("；") + "。");
                 wordInput.value = "";
                 meaningInput.value = "";
                 showDuplicateStatus("");
-                if (addButton) addButton.disabled = false;
             } else if (result.duplicates) {
-                showDuplicateStatus("您已记录这个单词！", true);
+                alert("该单词已存在，所选分类无需重复添加。");
             } else {
                 alert("Please check the word and meaning fields.");
             }
@@ -153,7 +233,7 @@ if (addButton) {
             console.error("Vocabulary save failed:", error);
             alert("保存失败，请检查网络连接及 Supabase 数据库权限。");
         } finally {
-            if (addButton && !isDuplicate(wordInput?.value || "")) addButton.disabled = false;
+            if (addButton) addButton.disabled = false;
         }
     });
 }
@@ -183,10 +263,19 @@ if (fileInput) {
             }));
 
             const result = await saveWordsToSupabase(importedWords);
-            alert(`导入完成：成功保存 ${result.inserted} 个，重复跳过 ${result.duplicates} 个，无效记录 ${result.invalid} 个。`);
+            const summary = [
+                "新增 " + result.inserted + " 个单词",
+                "重复单词 " + result.duplicates + " 个",
+                "新增分类关联 " + result.linked + " 条",
+                "无效记录 " + result.invalid + " 条"
+            ];
+            if (result.missingCategories.length) {
+                summary.push("未匹配分类：" + result.missingCategories.join("、"));
+            }
+            alert("导入完成：" + summary.join("；") + "。");
         } catch (error) {
             console.error("Vocabulary import failed:", error);
-            alert("导入失败，请确认文件格式、Supabase 权限及数据库字段。");
+            alert("导入失败，请确认文件格式、登录状态及 Supabase 数据库权限。");
         } finally {
             fileInput.value = "";
         }
