@@ -38,7 +38,10 @@ window.lexiqueAuth = {
     async signUp(email, password) {
         return await supabaseClient.auth.signUp({
             email: email.trim(),
-            password
+            password,
+            options: {
+                emailRedirectTo: "https://lorrainesufr0829-pixel.github.io/FRENCH-LEXIQUES/index.html"
+            }
         });
     },
 
