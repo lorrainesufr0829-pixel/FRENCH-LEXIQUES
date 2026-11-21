@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account | LEXIQUE</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <style>
+        .auth-page { max-width: 480px; margin: 55px auto; padding: 0 22px; }
+        .auth-panel { background: var(--lexique-surface, #fff); border: 1px solid var(--lexique-border, #e2e2e2); border-radius: 10px; padding: 32px; }
+        .auth-tabs { display: flex; gap: 22px; border-bottom: 1px solid var(--lexique-border, #e2e2e2); margin-bottom: 26px; }
+        .auth-tab { border: 0; background: none; padding: 0 0 13px; cursor: pointer; color: inherit; font: inherit; font-weight: 600; opacity: .6; }
+        .auth-tab.active { opacity: 1; border-bottom: 2px solid var(--lexique-accent, #1d8f5a); }
+        .auth-form { display: none; }
+        .auth-form.active { display: block; }
+        .auth-form label { display: block; margin: 16px 0 7px; font-size: 14px; font-weight: 600; }
+        .auth-form input { width: 100%; padding: 12px 13px; border: 1px solid var(--lexique-border, #ccc); border-radius: 6px; background: transparent; color: inherit; font: inherit; }
+        .auth-submit { width: 100%; margin-top: 23px; padding: 13px 16px; border: 0; border-radius: 6px; background: var(--lexique-accent, #1d8f5a); color: white; font: inherit; font-weight: 600; cursor: pointer; }
+        .auth-message { min-height: 24px; margin-top: 17px; font-size: 14px; line-height: 1.5; }
+        .auth-back { display: inline-block; margin-top: 22px; color: inherit; text-decoration: none; font-size: 14px; }
+        .auth-back:hover { text-decoration: underline; }
+        .auth-forgot { display: block; margin-top: 14px; text-align: right; color: inherit; font-size: 13px; }
+        @media (max-width: 480px) { .auth-panel { padding: 24px 19px; } .auth-page { margin-top: 35px; } }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <h1>LEXIQUE</h1>
+        <p>French Vocabulary Learning Platform</p>
+    </header>
+
+    <main class="auth-page">
+        <section class="auth-panel">
+            <h2>Welcome to LEXIQUE</h2>
+            <p>Sign in to access your personal vocabulary library and learning progress.</p>
+
+            <div class="auth-tabs" role="tablist" aria-label="Account actions">
+                <button class="auth-tab active" type="button" data-auth-tab="login">Log in</button>
+                <button class="auth-tab" type="button" data-auth-tab="signup">Sign up</button>
+            </div>
+
+            <form class="auth-form active" id="login-form">
+                <label for="login-email">Email</label>
+                <input id="login-email" type="email" autocomplete="email" required>
+                <label for="login-password">Password</label>
+                <input id="login-password" type="password" autocomplete="current-password" required>
+                <button class="auth-submit" type="submit">Log in</button>
+                <a class="auth-forgot" href="#" id="forgot-password">Forgot password?</a>
+            </form>
+
+            <form class="auth-form" id="signup-form">
+                <label for="signup-email">Email</label>
+                <input id="signup-email" type="email" autocomplete="email" required>
+                <label for="signup-password">Password</label>
+                <input id="signup-password" type="password" autocomplete="new-password" minlength="6" required>
+                <button class="auth-submit" type="submit">Create account</button>
+            </form>
+
+            <p class="auth-message" id="auth-message" role="status" aria-live="polite"></p>
+        </section>
+        <a class="auth-back" href="index.html">← Back to Home</a>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script>
+        const tabButtons = document.querySelectorAll("[data-auth-tab]");
+        const loginForm = document.getElementById("login-form");
+        const signupForm = document.getElementById("signup-form");
+        const message = document.getElementById("auth-message");
+
+        function showMessage(text, isError = false) {
+            message.textContent = text;
+            message.style.color = isError ? "#c0392b" : "var(--lexique-accent, #1d8f5a)";
+        }
+
+        tabButtons.forEach(button => {
+            button.addEventListener("click", () => {
+                tabButtons.forEach(item => item.classList.toggle("active", item === button));
+                loginForm.classList.toggle("active", button.dataset.authTab === "login");
+                signupForm.classList.toggle("active", button.dataset.authTab === "signup");
+                showMessage("");
+            });
+        });
+
+        loginForm.addEventListener("submit", async event => {
+            event.preventDefault();
+            const email = document.getElementById("login-email").value;
+            const password = document.getElementById("login-password").value;
+            showMessage("Signing in...");
+            const { error } = await window.lexiqueAuth.signIn(email, password);
+            if (error) {
+                showMessage(error.message, true);
+                return;
+            }
+            showMessage("Login successful. Redirecting...");
+            window.location.href = "index.html";
+        });
+
+        signupForm.addEventListener("submit", async event => {
+            event.preventDefault();
+            const email = document.getElementById("signup-email").value;
+            const password = document.getElementById("signup-password").value;
+            showMessage("Creating your account...");
+            const { data, error } = await window.lexiqueAuth.signUp(email, password);
+            if (error) {
+                showMessage(error.message, true);
+                return;
+            }
+            if (data.session) {
+                showMessage("Account created. Redirecting...");
+                window.location.href = "index.html";
+            } else {
+                showMessage("Account created. Please check your email and confirm your address before logging in.");
+            }
+        });
+
+        document.getElementById("forgot-password").addEventListener("click", async event => {
+            event.preventDefault();
+            const email = document.getElementById("login-email").value.trim();
+            if (!email) {
+                showMessage("Enter your email address first, then select Forgot password.", true);
+                return;
+            }
+            showMessage("Sending password reset email...");
+            const { error } = await window.lexiqueAuth.resetPassword(email);
+            if (error) {
+                showMessage(error.message, true);
+                return;
+            }
+            showMessage("If an account exists for this address, a password reset email has been sent.");
+        });
+    </script>
+</body>
+</html>
