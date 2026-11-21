@@ -4,20 +4,30 @@
 // Supabase Database
 // =====================================
 
-
-
 console.log("storage.js loaded");
 
+// =====================================
+// Authentication context
+// =====================================
 
+async function getCurrentUserId() {
+    const { data, error } = await supabaseClient.auth.getUser();
 
+    if (error || !data?.user?.id) {
+        console.error("Unable to get authenticated user:", error);
+        return null;
+    }
+
+    return data.user.id;
+}
 
 // =====================================
 // Vocabulary
 // =====================================
 
-
-
 async function getVocabulary() {
+    const userId = await getCurrentUserId();
+    if (!userId) return [];
 
     const { data, error } = await supabaseClient
         .from("vocabulary")
@@ -32,20 +42,13 @@ async function getVocabulary() {
                 )
             )
         `)
+        .eq("user_id", userId)
         .order("created_at", { ascending: true });
 
-
     if (error) {
-
-        console.error(
-            "Get vocabulary failed:",
-            error
-        );
-
+        console.error("Get vocabulary failed:", error);
         return [];
-
     }
-
 
     return (data || []).map(word => {
         const categories = (word.vocabulary_category_links || [])
@@ -63,93 +66,77 @@ async function getVocabulary() {
                 .map(item => item.name)
         };
     });
-
 }
 
-
-
-
-
 async function addVocabulary(words) {
+    const userId = await getCurrentUserId();
+    if (!userId) {
+        console.error("Cannot add vocabulary: no authenticated user.");
+        return [];
+    }
 
+    const userWords = (Array.isArray(words) ? words : [words]).map(word => ({
+        ...word,
+        user_id: userId
+    }));
 
     const { data, error } = await supabaseClient
         .from("vocabulary")
-        .insert(words)
+        .insert(userWords)
         .select();
 
-
     if (error) {
-
-        console.error(
-            "Add vocabulary failed:",
-            error
-        );
-
+        console.error("Add vocabulary failed:", error);
         return [];
-
     }
 
-
     return data || [];
-
 }
 
-
-
-
-
-
 async function deleteVocabulary(id) {
-
+    const userId = await getCurrentUserId();
+    if (!userId) return false;
 
     const { error } = await supabaseClient
         .from("vocabulary")
         .delete()
-        .eq("id", id);
-
-
+        .eq("id", id)
+        .eq("user_id", userId);
 
     if (error) {
-
-        console.error(
-            "Delete vocabulary failed:",
-            error
-        );
-
+        console.error("Delete vocabulary failed:", error);
         return false;
-
     }
 
-
     return true;
-
 }
-
-
-
-
-
 
 // =====================================
 // User Progress
 // =====================================
 
 async function getUserProgress() {
+    const userId = await getCurrentUserId();
+    if (!userId) return null;
+
     const { data, error } = await supabaseClient
         .from("user_progress")
         .select("*")
-        .limit(1)
+        .eq("user_id", userId)
         .maybeSingle();
 
     if (error) {
         console.error("Get progress failed:", error);
         return null;
     }
+
     return data;
 }
 
 async function updateUserProgress(updates) {
+    const userId = await getCurrentUserId();
+    if (!userId) return null;
+
     const progress = await getUserProgress();
     if (!progress || !progress.id) {
         console.error("Cannot update progress: user_progress row or id is missing.");
@@ -160,6 +147,7 @@ async function updateUserProgress(updates) {
         .from("user_progress")
         .update(updates)
         .eq("id", progress.id)
+        .eq("user_id", userId)
         .select()
         .single();
 
@@ -167,6 +155,7 @@ async function updateUserProgress(updates) {
         console.error("Update progress failed:", error);
         return null;
     }
+
     return data;
 }
 
@@ -177,9 +166,14 @@ async function recordStudyReview(word, rating) {
         throw new Error("Invalid study review.");
     }
 
+    const userId = await getCurrentUserId();
+    if (!userId) {
+        throw new Error("You must be logged in to record a study review.");
+    }
+
     const progress = await getUserProgress();
     if (!progress || !progress.id) {
-        throw new Error("The user_progress row could not be found.");
+        throw new Error("The user_progress row could not be found for this account.");
     }
 
     const now = new Date();
@@ -198,6 +192,7 @@ async function recordStudyReview(word, rating) {
         .from("vocabulary")
         .select("id,is_mastered,last_reviewed_date")
         .eq("id", word.id)
+        .eq("user_id", userId)
         .single();
 
     if (readWordError || !latestWord) {
@@ -217,6 +212,7 @@ async function recordStudyReview(word, rating) {
             .from("vocabulary")
             .update(wordUpdates)
             .eq("id", word.id)
+            .eq("user_id", userId)
             .select("id,is_mastered,last_reviewed_date")
             .maybeSingle();
 
@@ -247,12 +243,13 @@ async function recordStudyReview(word, rating) {
         .from("user_progress")
         .update(updates)
         .eq("id", progress.id)
+        .eq("user_id", userId)
         .select()
         .maybeSingle();
 
     if (progressError || !savedProgress) {
         console.error("Save study progress failed:", progressError);
-        // Restore the per-word markers; otherwise a retry would be incorrectly treated as a duplicate.
+
         if (Object.keys(wordUpdates).length) {
             const rollback = {
                 is_mastered: latestWord.is_mastered,
@@ -261,14 +258,18 @@ async function recordStudyReview(word, rating) {
             const { error: rollbackError } = await supabaseClient
                 .from("vocabulary")
                 .update(rollback)
-                .eq("id", word.id);
+                .eq("id", word.id)
+                .eq("user_id", userId);
+
             if (rollbackError) console.error("Study marker rollback failed:", rollbackError);
         }
+
         throw progressError || new Error("No user_progress row was updated.");
     }
 
     word.is_mastered = updatedWord.is_mastered === true;
     word.last_reviewed_date = updatedWord.last_reviewed_date;
+
     return { progress: savedProgress, newlyMastered, newlyReviewed };
 }
 
