@@ -2923,3 +2923,25 @@ body[data-theme="dark"] .daily-content-entry h3 {
         padding: 18px 16px;
     }
 }
+
+
+/* HOME — Featured Word aligned with Daily Reading & Listening */
+.featured-word .word-card {
+    padding: 25px 28px;
+    border: 1px solid var(--lexique-border, #e2e2e2);
+    border-left: 3px solid var(--lexique-accent, #1d8f5a);
+    border-radius: 10px;
+    background: var(--lexique-surface, #fff);
+    box-shadow: none;
+}
+body[data-theme="dark"] .featured-word .word-card {
+    border-color: var(--lexique-border);
+    border-left-color: var(--lexique-accent);
+    background: var(--lexique-surface);
+}
+@media (max-width: 760px) {
+    .featured-word .word-card { padding: 21px 19px; }
+}
+@media (max-width: 480px) {
+    .featured-word .word-card { padding: 18px 16px; }
+}
