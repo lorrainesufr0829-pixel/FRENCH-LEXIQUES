@@ -135,7 +135,11 @@ async function saveWordsToSupabase(words) {
         const existing = existingByWord.get(normalizeWord(item.word));
         if (existing) {
             duplicates++;
-            pendingLinks.push({ wordId: existing.id, item });
+            if (existing.pending) {
+                pendingLinks.push({ wordKey: normalizeWord(item.word), item });
+            } else {
+                pendingLinks.push({ wordId: existing.id, item });
+            }
         } else {
             newWords.push(item);
             // Prevent duplicate rows within the same uploaded file.
@@ -158,6 +162,13 @@ async function saveWordsToSupabase(words) {
         if (saved) pendingLinks.push({ wordId: saved.id, item });
     }
 
+    // Resolve repeated words inside the same file to the single inserted record.
+    pendingLinks.forEach(entry => {
+        if (!entry.wordId && entry.wordKey) {
+            entry.wordId = insertedByWord.get(entry.wordKey)?.id;
+        }
+    });
+
     if (inserted?.length) knownWords.push(...inserted);
 
     const { data: categories, error: categoryError } = await supabaseClient
@@ -179,6 +190,7 @@ async function saveWordsToSupabase(words) {
     let linked = 0;
     const missingCategories = new Set();
     for (const entry of pendingLinks) {
+        if (!entry.wordId) continue;
         const result = await attachWordCategories(entry.wordId, entry.item, categoryMap);
         linked += result.linked;
         result.missing.forEach(name => missingCategories.add(name));
