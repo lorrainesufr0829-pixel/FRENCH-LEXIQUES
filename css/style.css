@@ -2792,3 +2792,134 @@ body[data-theme="dark"] .library-sidebar li.active button { color:var(--lexique-
     .daily-goal-count { font-size: 14px; gap: 2px; }
     .daily-goal-unit { font-size: 8px; }
 }
+
+
+
+/* =====================================
+   HOME — Daily Reading & Listening
+   Consistent with the LEXIQUE editorial style
+===================================== */
+.daily-content-section {
+    margin-top: 42px;
+    color: var(--lexique-text, #222);
+}
+
+.daily-content-heading {
+    margin-bottom: 18px;
+}
+
+.daily-content-eyebrow {
+    margin: 0 0 7px;
+    color: var(--lexique-accent, #1d8f5a);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+}
+
+.daily-content-heading h2 {
+    margin: 0 0 8px;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -.4px;
+}
+
+.daily-content-heading > p:last-child {
+    max-width: 680px;
+    margin: 0;
+    color: var(--lexique-muted, #777);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.daily-content-entry {
+    padding: 25px 28px;
+    border: 1px solid var(--lexique-border, #e2e2e2);
+    border-left: 3px solid var(--lexique-accent, #1d8f5a);
+    border-radius: 10px;
+    background: var(--lexique-surface, #fff);
+}
+
+.daily-content-source {
+    margin: 0 0 12px;
+    color: var(--lexique-muted, #888);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+}
+
+.daily-content-entry h3 {
+    margin: 0 0 10px;
+    color: var(--lexique-text, #222);
+    font-size: 21px;
+    font-weight: 600;
+    line-height: 1.45;
+}
+
+.daily-content-description {
+    max-width: 760px;
+    margin: 0 0 14px;
+    color: var(--lexique-muted, #666);
+    font-size: 13px;
+    line-height: 1.75;
+}
+
+.daily-content-status {
+    margin: 0;
+    color: var(--lexique-muted, #999);
+    font-size: 11px;
+}
+
+.daily-listening {
+    margin-top: 38px;
+    padding-top: 34px;
+    border-top: 1px solid var(--lexique-border, #e2e2e2);
+}
+
+body[data-theme="dark"] .daily-content-entry {
+    border-color: var(--lexique-border);
+    border-left-color: var(--lexique-accent);
+    background: var(--lexique-surface);
+}
+
+body[data-theme="dark"] .daily-content-entry h3 {
+    color: var(--lexique-text);
+}
+
+@media (max-width: 760px) {
+    .daily-content-section {
+        margin-top: 32px;
+    }
+
+    .daily-content-heading h2 {
+        font-size: 24px;
+    }
+
+    .daily-content-entry {
+        padding: 21px 19px;
+    }
+
+    .daily-content-entry h3 {
+        font-size: 18px;
+    }
+
+    .daily-listening {
+        margin-top: 30px;
+        padding-top: 27px;
+    }
+}
+
+@media (max-width: 480px) {
+    .daily-content-heading h2 {
+        font-size: 22px;
+    }
+
+    .daily-content-heading > p:last-child,
+    .daily-content-description {
+        font-size: 12px;
+    }
+
+    .daily-content-entry {
+        padding: 18px 16px;
+    }
+}
