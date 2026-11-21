@@ -12,7 +12,7 @@ create table if not exists public.vocabulary_categories (
 );
 
 create table if not exists public.vocabulary_category_links (
-    vocabulary_id bigint not null
+    vocabulary_id uuid not null
         references public.vocabulary(id) on delete cascade,
     category_id bigint not null
         references public.vocabulary_categories(id) on delete cascade,
