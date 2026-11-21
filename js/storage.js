@@ -21,7 +21,17 @@ async function getVocabulary() {
 
     const { data, error } = await supabaseClient
         .from("vocabulary")
-        .select("*")
+        .select(`
+            *,
+            vocabulary_category_links (
+                category_id,
+                vocabulary_categories (
+                    id,
+                    name,
+                    category_type
+                )
+            )
+        `)
         .order("created_at", { ascending: true });
 
 
@@ -37,7 +47,22 @@ async function getVocabulary() {
     }
 
 
-    return data || [];
+    return (data || []).map(word => {
+        const categories = (word.vocabulary_category_links || [])
+            .map(link => link.vocabulary_categories)
+            .filter(Boolean);
+
+        return {
+            ...word,
+            categories,
+            category_names: categories
+                .filter(item => item.category_type === "collection")
+                .map(item => item.name),
+            level_names: categories
+                .filter(item => item.category_type === "level")
+                .map(item => item.name)
+        };
+    });
 
 }
 
