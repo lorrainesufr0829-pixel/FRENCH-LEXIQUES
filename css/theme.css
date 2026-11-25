@@ -794,3 +794,106 @@ body[data-theme="dark"] .secondary-button:hover {
     background-color: var(--lexique-accent-wash) !important;
 }
 
+/* =========================================
+   LEXIQUE — Import comic feedback
+   Playful comic-book feedback, tinted by the
+   user's selected accent colour.
+========================================= */
+.comic-feedback {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 5px 14px;
+    margin: 0 0 24px;
+    padding: 20px 24px;
+    overflow: hidden;
+    border: 2px solid var(--lexique-text);
+    border-left: 7px solid var(--lexique-accent);
+    border-radius: 15px 20px 14px 18px;
+    background: var(--lexique-accent-soft);
+    color: var(--lexique-text);
+    box-shadow: 5px 5px 0 color-mix(in srgb, var(--lexique-accent) 28%, transparent);
+    opacity: 0;
+    transform: translateY(10px) scale(.98);
+    transition: opacity .22s ease, transform .22s ease;
+}
+.comic-feedback.is-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+.comic-feedback::after {
+    content: "✦";
+    position: absolute;
+    right: 22px;
+    top: 4px;
+    color: var(--lexique-accent);
+    font-size: 42px;
+    line-height: 1;
+    transform: rotate(12deg);
+}
+.comic-feedback__burst {
+    grid-row: span 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 76px;
+    min-height: 48px;
+    padding: 7px 10px;
+    border: 2px solid var(--lexique-text);
+    border-radius: 50% 44% 48% 42%;
+    background: var(--lexique-accent);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: .5px;
+    text-align: center;
+    transform: rotate(-7deg);
+}
+.comic-feedback__title {
+    position: relative;
+    z-index: 1;
+    font-size: 19px;
+    font-weight: 850;
+    line-height: 1.35;
+}
+.comic-feedback__detail {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    color: var(--lexique-muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+.comic-feedback--error {
+    border-left-color: #d97724;
+    background: color-mix(in srgb, #d97724 10%, var(--lexique-surface));
+    box-shadow: 5px 5px 0 color-mix(in srgb, #d97724 25%, transparent);
+}
+.comic-feedback--error .comic-feedback__burst {
+    background: #d97724;
+}
+@media (max-width: 560px) {
+    .comic-feedback {
+        gap: 6px 11px;
+        padding: 16px 17px;
+    }
+    .comic-feedback__burst {
+        min-width: 60px;
+        min-height: 42px;
+        font-size: 10px;
+    }
+    .comic-feedback__title {
+        font-size: 16px;
+    }
+    .comic-feedback__detail {
+        font-size: 12px;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .comic-feedback {
+        transition: none;
+        transform: none;
+    }
+}
+
