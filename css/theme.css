@@ -897,3 +897,94 @@ body[data-theme="dark"] .secondary-button:hover {
     }
 }
 
+
+
+/* Import feedback modal — image slot intentionally left blank until supplied. */
+.comic-feedback-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(18, 25, 21, .48);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .22s ease, visibility .22s ease;
+}
+.comic-feedback-overlay.is-visible {
+    opacity: 1;
+    visibility: visible;
+}
+.comic-feedback-overlay .comic-feedback {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: min(100%, 430px);
+    margin: 0;
+    padding: 30px 28px 26px;
+    border: 2px solid var(--lexique-text);
+    border-radius: 20px;
+    border-left: 2px solid var(--lexique-text);
+    background: var(--lexique-surface);
+    color: var(--lexique-text);
+    text-align: center;
+    box-shadow: 7px 7px 0 color-mix(in srgb, var(--lexique-accent) 30%, transparent);
+    opacity: 0;
+    transform: translateY(12px) scale(.96);
+    transition: opacity .22s ease, transform .22s ease;
+}
+.comic-feedback-overlay.is-visible .comic-feedback {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+.comic-feedback-overlay .comic-feedback::after {
+    content: none;
+}
+.comic-feedback-overlay .comic-feedback__icon {
+    display: block;
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 18px;
+    border: 2px dashed var(--lexique-accent);
+    border-radius: 50%;
+    background: var(--lexique-accent-soft);
+}
+.comic-feedback-overlay .comic-feedback__close {
+    position: absolute;
+    top: 9px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--lexique-muted);
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+}
+.comic-feedback-overlay .comic-feedback__close:hover {
+    background: var(--lexique-accent-soft);
+    color: var(--lexique-accent);
+}
+.comic-feedback-overlay .comic-feedback__title {
+    font-size: 21px;
+}
+.comic-feedback-overlay .comic-feedback__detail {
+    margin-top: 8px;
+    font-size: 14px;
+}
+.comic-feedback-overlay .comic-feedback--error {
+    border-left-color: var(--lexique-text);
+}
+@media (max-width: 560px) {
+    .comic-feedback-overlay { padding: 18px; }
+    .comic-feedback-overlay .comic-feedback { padding: 28px 20px 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .comic-feedback-overlay,
+    .comic-feedback-overlay .comic-feedback { transition: none; }
+}
