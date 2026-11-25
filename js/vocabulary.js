@@ -12,6 +12,49 @@ let knownWords = [];
 let knownWordsLoaded = false;
 let duplicateMessage = null;
 
+function showComicFeedback(title, message = "", type = "success") {
+    const container = document.querySelector(".import-container");
+    if (!container) {
+        alert([title, message].filter(Boolean).join("\n"));
+        return;
+    }
+
+    let notice = document.getElementById("import-comic-feedback");
+    if (!notice) {
+        notice = document.createElement("section");
+        notice.id = "import-comic-feedback";
+        notice.className = "comic-feedback";
+        notice.setAttribute("role", "status");
+        notice.setAttribute("aria-live", "polite");
+        container.prepend(notice);
+    }
+
+    notice.className = "comic-feedback comic-feedback--" + type;
+    notice.innerHTML = "";
+    const burst = document.createElement("span");
+    burst.className = "comic-feedback__burst";
+    burst.setAttribute("aria-hidden", "true");
+    burst.textContent = type === "success" ? "✦ POW! ✦" : "!";
+    const heading = document.createElement("strong");
+    heading.className = "comic-feedback__title";
+    heading.textContent = title;
+    notice.append(burst, heading);
+
+    if (message) {
+        const detail = document.createElement("p");
+        detail.className = "comic-feedback__detail";
+        detail.textContent = message;
+        notice.appendChild(detail);
+    }
+
+    notice.classList.remove("is-visible");
+    requestAnimationFrame(() => notice.classList.add("is-visible"));
+    window.clearTimeout(notice.dismissTimer);
+    notice.dismissTimer = window.setTimeout(() => {
+        notice.classList.remove("is-visible");
+    }, 6500);
+}
+
 function normalizeWord(value) {
     return String(value || "").trim().toLocaleLowerCase();
 }
@@ -230,7 +273,7 @@ if (addButton) {
         const word = wordInput?.value.trim() || "";
         const meaning = meaningInput?.value.trim() || "";
         if (!word || !meaning) {
-            alert("Please enter both the word and its meaning.");
+            showComicFeedback("先补充完整信息哦！", "请填写单词和释义。", "error");
             return;
         }
 
@@ -251,18 +294,18 @@ if (addButton) {
                 if (result.missingCategories.length) {
                     messages.push("未匹配到分类目录：" + result.missingCategories.join("、"));
                 }
-                alert(messages.join("；") + "。");
+                showComicFeedback("成功！离大师又进一步！", messages.join("；") + "。");
                 wordInput.value = "";
                 meaningInput.value = "";
                 showDuplicateStatus("");
             } else if (result.duplicates) {
-                alert("该单词已存在，所选分类无需重复添加。");
+                showComicFeedback("分类已更新！", "这个单词已经在词库中，所选分类无需重复添加。");
             } else {
-                alert("Please check the word and meaning fields.");
+                showComicFeedback("再检查一下！", "请确认单词和释义都已填写。", "error");
             }
         } catch (error) {
             console.error("Vocabulary save failed:", error);
-            alert("保存失败，请检查网络连接及 Supabase 数据库权限。");
+            showComicFeedback("哎呀，保存没有成功！", "请检查网络连接或稍后重试。", "error");
         } finally {
             if (addButton) addButton.disabled = false;
         }
@@ -276,7 +319,7 @@ if (fileInput) {
         if (!file) return;
 
         if (typeof XLSX === "undefined") {
-            alert("Excel import library is not loaded.");
+            showComicFeedback("文件读取组件暂不可用！", "请刷新页面后重试。", "error");
             return;
         }
 
@@ -303,10 +346,10 @@ if (fileInput) {
             if (result.missingCategories.length) {
                 summary.push("未匹配分类：" + result.missingCategories.join("、"));
             }
-            alert("导入完成：" + summary.join("；") + "。");
+            showComicFeedback("成功！离大师又进一步！", summary.join("；") + "。");
         } catch (error) {
             console.error("Vocabulary import failed:", error);
-            alert("导入失败，请确认文件格式、登录状态及 Supabase 数据库权限。");
+            showComicFeedback("这次导入遇到一点小麻烦！", "请确认文件格式、登录状态及网络连接后重试。", "error");
         } finally {
             fileInput.value = "";
         }
