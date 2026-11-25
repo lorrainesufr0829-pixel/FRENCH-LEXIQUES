@@ -3146,3 +3146,27 @@ body[data-theme="dark"] .daily-content-entry h3 {
         font-size: 12px;
     }
 }
+
+
+/* HOME — Equal card dimensions across all three featured sections */
+@media (min-width: 761px) {
+    .main-content > .featured-word .word-card,
+    .main-content > .daily-content-section .daily-content-entry {
+        height: 180px;
+        min-height: 180px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        overflow: hidden;
+    }
+}
+@media (max-width: 760px) {
+    .main-content > .featured-word .word-card,
+    .main-content > .daily-content-section .daily-content-entry {
+        height: auto;
+        min-height: 150px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+}
