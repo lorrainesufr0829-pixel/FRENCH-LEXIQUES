@@ -988,3 +988,434 @@ body[data-theme="dark"] .secondary-button:hover {
     .comic-feedback-overlay,
     .comic-feedback-overlay .comic-feedback { transition: none; }
 }
+
+
+/* =========================================================
+   LEXIQUE — COMIC EDITION
+   Global visual refresh. Keeps existing HTML, Supabase,
+   language settings, accent controls and page interactions.
+========================================================= */
+:root {
+    --comic-paper: #fffaf0;
+    --comic-ink: #242321;
+    --comic-yellow: #ffd84d;
+    --comic-coral: #ff765f;
+    --comic-blue: #8ec8e8;
+    --comic-line: 2px solid var(--comic-ink);
+    --comic-shadow: 5px 5px 0 var(--comic-ink);
+    --comic-shadow-small: 3px 3px 0 var(--comic-ink);
+    --comic-radius: 16px;
+}
+
+body {
+    background-color: var(--comic-paper) !important;
+    background-image: radial-gradient(rgba(36,35,33,.055) .7px, transparent .7px) !important;
+    background-size: 9px 9px !important;
+    color: var(--comic-ink);
+}
+
+.site-header {
+    isolation: isolate;
+    overflow: hidden;
+    padding: 34px 20px 28px !important;
+    border: 0 !important;
+    border-bottom: var(--comic-line) !important;
+    background: var(--comic-yellow) !important;
+    color: var(--comic-ink) !important;
+}
+.site-header::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    width: 190px;
+    height: 150px;
+    right: 7%;
+    top: -48px;
+    opacity: .16;
+    background-image: radial-gradient(var(--comic-ink) 1.4px, transparent 1.5px);
+    background-size: 8px 8px;
+    transform: rotate(-12deg);
+    pointer-events: none;
+}
+.site-header h1 {
+    color: var(--comic-ink) !important;
+    font-weight: 950 !important;
+    letter-spacing: .16em !important;
+    text-shadow: 2px 2px 0 rgba(255,255,255,.65);
+}
+.site-header p {
+    color: rgba(36,35,33,.78) !important;
+    font-weight: 650;
+}
+
+.learning-progress,
+.daily-goal-section {
+    background: var(--comic-paper) !important;
+    border-bottom: var(--comic-line) !important;
+}
+.progress-item strong { color: var(--comic-ink) !important; }
+.progress-item span {
+    color: #69645b !important;
+    letter-spacing: .08em;
+}
+
+.main-navigation {
+    border-bottom: var(--comic-line) !important;
+    background: #fff !important;
+}
+.main-navigation ul { gap: clamp(12px, 2.8vw, 36px) !important; }
+.main-navigation a {
+    position: relative;
+    color: var(--comic-ink) !important;
+    font-weight: 850 !important;
+    transition: color .18s ease, transform .18s ease, background .18s ease !important;
+}
+.main-navigation a:hover {
+    color: var(--lexique-accent) !important;
+    transform: translateY(-2px);
+}
+.main-navigation a[aria-current="page"],
+.main-navigation a.active {
+    color: var(--lexique-accent) !important;
+    border-bottom: 3px solid var(--lexique-accent) !important;
+}
+
+h1, h2, h3, h4 { color: var(--comic-ink); }
+.featured-word > h2,
+.daily-content-heading h2,
+.page-title h2,
+.library-sidebar h2,
+.library-header h2 {
+    font-weight: 900 !important;
+    letter-spacing: -.035em;
+}
+.featured-word > h2::before,
+.daily-content-heading h2::before {
+    content: "✦";
+    display: inline-block;
+    margin-right: 9px;
+    color: var(--lexique-accent);
+    transform: rotate(-12deg);
+}
+
+.word-card,
+.daily-content-entry,
+.import-card,
+.study-setup,
+.study-complete,
+.study-flashcard,
+.settings-sidebar,
+.settings-content,
+.statistics-module,
+.distribution-item,
+.activity-grid > div,
+.plan-item,
+.vocabulary-card {
+    border: var(--comic-line) !important;
+    border-radius: var(--comic-radius) !important;
+    box-shadow: var(--comic-shadow) !important;
+    background: #fff !important;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease !important;
+}
+.import-card:hover,
+.statistics-module:hover,
+.distribution-item:hover,
+.activity-grid > div:hover,
+.plan-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 7px 8px 0 var(--comic-ink) !important;
+}
+.featured-word .word-card,
+.daily-content-entry {
+    border-left: var(--comic-line) !important;
+}
+.featured-word .word-card h3 {
+    display: inline-block;
+    width: fit-content;
+    padding: 3px 10px 5px;
+    background: var(--comic-yellow);
+    border: 1.5px solid var(--comic-ink);
+    border-radius: 7px;
+    box-shadow: 2px 2px 0 var(--comic-ink);
+    font-weight: 900 !important;
+}
+.daily-content-source,
+.daily-content-eyebrow {
+    color: var(--lexique-accent-strong) !important;
+    font-weight: 900 !important;
+}
+.daily-content-entry h3 { font-weight: 850 !important; }
+
+.word-row {
+    margin: 0 0 10px;
+    border: 1.5px solid var(--comic-ink) !important;
+    border-radius: 12px;
+    box-shadow: 2px 2px 0 rgba(36,35,33,.8);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease !important;
+}
+.word-row:hover {
+    transform: translate(-2px,-2px) !important;
+    box-shadow: 4px 4px 0 var(--comic-ink) !important;
+    background: #fff7dc !important;
+}
+.word-info h3 { font-weight: 850 !important; }
+
+.library-sidebar li button,
+.settings-tab {
+    border: 1.5px solid transparent;
+    border-radius: 10px !important;
+    font-weight: 750;
+    transition: transform .16s ease, background .16s ease, border-color .16s ease !important;
+}
+.library-sidebar li button:hover,
+.settings-tab:not(.active):hover {
+    transform: translateX(3px);
+    border-color: var(--comic-ink);
+}
+.library-sidebar li.active button,
+.settings-tab.active {
+    background: var(--lexique-accent) !important;
+    border: 1.5px solid var(--comic-ink) !important;
+    box-shadow: 2px 2px 0 var(--comic-ink);
+    color: #fff !important;
+}
+
+button,
+.primary-button,
+.secondary-button,
+.study-primary-button,
+.account-login,
+.account-logout,
+.upload-button {
+    -webkit-tap-highlight-color: transparent;
+}
+button,
+.primary-button,
+.secondary-button,
+.study-primary-button {
+    transition: transform .16s ease, box-shadow .16s ease, filter .16s ease, background .16s ease !important;
+}
+button:not(:disabled):hover,
+.primary-button:hover,
+.secondary-button:hover,
+.study-primary-button:hover {
+    filter: saturate(1.08);
+}
+button:not(:disabled):active,
+.primary-button:active,
+.secondary-button:active,
+.study-primary-button:active {
+    transform: translate(2px,2px) scale(.985) !important;
+    box-shadow: 1px 1px 0 var(--comic-ink) !important;
+}
+button:disabled,
+button[disabled],
+.primary-button:disabled,
+.study-primary-button:disabled {
+    cursor: not-allowed !important;
+    opacity: .48;
+    transform: none !important;
+    box-shadow: none !important;
+}
+.primary-button,
+.study-primary-button {
+    min-height: 48px;
+    padding: 0 24px;
+    border: var(--comic-line) !important;
+    border-radius: 11px !important;
+    background: var(--comic-yellow) !important;
+    color: var(--comic-ink) !important;
+    font-weight: 900 !important;
+    box-shadow: 4px 4px 0 var(--comic-ink) !important;
+}
+.primary-button:hover,
+.study-primary-button:hover {
+    background: #ffe477 !important;
+    color: var(--comic-ink) !important;
+    transform: translate(-2px,-2px) !important;
+    box-shadow: 6px 6px 0 var(--comic-ink) !important;
+}
+.secondary-button {
+    border: 1.5px solid var(--comic-ink) !important;
+    border-radius: 10px !important;
+    background: #fff !important;
+    box-shadow: 2px 2px 0 var(--comic-ink);
+}
+.secondary-button:hover {
+    background: #fff4c9 !important;
+    transform: translate(-1px,-1px);
+    box-shadow: 3px 3px 0 var(--comic-ink);
+}
+.account-login,
+.account-logout {
+    padding: 7px 12px !important;
+    border: 1.5px solid var(--comic-ink) !important;
+    border-radius: 8px;
+    background: #fff !important;
+    color: var(--comic-ink) !important;
+    box-shadow: 2px 2px 0 var(--comic-ink);
+    font-weight: 850 !important;
+}
+.account-login:hover,
+.account-logout:hover {
+    color: var(--comic-ink) !important;
+    background: var(--comic-coral) !important;
+    transform: translate(-1px,-1px);
+}
+.account-signed-in { color: var(--comic-ink) !important; }
+.account-check {
+    background: var(--lexique-accent) !important;
+    border: 1px solid var(--comic-ink);
+}
+
+input, select, textarea {
+    border: 1.5px solid #5d5951 !important;
+    border-radius: 10px !important;
+    background: #fff !important;
+    transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease !important;
+}
+input:focus, select:focus, textarea:focus {
+    border-color: var(--lexique-accent) !important;
+    box-shadow: 3px 3px 0 var(--lexique-accent-soft) !important;
+}
+.upload-box,
+.history-empty {
+    border: 2px dashed var(--comic-ink) !important;
+    border-radius: 14px !important;
+    background: #fff8df !important;
+}
+.format-list div {
+    border: 1.5px solid var(--comic-ink);
+    box-shadow: 2px 2px 0 var(--comic-ink);
+    font-weight: 800;
+    transition: transform .16s ease, box-shadow .16s ease !important;
+}
+.format-list div:hover {
+    transform: translate(-1px,-1px);
+    box-shadow: 3px 3px 0 var(--comic-ink);
+}
+
+.daily-goal-track {
+    height: 15px !important;
+    border: 1.5px solid var(--comic-ink);
+    border-radius: 99px !important;
+    background: #fff !important;
+}
+.daily-goal-track span {
+    border-radius: 99px !important;
+    background: var(--comic-coral) !important;
+}
+.daily-goal-count { font-weight: 900 !important; }
+
+a:focus-visible, button:focus-visible, input:focus-visible,
+select:focus-visible, textarea:focus-visible {
+    outline: 3px solid var(--lexique-accent) !important;
+    outline-offset: 3px !important;
+}
+::selection { background: var(--comic-yellow); color: var(--comic-ink); }
+
+@keyframes comic-pop-in {
+    0% { opacity: 0; transform: scale(.96) translateY(8px); }
+    70% { opacity: 1; transform: scale(1.012) translateY(-1px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.comic-feedback.is-visible,
+.comic-feedback-overlay.is-visible .comic-feedback {
+    animation: comic-pop-in .28s ease-out both;
+}
+
+body[data-theme="dark"] {
+    --comic-paper: #171b19;
+    --comic-ink: #edf2ee;
+    --comic-yellow: #806b2c;
+    --comic-coral: #a95445;
+    background-color: var(--lexique-page) !important;
+    background-image: radial-gradient(rgba(237,242,238,.045) .7px, transparent .7px) !important;
+}
+body[data-theme="dark"] .site-header {
+    background: #514522 !important;
+    border-color: var(--lexique-border) !important;
+}
+body[data-theme="dark"] .site-header h1,
+body[data-theme="dark"] .site-header p {
+    color: #fff7df !important;
+}
+body[data-theme="dark"] .main-navigation,
+body[data-theme="dark"] .learning-progress,
+body[data-theme="dark"] .daily-goal-section {
+    background: var(--lexique-surface) !important;
+}
+body[data-theme="dark"] .word-card,
+body[data-theme="dark"] .daily-content-entry,
+body[data-theme="dark"] .import-card,
+body[data-theme="dark"] .study-setup,
+body[data-theme="dark"] .study-complete,
+body[data-theme="dark"] .study-flashcard,
+body[data-theme="dark"] .settings-sidebar,
+body[data-theme="dark"] .settings-content,
+body[data-theme="dark"] .statistics-module,
+body[data-theme="dark"] .distribution-item,
+body[data-theme="dark"] .activity-grid > div,
+body[data-theme="dark"] .plan-item,
+body[data-theme="dark"] .vocabulary-card,
+body[data-theme="dark"] .word-row {
+    background: var(--lexique-surface) !important;
+    border-color: var(--lexique-border) !important;
+    box-shadow: 4px 4px 0 rgba(0,0,0,.3) !important;
+}
+body[data-theme="dark"] .featured-word .word-card h3 {
+    background: #514522;
+    border-color: var(--lexique-border);
+    color: #fff7df;
+}
+body[data-theme="dark"] .primary-button,
+body[data-theme="dark"] .study-primary-button {
+    background: #d9b947 !important;
+    color: #242321 !important;
+    border-color: #101311 !important;
+}
+body[data-theme="dark"] .secondary-button,
+body[data-theme="dark"] .account-login,
+body[data-theme="dark"] .account-logout {
+    background: var(--lexique-surface-muted) !important;
+    color: var(--lexique-text) !important;
+    border-color: var(--lexique-border) !important;
+}
+body[data-theme="dark"] input,
+body[data-theme="dark"] select,
+body[data-theme="dark"] textarea {
+    background: var(--lexique-surface-muted) !important;
+    color: var(--lexique-text) !important;
+    border-color: var(--lexique-border) !important;
+}
+body[data-theme="dark"] .upload-box,
+body[data-theme="dark"] .history-empty {
+    background: var(--lexique-surface-muted) !important;
+    border-color: var(--lexique-border) !important;
+}
+
+@media (max-width: 760px) {
+    .site-header { padding: 28px 16px 23px !important; }
+    .site-header h1 { letter-spacing: .12em !important; }
+    .word-card, .daily-content-entry, .import-card,
+    .study-setup, .study-complete, .study-flashcard,
+    .settings-content, .statistics-module, .distribution-item,
+    .activity-grid > div, .plan-item, .vocabulary-card {
+        box-shadow: 3px 3px 0 var(--comic-ink) !important;
+    }
+    .primary-button, .study-primary-button {
+        min-height: 46px;
+        box-shadow: 3px 3px 0 var(--comic-ink) !important;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    button, .primary-button, .secondary-button, .study-primary-button,
+    .word-row, .import-card, .statistics-module, .distribution-item,
+    .activity-grid > div, .plan-item {
+        transition: none !important;
+    }
+    .comic-feedback.is-visible,
+    .comic-feedback-overlay.is-visible .comic-feedback {
+        animation: none !important;
+    }
+}
