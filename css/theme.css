@@ -670,3 +670,127 @@ body[data-theme="dark"] .library-sidebar li:hover,
 body[data-theme="dark"] .settings-tab:hover {
     background: var(--lexique-accent-wash) !important;
 }
+
+/* =========================================
+   LEXIQUE — Accent colour controls
+   One accent token drives every interactive
+   and selected state across the whole site.
+========================================= */
+:root {
+    --lexique-accent-hover: var(--lexique-accent-strong);
+    --lexique-focus-ring: color-mix(in srgb, var(--lexique-accent) 24%, transparent);
+}
+
+/* Selected navigation and section controls */
+.main-navigation a[aria-current="page"],
+.main-navigation a.active,
+.library-sidebar li.active,
+.settings-tab.active {
+    color: #fff !important;
+    background-color: var(--lexique-accent) !important;
+    border-color: var(--lexique-accent) !important;
+}
+
+.main-navigation a[aria-current="page"],
+.main-navigation a.active {
+    color: var(--lexique-accent) !important;
+    background-color: transparent !important;
+    border-bottom-color: var(--lexique-accent) !important;
+}
+
+.settings-tab.active:hover,
+.library-sidebar li.active:hover {
+    background-color: var(--lexique-accent-strong) !important;
+    color: #fff !important;
+}
+
+.settings-tab:not(.active):hover,
+.library-sidebar li:not(.active):hover,
+.secondary-button:hover {
+    background-color: var(--lexique-accent-wash) !important;
+}
+
+/* Primary actions */
+button.primary-button,
+a.primary-button,
+button.study-primary-button,
+.study-primary-button {
+    background: var(--lexique-accent) !important;
+    border-color: var(--lexique-accent) !important;
+    color: #fff !important;
+}
+
+button.primary-button:hover,
+a.primary-button:hover,
+button.study-primary-button:hover,
+.study-primary-button:hover {
+    background: var(--lexique-accent-strong) !important;
+    border-color: var(--lexique-accent-strong) !important;
+}
+
+/* Form controls: checkbox, radio and range must follow the theme */
+input[type="checkbox"],
+input[type="radio"],
+input[type="range"],
+progress {
+    accent-color: var(--lexique-accent) !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus-visible,
+a:focus-visible,
+.settings-tab:focus-visible {
+    outline-color: var(--lexique-focus-ring) !important;
+    border-color: var(--lexique-accent) !important;
+    box-shadow: 0 0 0 3px var(--lexique-accent-soft) !important;
+}
+
+/* Accent-tinted information and learning states */
+.status-badge,
+.word-tag span,
+.word-meta span,
+.format-list div {
+    background-color: var(--lexique-accent-soft) !important;
+    color: var(--lexique-accent-strong) !important;
+}
+
+.format-list div:hover {
+    background-color: var(--lexique-accent) !important;
+    color: #fff !important;
+}
+
+.daily-goal-track,
+.study-progress-track {
+    background-color: var(--lexique-accent-soft) !important;
+}
+
+.daily-goal-track > span,
+#daily-goal-fill,
+#study-progress-fill {
+    background-color: var(--lexique-accent) !important;
+}
+
+.study-rating-buttons button:hover,
+.study-rating-buttons button[aria-pressed="true"],
+.study-reveal-button:hover {
+    border-color: var(--lexique-accent) !important;
+    color: var(--lexique-accent) !important;
+    background-color: var(--lexique-accent-soft) !important;
+}
+
+/* Ensure the dark theme uses the same selected accent states. */
+body[data-theme="dark"] .settings-tab.active,
+body[data-theme="dark"] .library-sidebar li.active {
+    background-color: var(--lexique-accent) !important;
+    border-color: var(--lexique-accent) !important;
+    color: #fff !important;
+}
+
+body[data-theme="dark"] .settings-tab:not(.active):hover,
+body[data-theme="dark"] .library-sidebar li:not(.active):hover,
+body[data-theme="dark"] .secondary-button:hover {
+    background-color: var(--lexique-accent-wash) !important;
+}
+
