@@ -18,14 +18,14 @@
     }
 
     function renderSignedIn(user) {
-        const email = user?.email || "Signed in";
         accountControl.innerHTML = `
-            <span class="account-signed-in" title="${email}" aria-label="Signed in">
+            <span class="account-signed-in" aria-label="Signed in">
                 <span class="account-check" aria-hidden="true">✓</span>
                 <span class="account-label">SIGNED IN</span>
             </span>
             <button class="account-logout" type="button">LOG OUT</button>
         `;
+        accountControl.querySelector(".account-signed-in").title = user?.email || "Signed in";
         accountControl.querySelector(".account-logout").addEventListener("click", async () => {
             const button = accountControl.querySelector(".account-logout");
             button.disabled = true;
