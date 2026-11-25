@@ -1,81 +1,372 @@
-/* LEXIQUE theme overrides */
+/* LEXIQUE — shared visual system */
 :root {
     --lexique-accent: #1d8f5a;
     --lexique-accent-soft: #e8f5ee;
-    --lexique-page: #f8f8f8;
+    --lexique-page: #f5f7f5;
     --lexique-surface: #ffffff;
-    --lexique-text: #222222;
-    --lexique-muted: #666666;
-    --lexique-border: #dddddd;
+    --lexique-text: #202923;
+    --lexique-muted: #6d7770;
+    --lexique-border: #e2e8e3;
+    --lexique-shadow: 0 8px 24px rgba(28, 55, 39, 0.055);
+    --lexique-radius: 14px;
+    --lexique-font: Inter, "Segoe UI", Arial, Helvetica, sans-serif;
 }
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     background: var(--lexique-page);
     color: var(--lexique-text);
+    font-family: var(--lexique-font);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
 }
-.site-header,
-.learning-progress,
-.main-navigation,
-.import-card,
+
+.site-header {
+    padding: 30px 20px 25px;
+    background: var(--lexique-surface);
+    border-bottom: 1px solid var(--lexique-border);
+    color: var(--lexique-text);
+}
+
+.site-header h1 {
+    font-size: clamp(34px, 4vw, 48px);
+    font-weight: 750;
+    letter-spacing: 0.22em;
+    line-height: 1.15;
+}
+
+.site-header p {
+    margin: 8px 0 0;
+    color: var(--lexique-muted);
+    font-size: 13px;
+    letter-spacing: 0.035em;
+}
+
+.learning-progress {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    gap: 0;
+    padding: 16px 20px;
+    background: var(--lexique-surface);
+    border-bottom: 1px solid var(--lexique-border);
+}
+
+.progress-item {
+    width: min(190px, 25%);
+    padding: 5px 18px;
+    border-right: 1px solid var(--lexique-border);
+}
+
+.progress-item:last-child {
+    border-right: 0;
+}
+
+.progress-item span {
+    color: var(--lexique-muted);
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+}
+
+.progress-item strong {
+    margin-top: 6px;
+    color: var(--lexique-text);
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1.25;
+    font-variant-numeric: tabular-nums;
+}
+
+.main-navigation {
+    position: relative;
+    z-index: 5;
+    background: var(--lexique-surface);
+    border-bottom: 1px solid var(--lexique-border);
+}
+
+.main-navigation ul {
+    gap: clamp(18px, 3.2vw, 42px);
+    padding: 0 20px;
+    min-height: 56px;
+}
+
+.main-navigation a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 56px;
+    border-bottom: 2px solid transparent;
+    color: var(--lexique-muted);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.075em;
+    transition: color .18s ease, border-color .18s ease;
+}
+
+.main-navigation a:hover,
+.main-navigation a[aria-current="page"] {
+    color: var(--lexique-accent);
+    border-bottom-color: var(--lexique-accent);
+}
+
+.main-content,
+.library-container,
+.import-container,
+.study-container {
+    width: min(100% - 48px, 1160px);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.main-content {
+    padding: 42px 0 70px;
+}
+
+.library-container,
+.import-container {
+    padding-top: 42px;
+    padding-bottom: 70px;
+}
+
+h1, h2, h3, h4 {
+    color: var(--lexique-text);
+    line-height: 1.25;
+}
+
+p {
+    color: inherit;
+}
+
 .word-card,
+.daily-content-entry,
+.import-card,
+.study-setup,
+.study-complete,
+.study-flashcard,
 .settings-sidebar,
 .settings-content,
 .statistics-module,
 .distribution-item,
+.activity-grid > div,
+.plan-item,
+.vocabulary-card {
+    background: var(--lexique-surface);
+    border: 1px solid var(--lexique-border);
+    border-radius: var(--lexique-radius);
+    box-shadow: var(--lexique-shadow);
+}
+
+.word-card,
+.import-card,
+.settings-content,
+.statistics-module,
+.distribution-item,
 .activity-grid > div {
-    background-color: var(--lexique-surface);
     color: var(--lexique-text);
 }
-.main-navigation { border-bottom-color: var(--lexique-accent); }
-.main-navigation a:hover,
-nav a:hover { color: var(--lexique-accent); }
-.settings-tab.active { background: var(--lexique-accent); }
-.primary-button { background: var(--lexique-accent); }
-.primary-button:hover { background: var(--lexique-accent); filter: brightness(.9); }
-.status-badge { color: var(--lexique-accent); }
+
+.library-sidebar {
+    border-color: var(--lexique-border);
+}
+
+.library-sidebar li,
+.settings-tab {
+    transition: background-color .18s ease, color .18s ease;
+}
+
+.library-sidebar li.active {
+    background: var(--lexique-accent);
+}
+
+.library-header {
+    border-bottom-color: var(--lexique-border);
+}
+
+.word-row {
+    background: var(--lexique-surface);
+    border-bottom-color: var(--lexique-border);
+}
+
+.word-row:hover {
+    background: var(--lexique-accent-soft);
+    transform: none;
+}
+
+.word-tag span,
+.word-meta span,
+.format-list div {
+    background: var(--lexique-accent-soft);
+    color: var(--lexique-accent);
+}
+
+input, select, textarea {
+    font: inherit;
+    color: var(--lexique-text);
+    border-color: var(--lexique-border);
+}
+
+input:focus, select:focus, textarea:focus,
+button:focus-visible, a:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--lexique-accent) 22%, transparent);
+    outline-offset: 2px;
+}
+
+.primary-button,
+.study-primary-button {
+    background: var(--lexique-accent);
+    border-radius: 9px;
+    box-shadow: none;
+}
+
+.primary-button:hover,
+.study-primary-button:hover {
+    background: var(--lexique-accent);
+    filter: brightness(.93);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px color-mix(in srgb, var(--lexique-accent) 18%, transparent);
+}
+
+.secondary-button {
+    border-color: var(--lexique-border);
+    border-radius: 9px;
+    color: var(--lexique-text);
+}
+
+.status-badge {
+    color: var(--lexique-accent);
+}
+
+.daily-goal-section {
+    background: var(--lexique-surface);
+    border-bottom: 1px solid var(--lexique-border);
+}
+
 body[data-accent="green"] { --lexique-accent:#1d8f5a; --lexique-accent-soft:#e8f5ee; }
 body[data-accent="blue"] { --lexique-accent:#2878c7; --lexique-accent-soft:#eaf3fc; }
 body[data-accent="purple"] { --lexique-accent:#8054b8; --lexique-accent-soft:#f2ecf9; }
 body[data-accent="orange"] { --lexique-accent:#d97724; --lexique-accent-soft:#fff2e5; }
 
 body[data-theme="dark"] {
-    --lexique-page:#17191d;
-    --lexique-surface:#22262c;
-    --lexique-text:#eeeeee;
-    --lexique-muted:#b5bbc4;
-    --lexique-border:#3b414a;
+    --lexique-page:#171b19;
+    --lexique-surface:#222925;
+    --lexique-text:#edf2ee;
+    --lexique-muted:#aeb9b1;
+    --lexique-border:#39443d;
+    --lexique-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
 }
+
 body[data-theme="dark"] .site-header,
 body[data-theme="dark"] .learning-progress,
 body[data-theme="dark"] .main-navigation,
-body[data-theme="dark"] .import-card,
+body[data-theme="dark"] .daily-goal-section,
 body[data-theme="dark"] .word-card,
+body[data-theme="dark"] .daily-content-entry,
+body[data-theme="dark"] .import-card,
+body[data-theme="dark"] .study-setup,
+body[data-theme="dark"] .study-complete,
+body[data-theme="dark"] .study-flashcard,
 body[data-theme="dark"] .settings-sidebar,
 body[data-theme="dark"] .settings-content,
 body[data-theme="dark"] .statistics-module,
 body[data-theme="dark"] .distribution-item,
-body[data-theme="dark"] .activity-grid > div {
-    background-color:var(--lexique-surface);
-    color:var(--lexique-text);
-    border-color:var(--lexique-border);
+body[data-theme="dark"] .activity-grid > div,
+body[data-theme="dark"] .plan-item,
+body[data-theme="dark"] .vocabulary-card {
+    background: var(--lexique-surface);
+    color: var(--lexique-text);
+    border-color: var(--lexique-border);
 }
+
 body[data-theme="dark"] .main-navigation a,
 body[data-theme="dark"] .setting-item label,
 body[data-theme="dark"] .settings-tab,
 body[data-theme="dark"] .word-info p,
-body[data-theme="dark"] .site-header p {
-    color:var(--lexique-muted);
+body[data-theme="dark"] .site-header p,
+body[data-theme="dark"] .progress-item span {
+    color: var(--lexique-muted);
 }
+
+body[data-theme="dark"] .word-row {
+    background: var(--lexique-surface);
+    color: var(--lexique-text);
+    border-color: var(--lexique-border);
+}
+
+body[data-theme="dark"] .word-row:hover {
+    background: color-mix(in srgb, var(--lexique-accent) 12%, var(--lexique-surface));
+}
+
 body[data-theme="dark"] input,
 body[data-theme="dark"] select,
 body[data-theme="dark"] textarea {
-    background:#2b3038;
-    color:#f2f2f2;
-    border-color:#4a515c;
+    background: #2b332e;
+    color: var(--lexique-text);
+    border-color: var(--lexique-border);
 }
-body[data-theme="dark"] .word-row,
-body[data-theme="dark"] .upload-box,
-body[data-theme="dark"] .history-empty {
-    background:#252a31;
-    color:var(--lexique-text);
-    border-color:var(--lexique-border);
+
+@media (max-width: 760px) {
+    .site-header {
+        padding: 24px 16px 20px;
+    }
+
+    .learning-progress {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        padding: 12px 14px;
+    }
+
+    .progress-item {
+        width: auto;
+        padding: 10px 12px;
+        border-right: 0;
+        border-bottom: 1px solid var(--lexique-border);
+        text-align: center;
+    }
+
+    .progress-item:nth-last-child(-n+2) {
+        border-bottom: 0;
+    }
+
+    .main-navigation {
+        overflow-x: auto;
+    }
+
+    .main-navigation ul {
+        justify-content: flex-start;
+        width: max-content;
+        min-width: 100%;
+        gap: 22px;
+        padding: 0 18px;
+    }
+
+    .main-content,
+    .library-container,
+    .import-container,
+    .study-container {
+        width: min(100% - 32px, 1160px);
+    }
+
+    .main-content,
+    .library-container,
+    .import-container {
+        padding-top: 28px;
+        padding-bottom: 48px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+    }
 }
