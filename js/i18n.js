@@ -183,7 +183,7 @@
 
     const trimmed = original.trim();
     if (!trimmed) return;
-    const translated = dict[trimmed] || trimmed;
+    const translated = dictionaries[language]?.[trimmed] || trimmed;
     node.nodeValue = original.replace(trimmed, translated);
   }
   function translateTree(root, language) {
