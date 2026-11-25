@@ -4,17 +4,25 @@
     const accentSelect = document.getElementById("accent-select");
     const languageSelect = document.getElementById("language-select");
 
+    // Keep preference values independent from translated option labels.
+    const themes = ["light", "dark"];
+    const accents = ["green", "blue", "purple", "orange"];
+
     function applyPreferences() {
-        const theme = localStorage.getItem("lexique_theme") || "light";
-        const accent = localStorage.getItem("lexique_accent") || "green";
+        let theme = localStorage.getItem("lexique_theme") || "light";
+        let accent = localStorage.getItem("lexique_accent") || "green";
+
+        if (!themes.includes(theme)) theme = "light";
+        if (!accents.includes(accent)) accent = "green";
+
         document.body.dataset.theme = theme;
         document.body.dataset.accent = accent;
-        if (themeSelect) themeSelect.value = theme === "dark" ? "Dark" : "Light";
+
+        if (themeSelect) {
+            themeSelect.selectedIndex = themes.indexOf(theme);
+        }
         if (accentSelect) {
-            const option = Array.from(accentSelect.options).find(
-                item => item.textContent.trim().toLowerCase() === accent
-            );
-            if (option) accentSelect.value = option.value;
+            accentSelect.selectedIndex = accents.indexOf(accent);
         }
         if (languageSelect && window.lexiqueI18n) {
             languageSelect.value = window.lexiqueI18n.getLanguage();
@@ -24,12 +32,13 @@
     applyPreferences();
 
     themeSelect?.addEventListener("change", () => {
-        localStorage.setItem("lexique_theme", themeSelect.value.toLowerCase());
+        const theme = themes[themeSelect.selectedIndex] || "light";
+        localStorage.setItem("lexique_theme", theme);
         applyPreferences();
     });
 
     accentSelect?.addEventListener("change", () => {
-        const accent = (accentSelect.selectedOptions[0]?.textContent || "Green").trim().toLowerCase();
+        const accent = accents[accentSelect.selectedIndex] || "green";
         localStorage.setItem("lexique_accent", accent);
         applyPreferences();
     });
