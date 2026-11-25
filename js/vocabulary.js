@@ -13,48 +13,66 @@ let knownWordsLoaded = false;
 let duplicateMessage = null;
 
 function showComicFeedback(title, message = "", type = "success") {
-    const container = document.querySelector(".import-container");
-    if (!container) {
-        alert([title, message].filter(Boolean).join("\n"));
-        return;
+    let overlay = document.getElementById("import-comic-overlay");
+    if (!overlay) {
+        overlay = document.createElement("div");
+        overlay.id = "import-comic-overlay";
+        overlay.className = "comic-feedback-overlay";
+        overlay.addEventListener("click", event => {
+            if (event.target === overlay) closeComicFeedback();
+        });
+        document.body.appendChild(overlay);
     }
 
-    let notice = document.getElementById("import-comic-feedback");
-    if (!notice) {
-        notice = document.createElement("section");
-        notice.id = "import-comic-feedback";
-        notice.className = "comic-feedback";
-        notice.setAttribute("role", "status");
-        notice.setAttribute("aria-live", "polite");
-        container.prepend(notice);
-    }
+    overlay.innerHTML = "";
+    const dialog = document.createElement("section");
+    dialog.className = "comic-feedback comic-feedback--" + type;
+    dialog.setAttribute("role", "dialog");
+    dialog.setAttribute("aria-modal", "true");
+    dialog.setAttribute("aria-labelledby", "import-comic-title");
 
-    notice.className = "comic-feedback comic-feedback--" + type;
-    notice.innerHTML = "";
-    const burst = document.createElement("span");
-    burst.className = "comic-feedback__burst";
-    burst.setAttribute("aria-hidden", "true");
-    burst.textContent = type === "success" ? "✦ POW! ✦" : "!";
+    const icon = document.createElement("span");
+    icon.className = "comic-feedback__icon";
+    icon.setAttribute("aria-hidden", "true");
+
+    const close = document.createElement("button");
+    close.className = "comic-feedback__close";
+    close.type = "button";
+    close.setAttribute("aria-label", "关闭提示");
+    close.textContent = "×";
+    close.addEventListener("click", closeComicFeedback);
+
     const heading = document.createElement("strong");
+    heading.id = "import-comic-title";
     heading.className = "comic-feedback__title";
     heading.textContent = title;
-    notice.append(burst, heading);
+    dialog.append(icon, close, heading);
 
     if (message) {
         const detail = document.createElement("p");
         detail.className = "comic-feedback__detail";
         detail.textContent = message;
-        notice.appendChild(detail);
+        dialog.appendChild(detail);
     }
 
-    notice.classList.remove("is-visible");
-    requestAnimationFrame(() => notice.classList.add("is-visible"));
-    window.clearTimeout(notice.dismissTimer);
-    notice.dismissTimer = window.setTimeout(() => {
-        notice.classList.remove("is-visible");
-    }, 6500);
+    overlay.appendChild(dialog);
+    window.clearTimeout(overlay.dismissTimer);
+    overlay.classList.remove("is-visible");
+    requestAnimationFrame(() => overlay.classList.add("is-visible"));
+    overlay.dismissTimer = window.setTimeout(closeComicFeedback, 6500);
 }
 
+function closeComicFeedback() {
+    const overlay = document.getElementById("import-comic-overlay");
+    if (!overlay) return;
+    window.clearTimeout(overlay.dismissTimer);
+    overlay.classList.remove("is-visible");
+    window.setTimeout(() => overlay.remove(), 240);
+}
+
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape") closeComicFeedback();
+});
 function normalizeWord(value) {
     return String(value || "").trim().toLocaleLowerCase();
 }
