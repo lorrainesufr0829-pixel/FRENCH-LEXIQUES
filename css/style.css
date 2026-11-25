@@ -2945,3 +2945,77 @@ body[data-theme="dark"] .featured-word .word-card {
 @media (max-width: 480px) {
     .featured-word .word-card { padding: 18px 16px; }
 }
+
+
+/* =====================================
+   LEXIQUE — Header account control
+===================================== */
+.site-header {
+    position: relative;
+}
+.account-nav {
+    position: absolute;
+    top: 18px;
+    right: max(24px, calc((100% - 1180px) / 2));
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 13px;
+    z-index: 5;
+    font-size: 11px;
+    letter-spacing: .7px;
+}
+.account-login,
+.account-logout {
+    color: var(--lexique-text, #333);
+    text-decoration: none;
+    font: inherit;
+    font-weight: 700;
+    letter-spacing: inherit;
+}
+.account-login:hover,
+.account-logout:hover {
+    color: var(--lexique-accent, #1d8f5a);
+}
+.account-signed-in {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #21864b;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.account-check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #21864b;
+    color: #fff;
+    font-size: 13px;
+    line-height: 1;
+}
+.account-logout {
+    padding: 5px 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.account-logout:disabled {
+    opacity: .55;
+    cursor: wait;
+}
+@media (max-width: 760px) {
+    .account-nav {
+        top: 10px;
+        right: 14px;
+        gap: 10px;
+        font-size: 10px;
+    }
+    .site-header {
+        padding-top: 49px;
+    }
+}
