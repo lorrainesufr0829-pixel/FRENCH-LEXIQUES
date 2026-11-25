@@ -33,8 +33,15 @@ async function updateProgress(){
 
         if(!progress){
 
+            // Logged-out visitors have no personal learning streak.
+            document
+            .querySelectorAll("#memory-streak")
+            .forEach(function(el){
+                el.textContent = "0 Days";
+            });
+
             console.warn(
-                "No user progress found"
+                "No user progress found; memory streak reset to zero"
             );
 
             return;
