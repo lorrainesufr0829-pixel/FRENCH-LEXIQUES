@@ -370,3 +370,303 @@ body[data-theme="dark"] textarea {
         animation-iteration-count: 1 !important;
     }
 }
+
+
+/* =========================================
+   LEXIQUE — Global colour system override
+   Keep this section last: it normalizes legacy
+   hard-coded colours across every page.
+========================================= */
+:root {
+    color-scheme: light;
+    --lexique-page: #f4f7f5;
+    --lexique-surface: #ffffff;
+    --lexique-surface-muted: #f7faf8;
+    --lexique-text: #202b25;
+    --lexique-muted: #68766e;
+    --lexique-border: #dce6df;
+    --lexique-accent: #247a52;
+    --lexique-accent-strong: #1d6845;
+    --lexique-accent-soft: #e8f3ec;
+    --lexique-accent-wash: #f1f7f3;
+    --lexique-shadow: 0 8px 26px rgba(28, 58, 40, .055);
+}
+
+body[data-accent="green"] {
+    --lexique-accent: #247a52;
+    --lexique-accent-strong: #1d6845;
+    --lexique-accent-soft: #e8f3ec;
+    --lexique-accent-wash: #f1f7f3;
+}
+body[data-accent="blue"] {
+    --lexique-accent: #326da8;
+    --lexique-accent-strong: #285887;
+    --lexique-accent-soft: #eaf1f8;
+    --lexique-accent-wash: #f2f6fb;
+}
+body[data-accent="purple"] {
+    --lexique-accent: #7655a6;
+    --lexique-accent-strong: #604487;
+    --lexique-accent-soft: #f0ebf6;
+    --lexique-accent-wash: #f7f4fa;
+}
+body[data-accent="orange"] {
+    --lexique-accent: #bd6b2c;
+    --lexique-accent-strong: #985321;
+    --lexique-accent-soft: #fbefe5;
+    --lexique-accent-wash: #fdf7f1;
+}
+
+body {
+    background: var(--lexique-page) !important;
+    color: var(--lexique-text) !important;
+}
+.site-header,
+.learning-progress,
+.main-navigation,
+.daily-goal-section {
+    background: var(--lexique-surface) !important;
+    border-color: var(--lexique-border) !important;
+}
+.site-header h1,
+.progress-item strong,
+h1, h2, h3, h4,
+.library-header h2,
+.library-sidebar h2 {
+    color: var(--lexique-text);
+}
+.site-header p,
+.progress-item span,
+.main-navigation a,
+.library-header span,
+.word-info p,
+.setting-item label,
+.settings-tab {
+    color: var(--lexique-muted);
+}
+.main-navigation {
+    border-bottom: 1px solid var(--lexique-border) !important;
+}
+.main-navigation a:hover,
+.main-navigation a[aria-current="page"] {
+    color: var(--lexique-accent) !important;
+    border-bottom-color: var(--lexique-accent) !important;
+}
+.daily-goal-section {
+    color: var(--lexique-text);
+}
+.daily-goal-track {
+    background: var(--lexique-accent-soft) !important;
+}
+.daily-goal-track span,
+#daily-goal-fill {
+    background: var(--lexique-accent) !important;
+}
+.word-card,
+.daily-content-entry,
+.import-card,
+.study-setup,
+.study-complete,
+.study-flashcard,
+.settings-sidebar,
+.settings-content,
+.statistics-module,
+.distribution-item,
+.activity-grid > div,
+.plan-item,
+.vocabulary-card {
+    background: var(--lexique-surface) !important;
+    color: var(--lexique-text);
+    border-color: var(--lexique-border) !important;
+    box-shadow: var(--lexique-shadow);
+}
+.word-row {
+    background: var(--lexique-surface) !important;
+    color: var(--lexique-text);
+    border-color: var(--lexique-border) !important;
+}
+.word-row:hover,
+.library-sidebar li:hover,
+.settings-tab:hover,
+.secondary-button:hover {
+    background: var(--lexique-accent-wash) !important;
+}
+.library-sidebar li.active,
+.settings-tab.active {
+    background: var(--lexique-accent) !important;
+    color: #fff !important;
+}
+.library-sidebar li.active button {
+    color: #fff !important;
+}
+.word-tag span,
+.word-meta span,
+.format-list div,
+.status-badge {
+    background: var(--lexique-accent-soft);
+    color: var(--lexique-accent-strong);
+}
+.library-header {
+    border-bottom-color: var(--lexique-border) !important;
+}
+.library-search input,
+.manual-form input,
+.manual-form select,
+.setting-item select,
+.setting-item input[type="number"],
+.study-setup-controls select,
+input, select, textarea {
+    background: var(--lexique-surface) !important;
+    color: var(--lexique-text) !important;
+    border-color: var(--lexique-border) !important;
+}
+input::placeholder,
+textarea::placeholder {
+    color: var(--lexique-muted);
+}
+.library-search input:focus,
+.manual-form input:focus,
+.manual-form select:focus,
+.setting-item select:focus,
+.setting-item input:focus {
+    border-color: var(--lexique-accent) !important;
+    box-shadow: 0 0 0 3px var(--lexique-accent-soft) !important;
+}
+.primary-button,
+.study-primary-button {
+    background: var(--lexique-accent) !important;
+    color: #fff !important;
+}
+.primary-button:hover,
+.study-primary-button:hover {
+    background: var(--lexique-accent-strong) !important;
+}
+.secondary-button {
+    background: var(--lexique-surface) !important;
+    color: var(--lexique-text) !important;
+    border-color: var(--lexique-border) !important;
+}
+.upload-box,
+.history-empty {
+    background: var(--lexique-surface-muted) !important;
+    border-color: var(--lexique-border) !important;
+    color: var(--lexique-muted);
+}
+.format-list div:hover {
+    background: var(--lexique-accent) !important;
+    color: #fff !important;
+}
+.study-progress-track {
+    background: var(--lexique-accent-soft) !important;
+}
+#study-progress-fill {
+    background: var(--lexique-accent) !important;
+}
+.study-rating-buttons button:hover,
+.study-reveal-button:hover {
+    border-color: var(--lexique-accent) !important;
+    color: var(--lexique-accent) !important;
+}
+.account-login:hover,
+.account-logout:hover {
+    color: var(--lexique-accent) !important;
+}
+
+/* Dark palette is applied consistently to legacy components too. */
+body[data-theme="dark"] {
+    color-scheme: dark;
+    --lexique-page: #151b18;
+    --lexique-surface: #202923;
+    --lexique-surface-muted: #252f29;
+    --lexique-text: #edf3ee;
+    --lexique-muted: #aab8af;
+    --lexique-border: #39483f;
+    --lexique-accent-soft: #293d31;
+    --lexique-accent-wash: #26362c;
+    --lexique-shadow: 0 8px 26px rgba(0, 0, 0, .18);
+}
+body[data-theme="dark"] {
+    background: var(--lexique-page) !important;
+    color: var(--lexique-text) !important;
+}
+body[data-theme="dark"] .site-header,
+body[data-theme="dark"] .learning-progress,
+body[data-theme="dark"] .main-navigation,
+body[data-theme="dark"] .daily-goal-section,
+body[data-theme="dark"] .word-card,
+body[data-theme="dark"] .daily-content-entry,
+body[data-theme="dark"] .import-card,
+body[data-theme="dark"] .study-setup,
+body[data-theme="dark"] .study-complete,
+body[data-theme="dark"] .study-flashcard,
+body[data-theme="dark"] .settings-sidebar,
+body[data-theme="dark"] .settings-content,
+body[data-theme="dark"] .statistics-module,
+body[data-theme="dark"] .distribution-item,
+body[data-theme="dark"] .activity-grid > div,
+body[data-theme="dark"] .plan-item,
+body[data-theme="dark"] .vocabulary-card,
+body[data-theme="dark"] .word-row,
+body[data-theme="dark"] .library-sidebar {
+    background: var(--lexique-surface) !important;
+    color: var(--lexique-text) !important;
+    border-color: var(--lexique-border) !important;
+}
+body[data-theme="dark"] .site-header h1,
+body[data-theme="dark"] h1,
+body[data-theme="dark"] h2,
+body[data-theme="dark"] h3,
+body[data-theme="dark"] h4,
+body[data-theme="dark"] .progress-item strong,
+body[data-theme="dark"] .word-info h3,
+body[data-theme="dark"] .library-header h2 {
+    color: var(--lexique-text) !important;
+}
+body[data-theme="dark"] .site-header p,
+body[data-theme="dark"] .progress-item span,
+body[data-theme="dark"] .main-navigation a,
+body[data-theme="dark"] .word-info p,
+body[data-theme="dark"] .setting-item label,
+body[data-theme="dark"] .settings-tab,
+body[data-theme="dark"] .library-header span,
+body[data-theme="dark"] .study-eyebrow,
+body[data-theme="dark"] .study-card-hint {
+    color: var(--lexique-muted) !important;
+}
+body[data-theme="dark"] .library-sidebar li.active,
+body[data-theme="dark"] .settings-tab.active {
+    background: var(--lexique-accent) !important;
+    color: #fff !important;
+}
+body[data-theme="dark"] .word-tag span,
+body[data-theme="dark"] .word-meta span,
+body[data-theme="dark"] .format-list div {
+    background: var(--lexique-accent-soft) !important;
+    color: var(--lexique-text) !important;
+}
+body[data-theme="dark"] input,
+body[data-theme="dark"] select,
+body[data-theme="dark"] textarea,
+body[data-theme="dark"] .study-setup-controls select,
+body[data-theme="dark"] .setting-item select,
+body[data-theme="dark"] .setting-item input[type="number"] {
+    background: var(--lexique-surface-muted) !important;
+    color: var(--lexique-text) !important;
+    border-color: var(--lexique-border) !important;
+}
+body[data-theme="dark"] .upload-box,
+body[data-theme="dark"] .history-empty {
+    background: var(--lexique-surface-muted) !important;
+    color: var(--lexique-muted) !important;
+    border-color: var(--lexique-border) !important;
+}
+body[data-theme="dark"] .secondary-button {
+    background: var(--lexique-surface-muted) !important;
+    color: var(--lexique-text) !important;
+    border-color: var(--lexique-border) !important;
+}
+body[data-theme="dark"] .word-row:hover,
+body[data-theme="dark"] .library-sidebar li:hover,
+body[data-theme="dark"] .settings-tab:hover {
+    background: var(--lexique-accent-wash) !important;
+}
