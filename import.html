@@ -446,6 +446,21 @@ No recent imports.
 <!-- Your JS -->
 <script src="js/supabase.js"></script>
 
+<script>
+    // Import is a private, account-scoped feature.
+    (async function requireImportLogin() {
+        try {
+            const { data, error } = await window.lexiqueAuth.getSession();
+            if (error || !data?.session) {
+                window.location.replace("auth.html?redirect=import.html");
+            }
+        } catch (error) {
+            console.error("Import authentication check failed:", error);
+            window.location.replace("auth.html?redirect=import.html");
+        }
+    })();
+</script>
+
 <script src="js/storage.js"></script>
 
 <script src="js/vocabulary.js"></script>
