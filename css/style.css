@@ -3019,3 +3019,130 @@ body[data-theme="dark"] .featured-word .word-card {
         padding-top: 49px;
     }
 }
+
+
+/* =====================================
+   HOME — Unified featured content blocks
+===================================== */
+.main-content > .featured-word,
+.main-content > .daily-content-section {
+    margin-top: 34px;
+    color: var(--lexique-text, #222);
+}
+.main-content > .featured-word:first-child {
+    margin-top: 0;
+}
+.featured-word > h2,
+.daily-content-heading h2 {
+    margin: 0 0 16px;
+    color: var(--lexique-text, #222);
+    font-size: 25px;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -.35px;
+}
+.daily-content-heading {
+    margin-bottom: 16px;
+}
+.daily-content-heading h2 {
+    margin-bottom: 7px;
+}
+.daily-content-heading > p:last-child {
+    font-size: 13px;
+    line-height: 1.65;
+}
+.featured-word .word-card,
+.daily-content-entry {
+    min-height: 150px;
+    padding: 25px 28px;
+    border: 1px solid var(--lexique-border, #e2e2e2);
+    border-left: 3px solid var(--lexique-accent, #1d8f5a);
+    border-radius: 10px;
+    background: var(--lexique-surface, #fff);
+    box-shadow: none;
+}
+.featured-word .word-card h3,
+.daily-content-entry h3 {
+    margin: 0 0 10px;
+    color: var(--lexique-text, #222);
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.45;
+}
+.featured-word .word-card p,
+.daily-content-entry .daily-content-description {
+    max-width: 760px;
+    margin: 0 0 10px;
+    color: var(--lexique-muted, #666);
+    font-size: 13px;
+    line-height: 1.7;
+}
+.featured-word .word-card p:last-child,
+.daily-content-entry .daily-content-status {
+    margin-bottom: 0;
+    color: var(--lexique-muted, #888);
+    font-size: 11px;
+    line-height: 1.6;
+}
+.daily-content-entry .daily-content-source {
+    margin: 0 0 10px;
+    color: var(--lexique-muted, #888);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+}
+.daily-listening {
+    margin-top: 34px;
+    padding-top: 30px;
+}
+body[data-theme="dark"] .featured-word .word-card,
+body[data-theme="dark"] .daily-content-entry {
+    border-color: var(--lexique-border);
+    border-left-color: var(--lexique-accent);
+    background: var(--lexique-surface);
+}
+body[data-theme="dark"] .featured-word .word-card h3,
+body[data-theme="dark"] .daily-content-entry h3 {
+    color: var(--lexique-text);
+}
+@media (max-width: 760px) {
+    .main-content > .featured-word,
+    .main-content > .daily-content-section {
+        margin-top: 28px;
+    }
+    .main-content > .featured-word:first-child {
+        margin-top: 0;
+    }
+    .featured-word > h2,
+    .daily-content-heading h2 {
+        font-size: 22px;
+    }
+    .featured-word .word-card,
+    .daily-content-entry {
+        min-height: 0;
+        padding: 21px 19px;
+    }
+    .featured-word .word-card h3,
+    .daily-content-entry h3 {
+        font-size: 18px;
+    }
+    .daily-listening {
+        margin-top: 28px;
+        padding-top: 25px;
+    }
+}
+@media (max-width: 480px) {
+    .featured-word > h2,
+    .daily-content-heading h2 {
+        font-size: 20px;
+    }
+    .featured-word .word-card,
+    .daily-content-entry {
+        padding: 18px 16px;
+    }
+    .featured-word .word-card p,
+    .daily-content-entry .daily-content-description,
+    .daily-content-heading > p:last-child {
+        font-size: 12px;
+    }
+}
