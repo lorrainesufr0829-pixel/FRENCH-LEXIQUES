@@ -69,6 +69,19 @@
         const loginForm = document.getElementById("login-form");
         const signupForm = document.getElementById("signup-form");
         const message = document.getElementById("auth-message");
+        const allowedRedirects = new Set([
+            "index.html", "library.html", "study.html",
+            "import.html", "statistics.html", "settings.html"
+        ]);
+        const requestedRedirect = new URLSearchParams(window.location.search).get("redirect");
+        const postAuthDestination = allowedRedirects.has(requestedRedirect)
+            ? requestedRedirect
+            : "index.html";
+
+        function redirectAfterAuth() {
+            window.location.href = postAuthDestination;
+        }
+
 
         function showMessage(text, isError = false) {
             message.textContent = text;
@@ -95,7 +108,7 @@
                 return;
             }
             showMessage("Login successful. Redirecting...");
-            window.location.href = "index.html";
+            redirectAfterAuth();
         });
 
         signupForm.addEventListener("submit", async event => {
