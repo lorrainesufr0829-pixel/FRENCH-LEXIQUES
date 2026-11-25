@@ -169,12 +169,14 @@
     const currentValue = node.nodeValue;
     if (!originalText.has(node)) originalText.set(node, currentValue);
     let original = originalText.get(node);
-    const dict = dictionaries[language] || {};
-    const previousTranslation = dict[original.trim()] || original.trim();
+    const originalTrimmed = original.trim();
+    const isExistingTranslation = Object.values(dictionaries).some(
+      dict => dict && dict[originalTrimmed] === currentValue.trim()
+    );
 
-    // Dynamic UI scripts may replace the contents of an existing text node.
-    // Detect that change without losing the original text used for language switching.
-    if (currentValue.trim() && currentValue.trim() !== previousTranslation) {
+    // Detect text replaced by dynamic UI scripts, while preserving the source
+    // text when switching between English, French and Chinese.
+    if (currentValue.trim() && currentValue.trim() !== originalTrimmed && !isExistingTranslation) {
       original = currentValue;
       originalText.set(node, original);
     }
