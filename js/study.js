@@ -1,39 +1,94 @@
 // =====================================
-// LEXIQUE — Minimal flashcard study
+// LEXIQUE — Multi-mode study + spaced repetition
 // =====================================
-
 (() => {
-    const setup = document.getElementById("study-setup");
+    const $ = id => document.getElementById(id);
+    const setup = $("study-setup");
     if (!setup) return;
 
-    const categorySelect = document.getElementById("study-category");
-    const countSelect = document.getElementById("study-count");
-    const startButton = document.getElementById("start-study-btn");
-    const loadMessage = document.getElementById("study-load-message");
-    const session = document.getElementById("study-session");
-    const complete = document.getElementById("study-complete");
-    const revealButton = document.getElementById("reveal-answer-btn");
-    const ratingPanel = document.getElementById("study-rating");
-    const byId = id => document.getElementById(id);
+    const categorySelect = $("study-category");
+    const countSelect = $("study-count");
+    const modeSelect = $("study-mode");
+    const focusSelect = $("study-focus");
+    const startButton = $("start-study-btn");
+    const loadMessage = $("study-load-message");
+    const session = $("study-session");
+    const complete = $("study-complete");
+    const ratingPanel = $("study-rating");
+    const ratings = ["again", "hard", "good", "easy"];
+    const ratingLabels = { again: "Again", hard: "Hard", good: "Good", easy: "Easy" };
 
     let vocabulary = [];
+    let reviewStates = {};
     let queue = [];
     let currentWord = null;
     let completedCount = 0;
     let sessionTotal = 0;
     let sessionRatings = { again: 0, hard: 0, good: 0, easy: 0 };
+    let answerCount = 0;
+    let correctCount = 0;
+    let startedAt = 0;
+    let saving = false;
+    let scheduleReady = false;
+
+    const shuffle = items => {
+        const copy = [...items];
+        for (let i = copy.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy;
+    };
+    const wordCategories = word => [
+        ...(Array.isArray(word.category_names) ? word.category_names : []),
+        ...(Array.isArray(word.categories) ? word.categories.map(item => item.name) : []),
+        word.category
+    ].filter(Boolean).map(String);
+    const normalize = value => String(value || "").trim().toLocaleLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[’']/g, "'").replace(/[^\p{L}\p{N}' -]/gu, "").replace(/\s+/g, " ");
+
+    function getSchedule(word) {
+        return reviewStates[word.id] || null;
+    }
+    function isDue(word) {
+        const state = getSchedule(word);
+        if (!state) return true;
+        return new Date(state.due_at).getTime() <= Date.now();
+    }
+    function isNew(word) {
+        return !getSchedule(word) && !word.last_reviewed_date;
+    }
+    function isWeak(word) {
+        const state = getSchedule(word);
+        return state ? Number(state.lapses || 0) > 0 || state.last_rating === "again" || Number(state.ease_factor || 2.5) < 2.1 : false;
+    }
 
     async function loadStudyVocabulary() {
         startButton.disabled = true;
-        loadMessage.textContent = "Loading your vocabulary…";
+        loadMessage.textContent = "Loading your personal vocabulary and review schedule…";
         try {
-            const words = await getVocabulary();
-            vocabulary = Array.isArray(words) ? words.filter(item =>
-                String(item.word || "").trim() && String(item.meaning || "").trim()
-            ) : [];
-            loadMessage.textContent = vocabulary.length
-                ? vocabulary.length + " words available"
-                : "No vocabulary yet. Add words in Import to begin.";
+            vocabulary = (await getVocabulary() || []).filter(word =>
+                String(word.word || "").trim() && String(word.meaning || "").trim()
+            );
+            try {
+                reviewStates = await getStudyReviewStates();
+                scheduleReady = true;
+            } catch (error) {
+                scheduleReady = false;
+                reviewStates = {};
+                console.warn("Spaced repetition schedule unavailable:", error);
+                loadMessage.textContent = error.message === "STUDY_REVIEW_TABLE_MISSING"
+                    ? "Vocabulary loaded. Run the Supabase migration to activate long-term review scheduling."
+                    : "Vocabulary loaded, but review schedules could not be retrieved.";
+            }
+            populateCategories();
+            if (scheduleReady) {
+                const due = vocabulary.filter(isDue).length;
+                loadMessage.textContent = vocabulary.length + " words available · " + due + " due for review";
+            } else if (!loadMessage.textContent.startsWith("Vocabulary loaded")) {
+                loadMessage.textContent = vocabulary.length + " words available";
+            }
         } catch (error) {
             console.error("Study vocabulary loading failed:", error);
             loadMessage.textContent = "Unable to load vocabulary. Please refresh and try again.";
@@ -42,28 +97,41 @@
         }
     }
 
+    function populateCategories() {
+        const categories = [...new Set(vocabulary.flatMap(wordCategories))].sort((a, b) => a.localeCompare(b));
+        const selected = categorySelect.value;
+        categorySelect.innerHTML = '<option value="all">All Vocabulary</option>';
+        categories.forEach(category => {
+            const option = document.createElement("option");
+            option.value = category;
+            option.textContent = category;
+            categorySelect.appendChild(option);
+        });
+        if (categories.includes(selected)) categorySelect.value = selected;
+    }
+
     function startSession() {
         const category = categorySelect.value;
-        const filtered = category === "all"
-            ? [...vocabulary]
-            : vocabulary.filter(item =>
-                String(item.category || "").trim().toLowerCase() === category.toLowerCase()
-            );
-
+        const focus = focusSelect.value;
+        let filtered = vocabulary.filter(word => category === "all" || wordCategories(word).some(name => name.toLowerCase() === category.toLowerCase()));
+        if (focus === "due") filtered = filtered.filter(isDue);
+        if (focus === "new") filtered = filtered.filter(isNew);
+        if (focus === "weak") filtered = filtered.filter(isWeak);
         if (!filtered.length) {
-            loadMessage.textContent = category === "all"
-                ? "No vocabulary is available for study."
-                : "There are no words in this collection yet.";
+            loadMessage.textContent = "No words match this selection. Try another category or study focus.";
             return;
         }
 
         const amount = countSelect.value === "all" ? filtered.length : Number(countSelect.value);
-        queue = filtered.slice(0, amount);
+        queue = shuffle(filtered).slice(0, amount).map(word => ({ word, retries: 0 }));
         sessionTotal = queue.length;
         completedCount = 0;
+        answerCount = 0;
+        correctCount = 0;
         sessionRatings = { again: 0, hard: 0, good: 0, easy: 0 };
+        startedAt = Date.now();
 
-        byId("session-category-label").textContent = category === "all" ? "ALL VOCABULARY" : category.toUpperCase();
+        $("session-category-label").textContent = (category === "all" ? "ALL VOCABULARY" : category.toUpperCase()) + " · " + modeSelect.options[modeSelect.selectedIndex].text.toUpperCase();
         setup.hidden = true;
         complete.hidden = true;
         session.hidden = false;
@@ -71,105 +139,192 @@
     }
 
     function renderCard() {
-        if (!queue.length) {
-            finishSession();
-            return;
+        if (!queue.length) return finishSession();
+        currentWord = queue[0].word;
+        const mode = modeSelect.value;
+        $("study-word").textContent = currentWord.word;
+        $("study-meaning").textContent = currentWord.meaning;
+        $("study-word-level").textContent = currentWord.level || (currentWord.level_names || []).join(" · ") || "VOCABULARY";
+        $("study-word-category").textContent = wordCategories(currentWord).join(" · ") || "GENERAL";
+        $("study-card-front").hidden = false;
+        $("study-card-back").hidden = true;
+        $("study-mode-prompt").hidden = true;
+        $("study-answer-input").hidden = true;
+        $("study-choice-options").hidden = true;
+        $("study-feedback").textContent = "";
+        $("study-feedback").className = "study-feedback";
+        $("study-answer").value = "";
+        $("study-audio-btn").hidden = mode !== "listening";
+        $("study-audio-btn").disabled = false;
+        $("reveal-answer-btn").hidden = mode !== "flashcards";
+        ratingPanel.hidden = true;
+        ratingPanel.querySelectorAll("button").forEach(button => button.disabled = false);
+
+        if (mode === "recall") {
+            $("study-mode-prompt").textContent = currentWord.meaning;
+            $("study-mode-prompt").hidden = false;
+            $("study-card-front").hidden = true;
+            $("study-answer-input").hidden = false;
+            $("study-answer").focus();
+        } else if (mode === "choice" || mode === "listening") {
+            $("study-mode-prompt").textContent = mode === "listening" ? "Listen, then choose the French word" : "Choose the correct meaning";
+            $("study-mode-prompt").hidden = false;
+            $("study-card-front").hidden = mode === "listening";
+            if (mode === "listening") speakWord();
+            renderChoices(mode);
         }
 
-        currentWord = queue[0];
-        byId("study-word").textContent = currentWord.word;
-        byId("study-meaning").textContent = currentWord.meaning;
-        byId("study-word-level").textContent = currentWord.level || "VOCABULARY";
-        byId("study-word-category").textContent = currentWord.category || "GENERAL";
-        byId("study-card-front").hidden = false;
-        byId("study-card-back").hidden = true;
-        revealButton.hidden = false;
-        ratingPanel.hidden = true;
+        const position = Math.min(completedCount + 1, sessionTotal);
+        $("study-progress-label").textContent = position + " / " + sessionTotal;
+        $("study-progress-fill").style.width = (completedCount / sessionTotal * 100) + "%";
+    }
 
-        const displayedPosition = Math.min(completedCount + 1, sessionTotal);
-        byId("study-progress-label").textContent = displayedPosition + " / " + sessionTotal;
-        byId("study-progress-fill").style.width = (Math.min(completedCount, sessionTotal) / sessionTotal * 100) + "%";
+    function renderChoices(mode) {
+        const panel = $("study-choice-options");
+        const candidates = shuffle(vocabulary.filter(word => word.id !== currentWord.id));
+        const distractors = candidates.slice(0, 3);
+        const options = shuffle([currentWord, ...distractors]);
+        panel.innerHTML = "";
+        options.forEach(option => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "study-choice-option";
+            button.textContent = mode === "listening" ? option.word : option.meaning;
+            button.addEventListener("click", () => {
+                if (saving || !panel.hidden) return;
+                const correct = option.id === currentWord.id;
+                answerCount++;
+                if (correct) correctCount++;
+                [...panel.children].forEach(item => {
+                    item.disabled = true;
+                    if (item.dataset.correct === "true") item.classList.add("is-correct");
+                });
+                button.dataset.correct = String(correct);
+                if (!correct) button.classList.add("is-incorrect");
+                showAnswerFeedback(correct);
+            });
+            button.dataset.correct = String(option.id === currentWord.id);
+            panel.appendChild(button);
+        });
+        panel.hidden = false;
+    }
+
+    function speakWord() {
+        if (!("speechSynthesis" in window)) {
+            $("study-feedback").textContent = "Speech playback is not supported by this browser.";
+            return;
+        }
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(currentWord.word);
+        utterance.lang = "fr-FR";
+        utterance.rate = 0.88;
+        window.speechSynthesis.speak(utterance);
     }
 
     function revealAnswer() {
         if (!currentWord) return;
-        byId("study-card-back").hidden = false;
-        revealButton.hidden = true;
+        $("study-card-back").hidden = false;
+        $("reveal-answer-btn").hidden = true;
         ratingPanel.hidden = false;
     }
 
+    function showAnswerFeedback(correct) {
+        $("study-feedback").textContent = correct ? "Correct !" : "Not quite. The answer is: " + currentWord.word;
+        $("study-feedback").className = "study-feedback " + (correct ? "is-correct" : "is-incorrect");
+        $("study-card-back").hidden = false;
+        ratingPanel.hidden = false;
+    }
+
+    function checkRecall() {
+        if (!currentWord || saving) return;
+        const answer = normalize($("study-answer").value);
+        if (!answer) {
+            $("study-feedback").textContent = "Enter an answer first.";
+            return;
+        }
+        const correct = answer === normalize(currentWord.word);
+        answerCount++;
+        if (correct) correctCount++;
+        showAnswerFeedback(correct);
+    }
+
     async function rateCard(rating) {
-        if (!currentWord || !Object.prototype.hasOwnProperty.call(sessionRatings, rating)) return;
-
-        const reviewedWord = currentWord;
-        const ratingButtons = [...ratingPanel.querySelectorAll("[data-rating]")];
-        ratingButtons.forEach(button => button.disabled = true);
-
+        if (!currentWord || saving || !ratings.includes(rating)) return;
+        saving = true;
+        const buttons = [...ratingPanel.querySelectorAll("[data-rating]")];
+        buttons.forEach(button => button.disabled = true);
+        const reviewed = currentWord;
         try {
-            await recordStudyReview(reviewedWord, rating);
+            if (scheduleReady) {
+                const state = await saveSpacedRepetitionReview(reviewed, rating);
+                reviewStates[reviewed.id] = state;
+            }
+            await recordStudyReview(reviewed, rating);
             sessionRatings[rating]++;
-            queue.shift();
-
-            if (rating === "again") queue.push(reviewedWord);
-
+            const current = queue.shift();
+            if (rating === "again" && current.retries < 1) {
+                current.retries++;
+                queue.push(current);
+            }
             completedCount++;
             currentWord = null;
-
-            if (typeof window.updateProgress === "function") {
-                await window.updateProgress();
-            }
-
+            if (typeof window.updateProgress === "function") await window.updateProgress();
             renderCard();
         } catch (error) {
-            console.error("Unable to save this study review:", error);
-            loadMessage.textContent = "Your review could not be synced. Please try again.";
-            alert("Your review was not saved. Please check your connection and try again.");
+            console.error("Unable to save study review:", error);
+            $("study-feedback").textContent = error.message === "STUDY_REVIEW_TABLE_MISSING"
+                ? "Run the Supabase migration before using long-term review scheduling."
+                : "Could not save this review. Check your connection and try again.";
+            buttons.forEach(button => button.disabled = false);
         } finally {
-            ratingButtons.forEach(button => button.disabled = false);
+            saving = false;
         }
     }
 
     function finishSession() {
         session.hidden = true;
         complete.hidden = false;
-
-        const totalRatings = Object.values(sessionRatings).reduce((sum, value) => sum + value, 0);
-        byId("study-complete-summary").textContent =
-            "You reviewed " + totalRatings + " cards. " +
-            sessionRatings.again + " again · " +
-            sessionRatings.hard + " hard · " +
-            sessionRatings.good + " good · " +
-            sessionRatings.easy + " easy.";
-        byId("study-progress-fill").style.width = "100%";
+        const total = Object.values(sessionRatings).reduce((sum, value) => sum + value, 0);
+        const accuracy = answerCount ? Math.round(correctCount / answerCount * 100) : null;
+        const elapsed = Math.max(1, Math.round((Date.now() - startedAt) / 60000));
+        $("study-complete-summary").textContent =
+            "Ratings: " + ratings.map(key => ratingLabels[key] + " " + sessionRatings[key]).join(" · ") +
+            (scheduleReady ? ". Your next reviews have been scheduled." : ". Run the database migration to save review schedules.");
+        $("study-result-accuracy").textContent = accuracy === null ? "—" : accuracy + "%";
+        $("study-result-reviewed").textContent = total;
+        $("study-result-time").textContent = elapsed + "m";
+        $("study-progress-fill").style.width = "100%";
     }
 
     function exitSession() {
+        if ("speechSynthesis" in window) window.speechSynthesis.cancel();
         session.hidden = true;
         complete.hidden = true;
         setup.hidden = false;
-        loadMessage.textContent = vocabulary.length + " words available";
+        loadStudyVocabulary();
     }
 
     startButton.addEventListener("click", startSession);
-    revealButton.addEventListener("click", revealAnswer);
-    byId("exit-study-btn").addEventListener("click", exitSession);
-    byId("study-again-btn").addEventListener("click", exitSession);
-
+    $("reveal-answer-btn").addEventListener("click", revealAnswer);
+    $("study-audio-btn").addEventListener("click", speakWord);
+    $("check-answer-btn").addEventListener("click", checkRecall);
+    $("study-answer").addEventListener("keydown", event => {
+        if (event.key === "Enter") checkRecall();
+    });
+    $("exit-study-btn").addEventListener("click", exitSession);
+    $("study-again-btn").addEventListener("click", exitSession);
     ratingPanel.querySelectorAll("[data-rating]").forEach(button => {
         button.addEventListener("click", () => rateCard(button.dataset.rating));
     });
 
-    // Keyboard controls: Space reveals; 1–4 selects a rating after reveal.
     document.addEventListener("keydown", event => {
         if (session.hidden || event.repeat || event.target.matches("input, textarea, select")) return;
-        if (event.code === "Space" && !revealButton.hidden) {
+        if (event.code === "Space" && modeSelect.value === "flashcards" && !$("reveal-answer-btn").hidden) {
             event.preventDefault();
             revealAnswer();
-            return;
         }
         if (!ratingPanel.hidden && ["1", "2", "3", "4"].includes(event.key)) {
-            const rating = ["again", "hard", "good", "easy"][Number(event.key) - 1];
-            rateCard(rating);
+            rateCard(ratings[Number(event.key) - 1]);
         }
     });
 
