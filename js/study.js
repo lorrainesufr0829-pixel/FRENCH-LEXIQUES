@@ -144,6 +144,18 @@
         if (focus === "due") filtered = filtered.filter(isDue);
         if (focus === "new") filtered = filtered.filter(isNew);
         if (focus === "weak") filtered = filtered.filter(isWeak);
+        if (getMode() === "choice") {
+            filtered = filtered.filter(word => String(word.meaning || "").trim());
+            const distinctMeanings = new Set(vocabulary.map(word => normalize(word.meaning)).filter(Boolean));
+            if (distinctMeanings.size < 2) {
+                if (session) session.hidden = true;
+                if (loadMessage) {
+                    loadMessage.hidden = false;
+                    loadMessage.textContent = "Multiple Choice needs at least two vocabulary entries with different saved meanings. Add more words, then try again.";
+                }
+                return;
+            }
+        }
         if (!filtered.length) {
             if (loadMessage) loadMessage.textContent = "No words match this selection. Return to Study and try another category or study focus.";
             else window.location.replace("study.html");
