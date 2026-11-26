@@ -5,7 +5,7 @@ values ('french-audio', 'french-audio', true, 2097152, array['audio/mpeg','audio
 on conflict (id) do update
 set public = true,
     file_size_limit = 2097152,
-    allowed_mime_types = array['audio/mpeg'];
+    allowed_mime_types = array['audio/mpeg','audio/ogg','audio/wav','audio/x-wav','audio/flac','audio/mp4','audio/webm','application/json'];
 
 -- Anyone can play cached pronunciation files; only the Edge Function's
 -- service-role credential can upload or replace objects.
