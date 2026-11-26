@@ -156,6 +156,17 @@
                 return;
             }
         }
+        if (getMode() === "listening") {
+            const distinctWords = new Set(vocabulary.map(word => normalizeRecallAnswer(word.word)).filter(Boolean));
+            if (distinctWords.size < 2) {
+                if (session) session.hidden = true;
+                if (loadMessage) {
+                    loadMessage.hidden = false;
+                    loadMessage.textContent = "Listening practice needs at least two different French words in your vocabulary. Add more words, then try again.";
+                }
+                return;
+            }
+        }
         if (!filtered.length) {
             if (loadMessage) loadMessage.textContent = "No words match this selection. Return to Study and try another category or study focus.";
             else window.location.replace("study.html");
@@ -213,9 +224,13 @@
             $("check-answer-btn").disabled = false;
         } else if (mode === "listening") {
             $("listening-feedback").textContent = "";
+            $("listening-feedback").className = "study-feedback listening-feedback";
+            $("listening-correct-answer").textContent = "";
             $("listening-correct-answer").hidden = true;
+            $("listening-audio-status").textContent = "";
+            $("study-audio-btn").disabled = false;
+            $("study-audio-btn").textContent = "Play pronunciation";
             renderChoices(mode);
-            speakWord();
         }
         const position = Math.min(completedCount + 1, sessionTotal);
         $("study-progress-label").textContent = position + " / " + sessionTotal;
@@ -245,7 +260,22 @@
                 ...candidates.filter(word => word.id !== currentWord.id).slice(0, 3)
             ]);
         } else {
-            options = shuffle([currentWord, ...shuffle(vocabulary.filter(word => word.id !== currentWord.id)).slice(0, 3)]);
+            // Listening choices are unique French headwords, never translations or duplicate spellings.
+            const seenWords = new Set();
+            const candidates = shuffle([
+                currentWord,
+                ...shuffle(vocabulary.filter(word => word.id !== currentWord.id))
+            ]).filter(word => {
+                const key = normalizeRecallAnswer(word.word);
+                if (!key || seenWords.has(key)) return false;
+                seenWords.add(key);
+                return true;
+            });
+            const correctOption = candidates.find(word => word.id === currentWord.id);
+            options = shuffle([
+                ...(correctOption ? [correctOption] : []),
+                ...candidates.filter(word => word.id !== currentWord.id).slice(0, 3)
+            ]);
         }
 
         panel.innerHTML = "";
@@ -283,12 +313,14 @@
                 const feedback = $(mode === "listening" ? "listening-feedback" : "choice-feedback");
                 feedback.textContent = mode === "choice"
                     ? (correct ? "Correct — well done." : "Not quite. Correct meaning: " + currentWord.meaning)
-                    : (correct ? "Correct !" : "Not quite.");
+                    : (correct ? "Correct — well heard." : "Not quite. The word you heard was " + currentWord.word + ".");
                 feedback.className = "study-feedback " + (correct ? "is-correct" : "is-incorrect");
 
                 if (mode === "listening") {
                     $("listening-correct-answer").textContent = currentWord.word + " — " + currentWord.meaning;
                     $("listening-correct-answer").hidden = false;
+                    $("study-audio-btn").disabled = false;
+                    $("study-audio-btn").textContent = "Replay pronunciation";
                 }
                 ratingPanel.hidden = false;
             });
@@ -305,16 +337,24 @@
     }
 
     function speakWord() {
-        if (!currentWord) return;
-        if (!("speechSynthesis" in window)) {
-            $("listening-feedback").textContent = "Speech playback is not supported by this browser.";
+        if (!currentWord || getMode() !== "listening") return;
+        const status = $("listening-audio-status");
+        const button = $("study-audio-btn");
+        if (!("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") {
+            status.textContent = "Audio playback is not supported in this browser. Try another browser to use Listening practice.";
+            button.disabled = true;
             return;
         }
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(currentWord.word);
         utterance.lang = "fr-FR";
-        utterance.rate = 0.88;
+        utterance.rate = 0.82;
+        utterance.onstart = () => { status.textContent = "Playing French pronunciation…"; };
+        utterance.onend = () => { status.textContent = "Listen again or choose the word you heard."; };
+        utterance.onerror = () => { status.textContent = "Pronunciation could not be played. Tap to try again."; };
+        status.textContent = "Preparing French pronunciation…";
         window.speechSynthesis.speak(utterance);
+        button.textContent = "Play again";
     }
 
     function revealAnswer() {
