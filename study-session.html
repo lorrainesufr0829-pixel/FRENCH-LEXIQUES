@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/theme.css?v=20261126-3">
 <link rel="stylesheet" href="css/study-enhancements.css?v=20261126-4">
-<link rel="stylesheet" href="css/study-immersive.css?v=20261126-1">
+<link rel="stylesheet" href="css/study-immersive.css?v=20261126-2">
 </head>
 <body data-study-page="session">
 <main class="study-immersive-shell">
@@ -29,9 +29,18 @@
       <span id="study-progress-label">1 / 20</span>
     </div>
     <div class="study-word-meta"><span id="study-word-level">VOCABULARY</span><span id="study-word-category">GENERAL</span></div>
-    <section class="mode-panel mode-flashcards" id="mode-flashcards" hidden>
-      <div class="flashcard-face" id="study-card-front"><p class="mode-kicker">FRENCH WORD</p><h1 id="study-word">—</h1><button class="study-reveal-button" id="reveal-answer-btn" type="button">Reveal meaning</button></div>
-      <div class="flashcard-face flashcard-answer" id="study-card-back" hidden><p class="mode-kicker">MEANING</p><p class="study-meaning" id="study-meaning"></p></div>
+    <section class="mode-panel mode-flashcards" id="mode-flashcards" hidden aria-label="Flashcard practice">
+      <div class="flashcard-face flashcard-question" id="study-card-front">
+        <p class="mode-kicker">FRENCH WORD</p>
+        <h1 id="study-word" lang="fr">—</h1>
+        <p class="flashcard-instruction">Try to recall the meaning before revealing the answer.</p>
+        <button class="study-reveal-button" id="reveal-answer-btn" type="button" aria-controls="study-card-back" aria-expanded="false">Reveal meaning</button>
+      </div>
+      <div class="flashcard-face flashcard-answer" id="study-card-back" hidden aria-live="polite">
+        <p class="mode-kicker">MEANING</p>
+        <p class="study-meaning" id="study-meaning"></p>
+      </div>
+      <p class="study-feedback flashcard-feedback" id="flashcard-feedback" role="status" aria-live="polite"></p>
     </section>
     <section class="mode-panel mode-choice" id="mode-choice" hidden>
       <p class="mode-kicker">WHAT DOES THIS WORD MEAN?</p><h1 class="mode-target-word" id="choice-target-word">—</h1>
@@ -76,6 +85,6 @@
 <script src="js/app.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/settings.js"></script>
-<script src="js/study.js?v=20261126-5"></script>
+<script src="js/study.js?v=20261126-6"></script>
 </body>
 </html>
