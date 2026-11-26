@@ -105,3 +105,9 @@ body[data-study-page="session"] .study-complete > p:not(.study-eyebrow) { color:
 .listening-audio-orb p{margin:14px 0 0;color:var(--lexique-muted);font-size:14px}
 .mode-listening .study-choice-options{margin-top:8px}
 @media(max-width:600px){.study-word-meta{font-size:9px}.mode-panel{min-height:440px;padding:26px 17px;border-radius:15px}.mode-recall .study-answer-input{flex-direction:column}.mode-recall .study-answer-input button{min-height:48px}}
+
+/* Preserve native hidden state despite component display rules */
+.mode-panel[hidden], .flashcard-face[hidden], .study-choice-options[hidden],
+.study-session[hidden], .study-complete[hidden], .study-rating[hidden] {
+    display: none !important;
+}
