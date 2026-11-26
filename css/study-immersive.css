@@ -189,3 +189,81 @@ body[data-study-page="session"] .study-complete > p:not(.study-eyebrow) { color:
     .flashcard-instruction { font-size: 12px; margin-bottom: 22px; }
     .study-reveal-button { width: 100%; }
 }
+
+
+/* Multiple choice — meaning-first answer options */
+.mode-choice {
+    gap: 0;
+}
+.mode-choice .mode-target-word {
+    margin-bottom: 12px;
+    font-size: clamp(42px, 7.5vw, 68px);
+    letter-spacing: -.035em;
+}
+.choice-instruction {
+    max-width: 470px;
+    margin: 0 0 8px;
+    color: var(--lexique-muted);
+    font-size: 14px;
+    line-height: 1.6;
+}
+.mode-choice .choice-meaning-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
+    max-width: 690px;
+    margin: 24px auto 0;
+}
+.mode-choice .choice-meaning-options .study-choice-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    min-height: 82px;
+    padding: 17px 18px;
+    text-align: left;
+    border-radius: 13px;
+}
+.choice-option-letter {
+    display: inline-flex;
+    flex: 0 0 27px;
+    width: 27px;
+    height: 27px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--lexique-border);
+    border-radius: 50%;
+    color: var(--lexique-muted);
+    font-size: 11px;
+    font-weight: 800;
+}
+.choice-option-text {
+    align-self: center;
+    color: inherit;
+    font-size: 14px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+.mode-choice .study-choice-option.is-correct .choice-option-letter {
+    border-color: var(--lexique-accent);
+    background: var(--lexique-accent);
+    color: #fff;
+}
+.mode-choice .study-choice-option.is-incorrect .choice-option-letter {
+    border-color: #c65b54;
+    color: #c65b54;
+}
+.mode-choice .choice-feedback {
+    max-width: 620px;
+    line-height: 1.6;
+}
+.mode-choice .study-choice-option:focus-visible {
+    outline: 3px solid var(--lexique-accent);
+    outline-offset: 3px;
+}
+@media (max-width: 600px) {
+    .choice-instruction { font-size: 12px; }
+    .mode-choice .choice-meaning-options { grid-template-columns: minmax(0, 1fr); gap: 9px; margin-top: 18px; }
+    .mode-choice .choice-meaning-options .study-choice-option { min-height: 64px; padding: 12px 14px; }
+    .choice-option-text { font-size: 13px; }
+}
