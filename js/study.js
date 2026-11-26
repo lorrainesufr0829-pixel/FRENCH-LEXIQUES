@@ -355,37 +355,6 @@
         if ("speechSynthesis" in window) window.speechSynthesis.cancel();
     }
 
-    function setListeningAudioReady(audio, word, requestId, sourceLabel) {
-        const status = $("listening-audio-status");
-        const button = $("study-audio-btn");
-        audio.preload = "auto";
-        audio.oncanplay = () => {
-            if (requestId !== listeningAudioRequest || listeningAudio !== audio) return;
-            listeningAudioReady = true;
-            button.disabled = false;
-            button.textContent = "Play pronunciation";
-            status.textContent = sourceLabel + " pronunciation ready. Tap to listen.";
-        };
-        audio.onended = () => {
-            if (requestId !== listeningAudioRequest || listeningAudio !== audio) return;
-            status.textContent = "Listen again or choose the word you heard.";
-            button.textContent = "Replay pronunciation";
-        };
-        audio.onerror = () => {
-            if (requestId !== listeningAudioRequest || listeningAudio !== audio) return;
-            listeningAudioReady = false;
-            button.disabled = true;
-            status.textContent = "This audio source could not be loaded. Preparing another source…";
-            if (sourceLabel === "Dictionary") {
-                prepareRemoteTts(word, requestId);
-            } else {
-                status.textContent = "No playable pronunciation is available for this word. Try another word or browser.";
-            }
-        };
-        audio.src = audio.src || "";
-        audio.load();
-    }
-
     function prepareRemoteTts(word, requestId) {
         if (requestId !== listeningAudioRequest) return;
         const status = $("listening-audio-status");
