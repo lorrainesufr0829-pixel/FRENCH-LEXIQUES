@@ -111,3 +111,81 @@ body[data-study-page="session"] .study-complete > p:not(.study-eyebrow) { color:
 .study-session[hidden], .study-complete[hidden], .study-rating[hidden] {
     display: none !important;
 }
+
+/* Flashcards — deliberate recall before answer reveal */
+.mode-flashcards {
+    gap: 0;
+}
+.mode-flashcards .flashcard-question {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 270px;
+}
+.mode-flashcards .flashcard-question h1 {
+    margin: 4px 0 14px;
+    font-size: clamp(44px, 8vw, 76px);
+    letter-spacing: -.035em;
+}
+.flashcard-instruction {
+    max-width: 420px;
+    margin: 0 0 26px;
+    color: var(--lexique-muted);
+    font-size: 14px;
+    line-height: 1.65;
+}
+.study-reveal-button {
+    min-height: 48px;
+    padding: 0 24px;
+    border: 1px solid var(--lexique-accent);
+    border-radius: 999px;
+    background: var(--lexique-accent);
+    color: #fff;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 750;
+    letter-spacing: .04em;
+    cursor: pointer;
+    transition: transform .18s ease, opacity .18s ease, box-shadow .18s ease;
+}
+.study-reveal-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 18px rgba(0,0,0,.10);
+}
+.study-reveal-button:focus-visible,
+.study-rating-buttons button:focus-visible {
+    outline: 3px solid var(--lexique-accent);
+    outline-offset: 3px;
+}
+.mode-flashcards .flashcard-answer {
+    width: 100%;
+    margin-top: 22px;
+    padding: 30px 12px 8px;
+    border-top: 1px solid var(--lexique-border);
+    animation: flashcard-answer-in .24s ease both;
+}
+.mode-flashcards .flashcard-answer .study-meaning {
+    overflow-wrap: anywhere;
+}
+.flashcard-feedback {
+    width: 100%;
+    margin-top: 12px;
+}
+@keyframes flashcard-answer-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .study-reveal-button,
+    .mode-flashcards .flashcard-answer {
+        transition: none;
+        animation: none;
+    }
+}
+@media (max-width: 600px) {
+    .mode-flashcards .flashcard-question { min-height: 250px; }
+    .flashcard-instruction { font-size: 12px; margin-bottom: 22px; }
+    .study-reveal-button { width: 100%; }
+}
