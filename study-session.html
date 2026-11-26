@@ -28,30 +28,24 @@
       <div class="study-progress-track"><div id="study-progress-fill"></div></div>
       <span id="study-progress-label">1 / 20</span>
     </div>
-    <article class="study-flashcard" id="study-flashcard">
-      <div class="study-card-topline">
-        <span id="study-word-level">VOCABULARY</span>
-        <span id="study-word-category">GENERAL</span>
-      </div>
-      <div class="study-mode-prompt" id="study-mode-prompt" hidden></div>
-      <div class="study-card-front" id="study-card-front" aria-live="polite">
-        <p class="study-card-hint">FRENCH WORD</p>
-        <h1 id="study-word">—</h1>
-        <button class="study-audio-button" id="study-audio-btn" type="button" aria-label="Play French pronunciation">🔊 Listen</button>
-        <button class="study-reveal-button" id="reveal-answer-btn" type="button">Reveal meaning</button>
-        <div class="study-answer-input" id="study-answer-input" hidden>
-          <input id="study-answer" type="text" autocomplete="off" placeholder="Type the French word…">
-          <button type="button" id="check-answer-btn">Check answer</button>
-        </div>
-        <div class="study-choice-options" id="study-choice-options" hidden></div>
-        <p class="study-feedback" id="study-feedback" role="status" aria-live="polite"></p>
-      </div>
-      <div class="study-card-back" id="study-card-back" aria-live="polite" hidden>
-        <div class="study-card-divider"></div>
-        <p class="study-card-hint">MEANING</p>
-        <p class="study-meaning" id="study-meaning"></p>
-      </div>
-    </article>
+    <div class="study-word-meta"><span id="study-word-level">VOCABULARY</span><span id="study-word-category">GENERAL</span></div>
+    <section class="mode-panel mode-flashcards" id="mode-flashcards" hidden>
+      <div class="flashcard-face" id="study-card-front"><p class="mode-kicker">FRENCH WORD</p><h1 id="study-word">—</h1><button class="study-reveal-button" id="reveal-answer-btn" type="button">Reveal meaning</button></div>
+      <div class="flashcard-face flashcard-answer" id="study-card-back" hidden><p class="mode-kicker">MEANING</p><p class="study-meaning" id="study-meaning"></p></div>
+    </section>
+    <section class="mode-panel mode-choice" id="mode-choice" hidden>
+      <p class="mode-kicker">WHAT DOES THIS WORD MEAN?</p><h1 class="mode-target-word" id="choice-target-word">—</h1>
+      <div class="study-choice-options" id="choice-options" hidden></div><p class="study-feedback" id="choice-feedback" role="status" aria-live="polite"></p>
+    </section>
+    <section class="mode-panel mode-recall" id="mode-recall" hidden>
+      <p class="mode-kicker">WRITE THE FRENCH WORD</p><h1 class="mode-meaning-prompt" id="recall-meaning">—</h1>
+      <div class="study-answer-input"><input id="study-answer" type="text" autocomplete="off" placeholder="Écrivez le mot en français…"><button type="button" id="check-answer-btn">Check</button></div>
+      <p class="study-feedback" id="recall-feedback" role="status" aria-live="polite"></p><p class="mode-answer-reveal" id="recall-correct-answer" hidden></p>
+    </section>
+    <section class="mode-panel mode-listening" id="mode-listening" hidden>
+      <p class="mode-kicker">LISTEN AND IDENTIFY</p><div class="listening-audio-orb"><span aria-hidden="true">♫</span><button class="study-audio-button" id="study-audio-btn" type="button">Play pronunciation</button><p>Listen carefully, then select the word you hear.</p></div>
+      <div class="study-choice-options" id="listening-options" hidden></div><p class="study-feedback" id="listening-feedback" role="status" aria-live="polite"></p><p class="mode-answer-reveal" id="listening-correct-answer" hidden></p>
+    </section>
     <section class="study-rating" id="study-rating" hidden>
       <p>How well did you remember this word?</p>
       <div class="study-rating-buttons">
