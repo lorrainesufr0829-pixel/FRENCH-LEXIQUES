@@ -1873,3 +1873,10 @@ body[data-theme="dark"] .study-rating-buttons button { color: #211f1a !important
         transition: none !important;
     }
 }
+
+/* Keyboard accessibility: keep focus clearly visible in the comic UI. */
+:where(a, button, input, select, textarea, [role="button"]):focus-visible {
+    outline: 3px solid var(--comic-blue, #3978c8);
+    outline-offset: 3px;
+    box-shadow: 3px 3px 0 var(--comic-ink, #211f1a);
+}
