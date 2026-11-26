@@ -281,3 +281,103 @@ body[data-study-page="session"] .study-complete > p:not(.study-eyebrow) { color:
     line-height: 1.65;
 }
 .study-load-message[hidden] { display: none !important; }
+
+
+/* Active recall — meaning-only prompt and deliberate French spelling */
+.mode-recall {
+    gap: 0;
+}
+.mode-recall .mode-kicker {
+    margin-bottom: 18px;
+}
+.mode-recall .mode-meaning-prompt {
+    margin: 0 auto 14px;
+    max-width: 680px;
+    color: var(--lexique-text);
+    font-size: clamp(28px, 5vw, 44px) !important;
+    font-weight: 700;
+    line-height: 1.4 !important;
+    overflow-wrap: anywhere;
+}
+.recall-instruction {
+    max-width: 470px;
+    margin: 0 0 26px;
+    color: var(--lexique-muted);
+    font-size: 14px;
+    line-height: 1.65;
+}
+.mode-recall .recall-answer-form {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    width: min(100%, 590px);
+    margin: 0 auto;
+}
+.mode-recall .recall-answer-form input {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    min-height: 58px;
+    padding: 12px 18px;
+    border: 1px solid var(--lexique-border);
+    border-radius: 12px;
+    background: var(--lexique-page);
+    color: var(--lexique-text);
+    font: inherit;
+    font-size: 18px;
+    text-align: center;
+}
+.mode-recall .recall-answer-form input:focus-visible {
+    outline: 3px solid var(--lexique-accent);
+    outline-offset: 2px;
+}
+.mode-recall .recall-answer-form button {
+    flex: 0 0 auto;
+    min-height: 58px;
+    padding: 0 23px;
+    border: 1px solid var(--lexique-accent);
+    border-radius: 12px;
+    background: var(--lexique-accent);
+    color: #fff;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 750;
+    cursor: pointer;
+}
+.mode-recall .recall-answer-form button:disabled {
+    opacity: .58;
+    cursor: default;
+}
+.mode-recall .recall-feedback {
+    min-height: 24px;
+    max-width: 620px;
+    margin: 22px 0 0;
+    line-height: 1.6;
+}
+.mode-recall .mode-answer-reveal {
+    margin: 8px 0 0;
+    font-size: clamp(21px, 3.5vw, 27px);
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+.mode-recall .recall-answer-form button:focus-visible {
+    outline: 3px solid var(--lexique-accent);
+    outline-offset: 3px;
+}
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+@media (max-width: 600px) {
+    .recall-instruction { margin-bottom: 20px; font-size: 12px; }
+    .mode-recall .recall-answer-form { flex-direction: column; }
+    .mode-recall .recall-answer-form input { min-height: 54px; font-size: 16px; }
+    .mode-recall .recall-answer-form button { min-height: 50px; width: 100%; }
+}
