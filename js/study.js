@@ -191,7 +191,7 @@
             button.className = "study-choice-option";
             button.textContent = mode === "listening" ? option.word : option.meaning;
             button.addEventListener("click", () => {
-                if (saving || !panel.hidden) return;
+                if (saving || button.disabled) return;
                 const correct = option.id === currentWord.id;
                 answerCount++;
                 if (correct) correctCount++;
