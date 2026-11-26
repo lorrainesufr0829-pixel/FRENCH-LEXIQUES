@@ -6,6 +6,7 @@
 <title>LEXIQUE - Study</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/theme.css?v=20261126-3">
+<link rel="stylesheet" href="css/study-enhancements.css?v=20261126-4">
 </head>
 <body>
 <header class="site-header">
@@ -54,6 +55,24 @@
       <p>Choose what to practise and how many words to take on.</p>
     </div>
     <div class="study-setup-controls">
+      <div class="study-field study-mode-field">
+        <label for="study-mode"><span class="study-field-number">0</span> Training mode</label>
+        <select id="study-mode">
+          <option value="flashcards">Flashcards · Recognition</option>
+          <option value="choice">Multiple choice</option>
+          <option value="recall">Active recall · Type the word</option>
+          <option value="listening">Listening · Identify the word</option>
+        </select>
+      </div>
+      <div class="study-field">
+        <label for="study-focus"><span class="study-field-number">C</span> Study focus</label>
+        <select id="study-focus">
+          <option value="all">All words</option>
+          <option value="due">Due for review</option>
+          <option value="new">New words</option>
+          <option value="weak">Needs practice</option>
+        </select>
+      </div>
       <div class="study-field">
         <label for="study-category"><span class="study-field-number">A</span> Collection</label>
         <select id="study-category">
@@ -98,10 +117,18 @@
         <span id="study-word-level">VOCABULARY</span>
         <span id="study-word-category">GENERAL</span>
       </div>
+      <div class="study-mode-prompt" id="study-mode-prompt" hidden></div>
       <div class="study-card-front" id="study-card-front" aria-live="polite">
         <p class="study-card-hint">FRENCH WORD</p>
         <h1 id="study-word">—</h1>
+        <button class="study-audio-button" id="study-audio-btn" type="button" aria-label="Play French pronunciation">🔊 Listen</button>
         <button class="study-reveal-button" id="reveal-answer-btn" type="button">Reveal meaning</button>
+        <div class="study-answer-input" id="study-answer-input" hidden>
+          <input id="study-answer" type="text" autocomplete="off" placeholder="Type the French word…">
+          <button type="button" id="check-answer-btn">Check answer</button>
+        </div>
+        <div class="study-choice-options" id="study-choice-options" hidden></div>
+        <p class="study-feedback" id="study-feedback" role="status" aria-live="polite"></p>
       </div>
       <div class="study-card-back" id="study-card-back" aria-live="polite" hidden>
         <div class="study-card-divider"></div>
@@ -126,6 +153,11 @@
     <p class="study-eyebrow">SESSION COMPLETE</p>
     <h3>Well done.</h3>
     <p id="study-complete-summary">You have finished this study session.</p>
+    <div class="study-result-grid">
+      <div><span>Accuracy</span><strong id="study-result-accuracy">—</strong></div>
+      <div><span>Reviewed</span><strong id="study-result-reviewed">0</strong></div>
+      <div><span>Time</span><strong id="study-result-time">0m</strong></div>
+    </div>
     <button class="study-primary-button" id="study-again-btn" type="button">Study again</button>
   </section>
 </main>
