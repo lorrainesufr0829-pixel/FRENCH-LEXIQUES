@@ -86,3 +86,22 @@ body[data-study-page="session"] .study-complete > p:not(.study-eyebrow) { color:
     }
     body[data-study-page="session"] .study-complete { margin-top: 40px; padding: 26px 18px; }
 }
+
+/* Mode-specific training interfaces */
+.study-word-meta{display:flex;justify-content:space-between;gap:12px;width:min(100%,820px);margin:0 auto 18px;color:var(--lexique-muted);font-size:11px;font-weight:750;letter-spacing:.09em;text-transform:uppercase}
+.mode-panel{width:min(100%,820px);min-height:410px;margin:0 auto;padding:clamp(24px,5vw,54px);border:1px solid var(--lexique-border);border-radius:20px;background:var(--lexique-surface);box-shadow:0 12px 36px rgba(30,50,40,.045);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.mode-kicker{margin:0 0 22px;color:var(--lexique-muted);font-size:11px;font-weight:800;letter-spacing:.16em}
+.mode-panel h1{margin:0 0 30px;color:var(--lexique-text);font-size:clamp(38px,7vw,64px);line-height:1.12}
+.flashcard-face{width:100%}.flashcard-answer{padding-top:34px;border-top:1px solid var(--lexique-border)}
+.study-meaning{max-width:650px;margin:0 auto;color:var(--lexique-text);font-size:clamp(23px,4vw,34px);line-height:1.5}
+.mode-choice .study-choice-options,.mode-listening .study-choice-options{width:100%}
+.mode-meaning-prompt{max-width:680px;font-size:clamp(25px,4.5vw,40px)!important;font-weight:650;line-height:1.45!important}
+.mode-recall .study-answer-input{width:min(100%,580px)}
+.mode-recall .study-answer-input input{min-height:58px;text-align:center;font-size:19px}
+.mode-recall .study-answer-input button{min-height:58px}
+.mode-answer-reveal{margin:18px 0 0;color:var(--lexique-accent);font-size:25px;font-weight:800}
+.listening-audio-orb{width:100%;max-width:430px;margin:0 auto 22px;padding:25px 20px;border-radius:16px;background:var(--lexique-accent-soft)}
+.listening-audio-orb>span{display:block;margin-bottom:12px;color:var(--lexique-accent);font-size:42px}
+.listening-audio-orb p{margin:14px 0 0;color:var(--lexique-muted);font-size:14px}
+.mode-listening .study-choice-options{margin-top:8px}
+@media(max-width:600px){.study-word-meta{font-size:9px}.mode-panel{min-height:440px;padding:26px 17px;border-radius:15px}.mode-recall .study-answer-input{flex-direction:column}.mode-recall .study-answer-input button{min-height:48px}}
