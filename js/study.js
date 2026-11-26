@@ -211,14 +211,50 @@
 
     function renderChoices(mode) {
         const panel = $(mode === "listening" ? "listening-options" : "choice-options");
-        const options = shuffle([currentWord, ...shuffle(vocabulary.filter(word => word.id !== currentWord.id)).slice(0, 3)]);
+        let options;
+
+        if (mode === "choice") {
+            // Meaning options must be distinct; duplicate translations make the question ambiguous.
+            const seenMeanings = new Set();
+            const candidates = shuffle([
+                currentWord,
+                ...shuffle(vocabulary.filter(word => word.id !== currentWord.id))
+            ]).filter(word => {
+                const meaning = String(word.meaning || "").trim();
+                const key = normalize(meaning);
+                if (!meaning || !key || seenMeanings.has(key)) return false;
+                seenMeanings.add(key);
+                return true;
+            });
+            const correctOption = candidates.find(word => word.id === currentWord.id);
+            options = shuffle([
+                ...(correctOption ? [correctOption] : []),
+                ...candidates.filter(word => word.id !== currentWord.id).slice(0, 3)
+            ]);
+        } else {
+            options = shuffle([currentWord, ...shuffle(vocabulary.filter(word => word.id !== currentWord.id)).slice(0, 3)]);
+        }
+
         panel.innerHTML = "";
-        options.forEach(option => {
+        options.forEach((option, index) => {
             const button = document.createElement("button");
             button.type = "button";
             button.className = "study-choice-option";
-            button.textContent = mode === "listening" ? option.word : option.meaning;
             button.dataset.correct = String(option.id === currentWord.id);
+            button.setAttribute("aria-pressed", "false");
+
+            if (mode === "choice") {
+                const letter = document.createElement("span");
+                letter.className = "choice-option-letter";
+                letter.textContent = String.fromCharCode(65 + index);
+                const meaning = document.createElement("span");
+                meaning.className = "choice-option-text";
+                meaning.textContent = option.meaning;
+                button.append(letter, meaning);
+            } else {
+                button.textContent = option.word;
+            }
+
             button.addEventListener("click", () => {
                 if (saving || button.disabled) return;
                 const correct = option.id === currentWord.id;
@@ -226,12 +262,17 @@
                 if (correct) correctCount++;
                 [...panel.children].forEach(item => {
                     item.disabled = true;
+                    item.setAttribute("aria-pressed", String(item === button));
                     if (item.dataset.correct === "true") item.classList.add("is-correct");
                 });
                 if (!correct) button.classList.add("is-incorrect");
+
                 const feedback = $(mode === "listening" ? "listening-feedback" : "choice-feedback");
-                feedback.textContent = correct ? "Correct !" : "Not quite.";
+                feedback.textContent = mode === "choice"
+                    ? (correct ? "Correct — well done." : "Not quite. Correct meaning: " + currentWord.meaning)
+                    : (correct ? "Correct !" : "Not quite.");
                 feedback.className = "study-feedback " + (correct ? "is-correct" : "is-incorrect");
+
                 if (mode === "listening") {
                     $("listening-correct-answer").textContent = currentWord.word + " — " + currentWord.meaning;
                     $("listening-correct-answer").hidden = false;
@@ -240,7 +281,14 @@
             });
             panel.appendChild(button);
         });
+
         panel.hidden = false;
+        if (mode === "choice" && options.length < 2) {
+            $("choice-feedback").textContent = "There are not enough distinct meanings in your vocabulary for a multiple-choice question yet.";
+            $("choice-feedback").className = "study-feedback is-incorrect";
+            panel.hidden = true;
+            ratingPanel.hidden = true;
+        }
     }
 
     function speakWord() {
