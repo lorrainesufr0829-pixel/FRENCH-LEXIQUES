@@ -229,6 +229,7 @@
             $("listening-correct-answer").textContent = "";
             $("listening-correct-answer").hidden = true;
             $("listening-audio-status").textContent = "Preparing pronunciation…";
+            if ($("listening-audio-attribution")) { $("listening-audio-attribution").replaceChildren(); $("listening-audio-attribution").hidden = true; }
             $("study-audio-btn").disabled = true;
             $("study-audio-btn").textContent = "Preparing audio…";
             renderChoices(mode);
@@ -355,13 +356,45 @@
         if ("speechSynthesis" in window) window.speechSynthesis.cancel();
     }
 
+    function renderAudioAttribution(data) {
+        const panel = $("listening-audio-attribution");
+        if (!panel) return;
+        panel.replaceChildren();
+        const source = document.createElement("a");
+        source.href = data.sourceUrl;
+        source.target = "_blank";
+        source.rel = "noopener noreferrer";
+        source.textContent = data.source || "Audio source";
+        panel.append("Source: ", source);
+        if (data.attribution) panel.append(" · " + data.attribution);
+        if (data.license) {
+            panel.append(" · ");
+            if (data.licenseUrl) {
+                const license = document.createElement("a");
+                license.href = data.licenseUrl;
+                license.target = "_blank";
+                license.rel = "noopener noreferrer";
+                license.textContent = data.license;
+                panel.append(license);
+            } else {
+                panel.append(data.license);
+            }
+        }
+        panel.hidden = false;
+    }
+
     async function prepareListeningAudio(word) {
         const requestId = ++listeningAudioRequest;
         const status = $("listening-audio-status");
         const button = $("study-audio-btn");
+        const attribution = $("listening-audio-attribution");
+        if (attribution) {
+            attribution.replaceChildren();
+            attribution.hidden = true;
+        }
         button.disabled = true;
         button.textContent = "Preparing audio…";
-        status.textContent = "Generating French pronunciation…";
+        status.textContent = "Searching for an existing French pronunciation…";
 
         try {
             const { data, error } = await supabaseClient.functions.invoke(
@@ -371,9 +404,10 @@
             if (requestId !== listeningAudioRequest) return;
             if (error) throw error;
             if (!data || typeof data.audioUrl !== "string" || !data.audioUrl) {
-                throw new Error(data?.error || "The pronunciation service returned no audio URL.");
+                throw new Error(data?.error || "No pronunciation audio is available for this word.");
             }
 
+            renderAudioAttribution(data);
             const audio = new Audio();
             listeningAudio = audio;
             listeningAudioWord = word;
@@ -383,9 +417,10 @@
                 listeningAudioReady = true;
                 button.disabled = false;
                 button.textContent = "Play pronunciation";
-                status.textContent = data.cached
-                    ? "French pronunciation ready. Tap to listen."
-                    : "French pronunciation generated and saved. Tap to listen.";
+                const humanRecording = String(data.source || "").includes("Wiktionnaire");
+                status.textContent = humanRecording
+                    ? "A recorded human pronunciation is ready. Tap to listen."
+                    : "Pronunciation audio is ready. Tap to listen.";
             };
             audio.onended = () => {
                 if (requestId !== listeningAudioRequest || listeningAudio !== audio) return;
@@ -396,7 +431,7 @@
                 if (requestId !== listeningAudioRequest || listeningAudio !== audio) return;
                 listeningAudioReady = false;
                 button.disabled = true;
-                status.textContent = "The saved audio file could not be loaded. Please check Supabase Storage settings.";
+                status.textContent = "The audio file could not be loaded. Please check the Supabase Storage bucket.";
             };
             audio.src = data.audioUrl;
             audio.load();
@@ -406,7 +441,7 @@
             listeningAudioReady = false;
             button.disabled = true;
             button.textContent = "Audio unavailable";
-            status.textContent = error?.message || "French audio service is not configured yet.";
+            status.textContent = error?.message || "No French audio could be found for this word.";
         }
     }
 
