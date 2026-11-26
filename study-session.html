@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/theme.css?v=20261126-3">
 <link rel="stylesheet" href="css/study-enhancements.css?v=20261126-4">
-<link rel="stylesheet" href="css/study-immersive.css?v=20261126-4">
+<link rel="stylesheet" href="css/study-immersive.css?v=20261126-5">
 </head>
 <body data-study-page="session">
 <main class="study-immersive-shell">
@@ -62,9 +62,18 @@
       <p class="study-feedback recall-feedback" id="recall-feedback" role="status" aria-live="polite"></p>
       <p class="mode-answer-reveal" id="recall-correct-answer" lang="fr" hidden></p>
     </section>
-    <section class="mode-panel mode-listening" id="mode-listening" hidden>
-      <p class="mode-kicker">LISTEN AND IDENTIFY</p><div class="listening-audio-orb"><span aria-hidden="true">♫</span><button class="study-audio-button" id="study-audio-btn" type="button">Play pronunciation</button><p>Listen carefully, then select the word you hear.</p></div>
-      <div class="study-choice-options" id="listening-options" hidden></div><p class="study-feedback" id="listening-feedback" role="status" aria-live="polite"></p><p class="mode-answer-reveal" id="listening-correct-answer" hidden></p>
+    <section class="mode-panel mode-listening" id="mode-listening" hidden aria-label="Listening comprehension practice">
+      <p class="mode-kicker">LISTEN AND IDENTIFY THE FRENCH WORD</p>
+      <div class="listening-audio-orb">
+        <span class="listening-sound-icon" aria-hidden="true">♫</span>
+        <button class="study-audio-button" id="study-audio-btn" type="button">Play pronunciation</button>
+        <p id="listening-audio-hint">Listen carefully. The French word will not appear until you answer.</p>
+        <p class="listening-audio-status" id="listening-audio-status" role="status" aria-live="polite"></p>
+      </div>
+      <p class="listening-options-prompt">Which French word did you hear?</p>
+      <div class="study-choice-options listening-word-options" id="listening-options" role="group" aria-label="French word choices" hidden></div>
+      <p class="study-feedback listening-feedback" id="listening-feedback" role="status" aria-live="polite"></p>
+      <p class="mode-answer-reveal listening-answer-reveal" id="listening-correct-answer" lang="fr" hidden></p>
     </section>
     <section class="study-rating" id="study-rating" hidden>
       <p>How well did you remember this word?</p>
@@ -96,6 +105,6 @@
 <script src="js/app.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/settings.js"></script>
-<script src="js/study.js?v=20261126-8"></script>
+<script src="js/study.js?v=20261126-9"></script>
 </body>
 </html>
