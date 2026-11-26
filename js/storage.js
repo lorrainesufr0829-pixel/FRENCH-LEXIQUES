@@ -277,6 +277,98 @@ window.getUserProgress = getUserProgress;
 window.updateUserProgress = updateUserProgress;
 window.recordStudyReview = recordStudyReview;
 
+
+// =====================================
+// Spaced repetition (SM-2-inspired scheduler)
+// Requires supabase/migrations/20261126_study_review_state.sql
+// =====================================
+async function getStudyReviewStates() {
+    const userId = await getCurrentUserId();
+    if (!userId) return {};
+    const { data, error } = await supabaseClient
+        .from("vocabulary_review_state")
+        .select("vocabulary_id,due_at,interval_days,ease_factor,repetitions,lapses,last_rating,last_reviewed_at")
+        .eq("user_id", userId);
+    if (error) {
+        console.error("Study schedule loading failed:", error);
+        if (error.code === "42P01" || error.code === "PGRST205") {
+            throw new Error("STUDY_REVIEW_TABLE_MISSING");
+        }
+        throw error;
+    }
+    return Object.fromEntries((data || []).map(row => [row.vocabulary_id, row]));
+}
+
+async function saveSpacedRepetitionReview(word, rating) {
+    if (!word?.id || !["again", "hard", "good", "easy"].includes(rating)) {
+        throw new Error("Invalid spaced-repetition review.");
+    }
+    const userId = await getCurrentUserId();
+    if (!userId) throw new Error("Please sign in to save your review schedule.");
+
+    const { data: previous, error: readError } = await supabaseClient
+        .from("vocabulary_review_state")
+        .select("interval_days,ease_factor,repetitions,lapses")
+        .eq("user_id", userId)
+        .eq("vocabulary_id", word.id)
+        .maybeSingle();
+    if (readError) {
+        if (readError.code === "42P01" || readError.code === "PGRST205") {
+            throw new Error("STUDY_REVIEW_TABLE_MISSING");
+        }
+        throw readError;
+    }
+
+    const oldInterval = Number(previous?.interval_days || 0);
+    let ease = Number(previous?.ease_factor || 2.5);
+    let repetitions = Number(previous?.repetitions || 0);
+    let lapses = Number(previous?.lapses || 0);
+    let intervalDays;
+
+    if (rating === "again") {
+        repetitions = 0;
+        lapses += 1;
+        ease = Math.max(1.3, ease - 0.2);
+        intervalDays = 10 / 1440; // retry in ten minutes
+    } else if (rating === "hard") {
+        ease = Math.max(1.3, ease - 0.15);
+        intervalDays = Math.max(1, Math.ceil(oldInterval ? oldInterval * 1.2 : 1));
+        repetitions += 1;
+    } else if (rating === "good") {
+        intervalDays = repetitions === 0 ? 1 : repetitions === 1 ? 3 : Math.max(1, Math.round(oldInterval * ease));
+        repetitions += 1;
+    } else {
+        ease = Math.min(3.0, ease + 0.15);
+        intervalDays = repetitions === 0 ? 4 : Math.max(2, Math.round((oldInterval || 3) * ease * 1.3));
+        repetitions += 1;
+    }
+
+    const now = new Date();
+    const dueAt = new Date(now.getTime() + intervalDays * 86400000);
+    const payload = {
+        user_id: userId,
+        vocabulary_id: word.id,
+        due_at: dueAt.toISOString(),
+        interval_days: intervalDays,
+        ease_factor: Number(ease.toFixed(2)),
+        repetitions,
+        lapses,
+        last_rating: rating,
+        last_reviewed_at: now.toISOString(),
+        updated_at: now.toISOString()
+    };
+    const { data, error } = await supabaseClient
+        .from("vocabulary_review_state")
+        .upsert(payload, { onConflict: "user_id,vocabulary_id" })
+        .select()
+        .single();
+    if (error) throw error;
+    return data;
+}
+
+window.getStudyReviewStates = getStudyReviewStates;
+window.saveSpacedRepetitionReview = saveSpacedRepetitionReview;
+
 // =====================================
 // Export (Global)
 // =====================================
