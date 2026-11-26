@@ -1,0 +1,4 @@
+project_id = "uccznppecrkdbgykrucx"
+
+[functions.french-pronunciation]
+verify_jwt = true
