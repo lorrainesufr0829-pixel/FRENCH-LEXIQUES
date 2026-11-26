@@ -372,7 +372,7 @@
         }
     }
 
-    function speakWord() {
+    async function speakWord() {
         if (!currentWord || getMode() !== "listening") return;
         const word = String(currentWord.word || "").trim();
         if (!word) return;
@@ -380,45 +380,57 @@
         const button = $("study-audio-btn");
 
         stopListeningAudio();
-        status.textContent = "Loading French audio…";
+        status.textContent = "Finding French pronunciation…";
         button.textContent = "Loading audio…";
         button.disabled = true;
 
-        // Use a real audio stream first; Web Speech is retained as a device-level fallback.
-        const audioUrl = "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=fr&q=" + encodeURIComponent(word);
-        const audio = new Audio(audioUrl);
-        listeningAudio = audio;
-        audio.preload = "auto";
-        audio.onplaying = () => {
-            status.textContent = "Playing French pronunciation…";
-            button.textContent = "Replay pronunciation";
-            button.disabled = false;
-        };
-        audio.onended = () => {
-            status.textContent = "Listen again or choose the word you heard.";
-            button.textContent = "Replay pronunciation";
-            button.disabled = false;
-        };
-        audio.onerror = () => {
-            if (listeningAudio !== audio) return;
-            listeningAudio = null;
-            playSpeechSynthesisFallback(word, status);
-            button.textContent = "Replay pronunciation";
-            button.disabled = false;
-        };
-        audio.play().then(() => {
-            if (listeningAudio === audio) {
+        // Prefer an actual recorded pronunciation from the French dictionary API.
+        try {
+            const response = await fetch(
+                "https://api.dictionaryapi.dev/api/v2/entries/fr/" + encodeURIComponent(word),
+                { headers: { "Accept": "application/json" } }
+            );
+            if (!response.ok) throw new Error("No dictionary audio entry");
+            const entries = await response.json();
+            const audioUrl = (entries || [])
+                .flatMap(entry => entry.phonetics || [])
+                .map(item => item.audio)
+                .find(url => typeof url === "string" && /^https:\/\//i.test(url));
+
+            if (audioUrl) {
+                const audio = new Audio(audioUrl);
+                listeningAudio = audio;
+                audio.preload = "auto";
+                audio.onplaying = () => {
+                    status.textContent = "Playing recorded French pronunciation…";
+                    button.textContent = "Replay pronunciation";
+                    button.disabled = false;
+                };
+                audio.onended = () => {
+                    status.textContent = "Listen again or choose the word you heard.";
+                    button.textContent = "Replay pronunciation";
+                    button.disabled = false;
+                };
+                audio.onerror = () => {
+                    if (listeningAudio !== audio) return;
+                    listeningAudio = null;
+                    playSpeechSynthesisFallback(word, status);
+                    button.textContent = "Replay pronunciation";
+                    button.disabled = false;
+                };
+                await audio.play();
                 button.textContent = "Replay pronunciation";
                 button.disabled = false;
+                return;
             }
-        }).catch(error => {
-            console.warn("French audio stream could not be played:", error);
-            if (listeningAudio !== audio) return;
-            listeningAudio = null;
-            playSpeechSynthesisFallback(word, status);
-            button.textContent = "Replay pronunciation";
-            button.disabled = false;
-        });
+        } catch (error) {
+            console.warn("Recorded French pronunciation unavailable; trying device voice:", error);
+        }
+
+        // Some words do not have a recording in the dictionary. Fall back to the device's French voice.
+        playSpeechSynthesisFallback(word, status);
+        button.textContent = "Replay pronunciation";
+        button.disabled = false;
     }
 
     function revealAnswer() {
