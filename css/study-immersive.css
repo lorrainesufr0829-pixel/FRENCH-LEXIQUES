@@ -267,3 +267,17 @@ body[data-study-page="session"] .study-complete > p:not(.study-eyebrow) { color:
     .mode-choice .choice-meaning-options .study-choice-option { min-height: 64px; padding: 12px 14px; }
     .choice-option-text { font-size: 13px; }
 }
+
+
+.study-load-message {
+    width: min(100%, 680px);
+    margin: 56px auto;
+    padding: 22px 24px;
+    border: 1px solid var(--lexique-border);
+    border-radius: 14px;
+    background: var(--lexique-surface);
+    color: var(--lexique-text);
+    text-align: center;
+    line-height: 1.65;
+}
+.study-load-message[hidden] { display: none !important; }
