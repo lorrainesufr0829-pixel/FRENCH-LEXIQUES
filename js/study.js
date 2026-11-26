@@ -303,7 +303,8 @@
             renderCard();
         } catch (error) {
             console.error("Unable to save study review:", error);
-            $("study-feedback").textContent = error.message === "STUDY_REVIEW_TABLE_MISSING"
+            const feedbackId = getMode() === "recall" ? "recall-feedback" : getMode() === "listening" ? "listening-feedback" : "choice-feedback";
+            $(feedbackId).textContent = error.message === "STUDY_REVIEW_TABLE_MISSING"
                 ? "Run the Supabase migration before using long-term review scheduling."
                 : "Could not save this review. Check your connection and try again.";
             buttons.forEach(button => button.disabled = false);
