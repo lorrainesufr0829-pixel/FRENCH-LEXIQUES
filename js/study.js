@@ -206,10 +206,11 @@
             $("recall-meaning").textContent = currentWord.meaning;
             $("study-answer").value = "";
             $("recall-feedback").textContent = "";
+            $("recall-feedback").className = "study-feedback recall-feedback";
+            $("recall-correct-answer").textContent = "";
             $("recall-correct-answer").hidden = true;
             $("study-answer").disabled = false;
             $("check-answer-btn").disabled = false;
-            $("study-answer").focus();
         } else if (mode === "listening") {
             $("listening-feedback").textContent = "";
             $("listening-correct-answer").hidden = true;
@@ -324,21 +325,32 @@
         ratingPanel.hidden = false;
     }
 
+    function normalizeRecallAnswer(value) {
+        return String(value || "").trim().normalize("NFC").toLocaleLowerCase()
+            .replace(/[’]/g, "'").replace(/\\s+/g, " ");
+    }
+
     function checkRecall() {
-        if (!currentWord || saving) return;
-        const answer = normalize($("study-answer").value);
-        if (!answer) {
-            $("recall-feedback").textContent = "Enter an answer first.";
+        if (!currentWord || saving || $("study-answer").disabled) return;
+        const rawAnswer = $("study-answer").value.trim();
+        if (!rawAnswer) {
+            $("recall-feedback").textContent = "Enter your French answer first.";
+            $("study-answer").focus();
             return;
         }
-        const correct = answer === normalize(currentWord.word);
+        // Accents are significant in French spelling; only case, apostrophe style and extra spaces are normalized.
+        const correct = normalizeRecallAnswer(rawAnswer) === normalizeRecallAnswer(currentWord.word);
         answerCount++;
         if (correct) correctCount++;
         $("study-answer").disabled = true;
         $("check-answer-btn").disabled = true;
-        $("recall-feedback").textContent = correct ? "Correct !" : "Not quite.";
-        $("recall-feedback").className = "study-feedback " + (correct ? "is-correct" : "is-incorrect");
-        $("recall-correct-answer").textContent = currentWord.word;
+        $("recall-feedback").textContent = correct
+            ? "Correct — your spelling is right."
+            : "Not quite. Your answer: " + rawAnswer;
+        $("recall-feedback").className = "study-feedback recall-feedback " + (correct ? "is-correct" : "is-incorrect");
+        $("recall-correct-answer").textContent = correct
+            ? "✓ " + currentWord.word
+            : "Correct spelling: " + currentWord.word;
         $("recall-correct-answer").hidden = false;
         ratingPanel.hidden = false;
     }
@@ -402,9 +414,9 @@
     if (startButton) startButton.addEventListener("click", startSession);
     $("reveal-answer-btn").addEventListener("click", revealAnswer);
     $("study-audio-btn").addEventListener("click", speakWord);
-    $("check-answer-btn").addEventListener("click", checkRecall);
-    $("study-answer").addEventListener("keydown", event => {
-        if (event.key === "Enter") checkRecall();
+    $("recall-answer-form").addEventListener("submit", event => {
+        event.preventDefault();
+        checkRecall();
     });
     $("exit-study-btn").addEventListener("click", exitSession);
     $("study-again-btn").addEventListener("click", exitSession);
