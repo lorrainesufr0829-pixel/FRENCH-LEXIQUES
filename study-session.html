@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/theme.css?v=20261126-3">
 <link rel="stylesheet" href="css/study-enhancements.css?v=20261126-4">
-<link rel="stylesheet" href="css/study-immersive.css?v=20261126-2">
+<link rel="stylesheet" href="css/study-immersive.css?v=20261126-3">
 </head>
 <body data-study-page="session">
 <main class="study-immersive-shell">
@@ -42,9 +42,12 @@
       </div>
       <p class="study-feedback flashcard-feedback" id="flashcard-feedback" role="status" aria-live="polite"></p>
     </section>
-    <section class="mode-panel mode-choice" id="mode-choice" hidden>
-      <p class="mode-kicker">WHAT DOES THIS WORD MEAN?</p><h1 class="mode-target-word" id="choice-target-word">—</h1>
-      <div class="study-choice-options" id="choice-options" hidden></div><p class="study-feedback" id="choice-feedback" role="status" aria-live="polite"></p>
+    <section class="mode-panel mode-choice" id="mode-choice" hidden aria-label="Multiple choice practice">
+      <p class="mode-kicker">CHOOSE THE CORRECT MEANING</p>
+      <h1 class="mode-target-word" id="choice-target-word" lang="fr">—</h1>
+      <p class="choice-instruction">Select the Chinese meaning that best matches this French word.</p>
+      <div class="study-choice-options choice-meaning-options" id="choice-options" role="group" aria-label="Meaning choices" hidden></div>
+      <p class="study-feedback choice-feedback" id="choice-feedback" role="status" aria-live="polite"></p>
     </section>
     <section class="mode-panel mode-recall" id="mode-recall" hidden>
       <p class="mode-kicker">WRITE THE FRENCH WORD</p><h1 class="mode-meaning-prompt" id="recall-meaning">—</h1>
@@ -85,6 +88,6 @@
 <script src="js/app.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/settings.js"></script>
-<script src="js/study.js?v=20261126-6"></script>
+<script src="js/study.js?v=20261126-7"></script>
 </body>
 </html>
