@@ -500,3 +500,22 @@ body[data-study-page="session"] .study-complete > p:not(.study-eyebrow) { color:
 @media (prefers-reduced-motion: reduce) {
     .mode-listening .study-audio-button { transition: none; }
 }
+
+
+/* Listening audio attribution — keep source and license visible to learners */
+.mode-listening .listening-audio-attribution {
+    max-width: 440px;
+    margin: 8px 0 0;
+    color: var(--lexique-muted);
+    font-size: 11px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+.mode-listening .listening-audio-attribution a {
+    color: var(--lexique-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+.mode-listening .listening-audio-attribution[hidden] {
+    display: none !important;
+}
