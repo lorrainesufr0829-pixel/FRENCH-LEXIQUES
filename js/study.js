@@ -4,7 +4,8 @@
 (() => {
     const $ = id => document.getElementById(id);
     const setup = $("study-setup");
-    if (!setup) return;
+    const isSessionPage = document.body.dataset.studyPage === "session";
+    if (!setup && !isSessionPage) return;
 
     const categorySelect = $("study-category");
     const countSelect = $("study-count");
@@ -12,6 +13,10 @@
     const focusSelect = $("study-focus");
     const startButton = $("start-study-btn");
     const loadMessage = $("study-load-message");
+    let sessionConfig = null;
+    try { sessionConfig = JSON.parse(sessionStorage.getItem("lexique_study_session") || "null"); }
+    catch (_) { sessionConfig = null; }
+    const getMode = () => isSessionPage ? (sessionConfig?.mode || "flashcards") : modeSelect.value;
     const session = $("study-session");
     const complete = $("study-complete");
     const ratingPanel = $("study-rating");
@@ -65,8 +70,8 @@
     }
 
     async function loadStudyVocabulary() {
-        startButton.disabled = true;
-        loadMessage.textContent = "Loading your personal vocabulary and review schedule…";
+        if (startButton) startButton.disabled = true;
+        if (loadMessage) loadMessage.textContent = "Loading your personal vocabulary and review schedule…";
         try {
             vocabulary = (await getVocabulary() || []).filter(word =>
                 String(word.word || "").trim() && String(word.meaning || "").trim()
@@ -78,26 +83,33 @@
                 scheduleReady = false;
                 reviewStates = {};
                 console.warn("Spaced repetition schedule unavailable:", error);
-                loadMessage.textContent = error.message === "STUDY_REVIEW_TABLE_MISSING"
+                if (loadMessage) loadMessage.textContent = error.message === "STUDY_REVIEW_TABLE_MISSING"
                     ? "Vocabulary loaded. Run the Supabase migration to activate long-term review scheduling."
                     : "Vocabulary loaded, but review schedules could not be retrieved.";
             }
-            populateCategories();
-            if (scheduleReady) {
+            if (categorySelect) {
+                populateCategories();
+                if (sessionConfig?.category) categorySelect.value = sessionConfig.category;
+                if (sessionConfig?.focus) focusSelect.value = sessionConfig.focus;
+                if (sessionConfig?.count) countSelect.value = sessionConfig.count;
+                if (sessionConfig?.mode) modeSelect.value = sessionConfig.mode;
+            }
+            if (loadMessage && scheduleReady) {
                 const due = vocabulary.filter(isDue).length;
                 loadMessage.textContent = vocabulary.length + " words available · " + due + " due for review";
-            } else if (!loadMessage.textContent.startsWith("Vocabulary loaded")) {
+            } else if (loadMessage && !loadMessage.textContent.startsWith("Vocabulary loaded")) {
                 loadMessage.textContent = vocabulary.length + " words available";
             }
         } catch (error) {
             console.error("Study vocabulary loading failed:", error);
-            loadMessage.textContent = "Unable to load vocabulary. Please refresh and try again.";
+            if (loadMessage) loadMessage.textContent = "Unable to load vocabulary. Please refresh and try again.";
         } finally {
-            startButton.disabled = vocabulary.length === 0;
+            if (startButton) startButton.disabled = vocabulary.length === 0;
         }
     }
 
     function populateCategories() {
+        if (!categorySelect) return;
         const categories = [...new Set(vocabulary.flatMap(wordCategories))].sort((a, b) => a.localeCompare(b));
         const selected = categorySelect.value;
         categorySelect.innerHTML = '<option value="all">All Vocabulary</option>';
@@ -111,18 +123,34 @@
     }
 
     function startSession() {
-        const category = categorySelect.value;
-        const focus = focusSelect.value;
+        if (!isSessionPage) {
+            sessionConfig = {
+                mode: modeSelect.value,
+                focus: focusSelect.value,
+                category: categorySelect.value,
+                count: countSelect.value
+            };
+            sessionStorage.setItem("lexique_study_session", JSON.stringify(sessionConfig));
+            window.location.href = "study-session.html";
+            return;
+        }
+        if (!sessionConfig) {
+            window.location.replace("study.html");
+            return;
+        }
+        const category = sessionConfig.category || "all";
+        const focus = sessionConfig.focus || "all";
         let filtered = vocabulary.filter(word => category === "all" || wordCategories(word).some(name => name.toLowerCase() === category.toLowerCase()));
         if (focus === "due") filtered = filtered.filter(isDue);
         if (focus === "new") filtered = filtered.filter(isNew);
         if (focus === "weak") filtered = filtered.filter(isWeak);
         if (!filtered.length) {
-            loadMessage.textContent = "No words match this selection. Try another category or study focus.";
+            if (loadMessage) loadMessage.textContent = "No words match this selection. Return to Study and try another category or study focus.";
+            else window.location.replace("study.html");
             return;
         }
 
-        const amount = countSelect.value === "all" ? filtered.length : Number(countSelect.value);
+        const amount = sessionConfig.count === "all" ? filtered.length : Number(sessionConfig.count || 20);
         queue = shuffle(filtered).slice(0, amount).map(word => ({ word, retries: 0 }));
         sessionTotal = queue.length;
         completedCount = 0;
@@ -131,8 +159,10 @@
         sessionRatings = { again: 0, hard: 0, good: 0, easy: 0 };
         startedAt = Date.now();
 
-        $("session-category-label").textContent = (category === "all" ? "ALL VOCABULARY" : category.toUpperCase()) + " · " + modeSelect.options[modeSelect.selectedIndex].text.toUpperCase();
-        setup.hidden = true;
+        $("session-category-label").textContent = (category === "all" ? "ALL VOCABULARY" : category.toUpperCase());
+        const modeNames = { flashcards: "Flashcards", choice: "Multiple choice", recall: "Active recall", listening: "Listening" };
+        $("session-mode-title").textContent = modeNames[getMode()] || "Vocabulary practice";
+        if (setup) setup.hidden = true;
         complete.hidden = true;
         session.hidden = false;
         renderCard();
@@ -141,7 +171,7 @@
     function renderCard() {
         if (!queue.length) return finishSession();
         currentWord = queue[0].word;
-        const mode = modeSelect.value;
+        const mode = getMode();
         $("study-word").textContent = currentWord.word;
         $("study-meaning").textContent = currentWord.meaning;
         $("study-word-level").textContent = currentWord.level || (currentWord.level_names || []).join(" · ") || "VOCABULARY";
@@ -300,11 +330,10 @@
         if ("speechSynthesis" in window) window.speechSynthesis.cancel();
         session.hidden = true;
         complete.hidden = true;
-        setup.hidden = false;
-        loadStudyVocabulary();
+        window.location.href = "study.html";
     }
 
-    startButton.addEventListener("click", startSession);
+    if (startButton) startButton.addEventListener("click", startSession);
     $("reveal-answer-btn").addEventListener("click", revealAnswer);
     $("study-audio-btn").addEventListener("click", speakWord);
     $("check-answer-btn").addEventListener("click", checkRecall);
@@ -319,7 +348,7 @@
 
     document.addEventListener("keydown", event => {
         if (session.hidden || event.repeat || event.target.matches("input, textarea, select")) return;
-        if (event.code === "Space" && modeSelect.value === "flashcards" && !$("reveal-answer-btn").hidden) {
+        if (event.code === "Space" && getMode() === "flashcards" && !$("reveal-answer-btn").hidden) {
             event.preventDefault();
             revealAnswer();
         }
@@ -328,5 +357,7 @@
         }
     });
 
-    loadStudyVocabulary();
+    loadStudyVocabulary().then(() => {
+        if (isSessionPage && vocabulary.length) startSession();
+    });
 })();
