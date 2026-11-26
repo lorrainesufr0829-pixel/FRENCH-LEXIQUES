@@ -2206,3 +2206,65 @@ body[data-theme="dark"] .study-setup-tag { background: #2c3530; color: var(--com
         transition: none !important;
     }
 }
+
+
+/* STUDY PHASE 1 refinement — one shared frame for the hero and setup. */
+.study-launch-panel {
+    width: min(100%, 900px);
+    margin: 8px auto 54px;
+    overflow: hidden;
+    border: 3px solid var(--comic-ink);
+    border-radius: 12px;
+    background: #fffdf7;
+    box-shadow: 9px 9px 0 var(--comic-ink);
+}
+.study-launch-panel .study-heading {
+    width: 100%;
+    max-width: none;
+    margin: 0 !important;
+    padding: 42px 48px 34px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+.study-launch-panel .study-heading::after {
+    box-shadow: none;
+}
+.study-launch-panel .study-setup {
+    width: 100%;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 38px 30px !important;
+    border: 0 !important;
+    border-top: 2px solid var(--comic-ink) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+.study-launch-panel .study-setup-topline {
+    margin-top: 0;
+}
+body[data-theme="dark"] .study-launch-panel {
+    background: #202723 !important;
+    border-color: var(--comic-ink);
+}
+@media (max-width: 760px) {
+    .study-launch-panel {
+        width: calc(100% - 5px);
+        margin: 8px auto 44px;
+    }
+    .study-launch-panel .study-heading {
+        padding: 34px 25px 28px !important;
+    }
+    .study-launch-panel .study-setup {
+        padding: 0 22px 24px !important;
+    }
+}
+@media (max-width: 520px) {
+    .study-launch-panel .study-heading {
+        padding: 30px 20px 24px !important;
+    }
+    .study-launch-panel .study-setup {
+        padding: 0 17px 22px !important;
+    }
+}
