@@ -183,6 +183,9 @@
             $("study-card-front").hidden = false;
             $("study-card-back").hidden = true;
             $("reveal-answer-btn").hidden = false;
+            $("reveal-answer-btn").setAttribute("aria-expanded", "false");
+            $("flashcard-feedback").textContent = "";
+            $("flashcard-feedback").className = "study-feedback flashcard-feedback";
         } else if (mode === "choice") {
             $("choice-target-word").textContent = currentWord.word;
             $("choice-feedback").textContent = "";
@@ -256,6 +259,7 @@
     function revealAnswer() {
         if (!currentWord || getMode() !== "flashcards") return;
         $("study-card-back").hidden = false;
+        $("reveal-answer-btn").setAttribute("aria-expanded", "true");
         $("reveal-answer-btn").hidden = true;
         ratingPanel.hidden = false;
     }
@@ -303,7 +307,7 @@
             renderCard();
         } catch (error) {
             console.error("Unable to save study review:", error);
-            const feedbackId = getMode() === "recall" ? "recall-feedback" : getMode() === "listening" ? "listening-feedback" : "choice-feedback";
+            const feedbackId = getMode() === "flashcards" ? "flashcard-feedback" : getMode() === "recall" ? "recall-feedback" : getMode() === "listening" ? "listening-feedback" : "choice-feedback";
             $(feedbackId).textContent = error.message === "STUDY_REVIEW_TABLE_MISSING"
                 ? "Run the Supabase migration before using long-term review scheduling."
                 : "Could not save this review. Check your connection and try again.";
