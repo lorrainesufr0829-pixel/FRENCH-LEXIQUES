@@ -327,7 +327,7 @@
 
     function normalizeRecallAnswer(value) {
         return String(value || "").trim().normalize("NFC").toLocaleLowerCase()
-            .replace(/[’]/g, "'").replace(/\\s+/g, " ");
+            .replace(/[’]/g, "'").replace(/\s+/g, " ");
     }
 
     function checkRecall() {
