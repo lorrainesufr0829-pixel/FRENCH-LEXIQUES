@@ -172,54 +172,50 @@
         if (!queue.length) return finishSession();
         currentWord = queue[0].word;
         const mode = getMode();
-        $("study-word").textContent = currentWord.word;
-        $("study-meaning").textContent = currentWord.meaning;
+        ["flashcards", "choice", "recall", "listening"].forEach(name => $("mode-" + name).hidden = name !== mode);
         $("study-word-level").textContent = currentWord.level || (currentWord.level_names || []).join(" · ") || "VOCABULARY";
         $("study-word-category").textContent = wordCategories(currentWord).join(" · ") || "GENERAL";
-        $("study-card-front").hidden = false;
-        $("study-card-back").hidden = true;
-        $("study-mode-prompt").hidden = true;
-        $("study-answer-input").hidden = true;
-        $("study-choice-options").hidden = true;
-        $("study-feedback").textContent = "";
-        $("study-feedback").className = "study-feedback";
-        $("study-answer").value = "";
-        $("study-audio-btn").hidden = mode !== "listening";
-        $("study-audio-btn").disabled = false;
-        $("reveal-answer-btn").hidden = mode !== "flashcards";
         ratingPanel.hidden = true;
         ratingPanel.querySelectorAll("button").forEach(button => button.disabled = false);
-
-        if (mode === "recall") {
-            $("study-mode-prompt").textContent = currentWord.meaning;
-            $("study-mode-prompt").hidden = false;
-            $("study-card-front").hidden = true;
-            $("study-answer-input").hidden = false;
-            $("study-answer").focus();
-        } else if (mode === "choice" || mode === "listening") {
-            $("study-mode-prompt").textContent = mode === "listening" ? "Listen, then choose the French word" : "Choose the correct meaning";
-            $("study-mode-prompt").hidden = false;
-            $("study-card-front").hidden = mode === "listening";
-            if (mode === "listening") speakWord();
+        if (mode === "flashcards") {
+            $("study-word").textContent = currentWord.word;
+            $("study-meaning").textContent = currentWord.meaning;
+            $("study-card-front").hidden = false;
+            $("study-card-back").hidden = true;
+            $("reveal-answer-btn").hidden = false;
+        } else if (mode === "choice") {
+            $("choice-target-word").textContent = currentWord.word;
+            $("choice-feedback").textContent = "";
             renderChoices(mode);
+        } else if (mode === "recall") {
+            $("recall-meaning").textContent = currentWord.meaning;
+            $("study-answer").value = "";
+            $("recall-feedback").textContent = "";
+            $("recall-correct-answer").hidden = true;
+            $("study-answer").disabled = false;
+            $("check-answer-btn").disabled = false;
+            $("study-answer").focus();
+        } else if (mode === "listening") {
+            $("listening-feedback").textContent = "";
+            $("listening-correct-answer").hidden = true;
+            renderChoices(mode);
+            speakWord();
         }
-
         const position = Math.min(completedCount + 1, sessionTotal);
         $("study-progress-label").textContent = position + " / " + sessionTotal;
         $("study-progress-fill").style.width = (completedCount / sessionTotal * 100) + "%";
     }
 
     function renderChoices(mode) {
-        const panel = $("study-choice-options");
-        const candidates = shuffle(vocabulary.filter(word => word.id !== currentWord.id));
-        const distractors = candidates.slice(0, 3);
-        const options = shuffle([currentWord, ...distractors]);
+        const panel = $(mode === "listening" ? "listening-options" : "choice-options");
+        const options = shuffle([currentWord, ...shuffle(vocabulary.filter(word => word.id !== currentWord.id)).slice(0, 3)]);
         panel.innerHTML = "";
         options.forEach(option => {
             const button = document.createElement("button");
             button.type = "button";
             button.className = "study-choice-option";
             button.textContent = mode === "listening" ? option.word : option.meaning;
+            button.dataset.correct = String(option.id === currentWord.id);
             button.addEventListener("click", () => {
                 if (saving || button.disabled) return;
                 const correct = option.id === currentWord.id;
@@ -229,19 +225,25 @@
                     item.disabled = true;
                     if (item.dataset.correct === "true") item.classList.add("is-correct");
                 });
-                button.dataset.correct = String(correct);
                 if (!correct) button.classList.add("is-incorrect");
-                showAnswerFeedback(correct);
+                const feedback = $(mode === "listening" ? "listening-feedback" : "choice-feedback");
+                feedback.textContent = correct ? "Correct !" : "Not quite.";
+                feedback.className = "study-feedback " + (correct ? "is-correct" : "is-incorrect");
+                if (mode === "listening") {
+                    $("listening-correct-answer").textContent = currentWord.word + " — " + currentWord.meaning;
+                    $("listening-correct-answer").hidden = false;
+                }
+                ratingPanel.hidden = false;
             });
-            button.dataset.correct = String(option.id === currentWord.id);
             panel.appendChild(button);
         });
         panel.hidden = false;
     }
 
     function speakWord() {
+        if (!currentWord) return;
         if (!("speechSynthesis" in window)) {
-            $("study-feedback").textContent = "Speech playback is not supported by this browser.";
+            $("listening-feedback").textContent = "Speech playback is not supported by this browser.";
             return;
         }
         window.speechSynthesis.cancel();
@@ -252,16 +254,9 @@
     }
 
     function revealAnswer() {
-        if (!currentWord) return;
+        if (!currentWord || getMode() !== "flashcards") return;
         $("study-card-back").hidden = false;
         $("reveal-answer-btn").hidden = true;
-        ratingPanel.hidden = false;
-    }
-
-    function showAnswerFeedback(correct) {
-        $("study-feedback").textContent = correct ? "Correct !" : "Not quite. The answer is: " + currentWord.word;
-        $("study-feedback").className = "study-feedback " + (correct ? "is-correct" : "is-incorrect");
-        $("study-card-back").hidden = false;
         ratingPanel.hidden = false;
     }
 
@@ -269,13 +264,19 @@
         if (!currentWord || saving) return;
         const answer = normalize($("study-answer").value);
         if (!answer) {
-            $("study-feedback").textContent = "Enter an answer first.";
+            $("recall-feedback").textContent = "Enter an answer first.";
             return;
         }
         const correct = answer === normalize(currentWord.word);
         answerCount++;
         if (correct) correctCount++;
-        showAnswerFeedback(correct);
+        $("study-answer").disabled = true;
+        $("check-answer-btn").disabled = true;
+        $("recall-feedback").textContent = correct ? "Correct !" : "Not quite.";
+        $("recall-feedback").className = "study-feedback " + (correct ? "is-correct" : "is-incorrect");
+        $("recall-correct-answer").textContent = currentWord.word;
+        $("recall-correct-answer").hidden = false;
+        ratingPanel.hidden = false;
     }
 
     async function rateCard(rating) {
