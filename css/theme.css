@@ -2268,3 +2268,68 @@ body[data-theme="dark"] .study-launch-panel {
         padding: 0 17px 22px !important;
     }
 }
+
+
+/* STUDY — enforce a single visible frame (final cascade override). */
+body .study-container .study-launch-panel {
+    display: block !important;
+    width: min(100%, 900px) !important;
+    margin: 8px auto 54px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border: 3px solid var(--comic-ink, #26231f) !important;
+    border-radius: 12px !important;
+    background: #fffdf7 !important;
+    box-shadow: 9px 9px 0 var(--comic-ink, #26231f) !important;
+}
+body .study-container .study-launch-panel > .study-heading,
+body .study-container .study-launch-panel > .study-setup {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+body .study-container .study-launch-panel > .study-heading {
+    padding: 42px 48px 34px !important;
+    background: transparent !important;
+}
+body .study-container .study-launch-panel > .study-setup {
+    padding: 0 38px 30px !important;
+    border-top: 2px solid var(--comic-ink) !important;
+    background: transparent !important;
+}
+body .study-container .study-launch-panel > .study-heading::after {
+    box-shadow: none !important;
+}
+body[data-theme="dark"] .study-container .study-launch-panel {
+    background: #202723 !important;
+}
+body[data-theme="dark"] .study-container .study-launch-panel > .study-heading,
+body[data-theme="dark"] .study-container .study-launch-panel > .study-setup {
+    background: transparent !important;
+}
+@media (max-width: 760px) {
+    body .study-container .study-launch-panel {
+        width: calc(100% - 5px) !important;
+        margin-bottom: 44px !important;
+    }
+    body .study-container .study-launch-panel > .study-heading {
+        padding: 34px 25px 28px !important;
+    }
+    body .study-container .study-launch-panel > .study-setup {
+        padding: 0 22px 24px !important;
+    }
+}
+@media (max-width: 520px) {
+    body .study-container .study-launch-panel > .study-heading {
+        padding: 30px 20px 24px !important;
+    }
+    body .study-container .study-launch-panel > .study-setup {
+        padding: 0 17px 22px !important;
+    }
+}
