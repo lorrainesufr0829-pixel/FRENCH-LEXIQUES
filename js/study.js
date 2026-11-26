@@ -355,59 +355,24 @@
         if ("speechSynthesis" in window) window.speechSynthesis.cancel();
     }
 
-    function prepareRemoteTts(word, requestId) {
-        if (requestId !== listeningAudioRequest) return;
-        const status = $("listening-audio-status");
-        const button = $("study-audio-btn");
-        const url = "https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=fr&dt=t&q=" + encodeURIComponent(word);
-        const audio = new Audio();
-        listeningAudio = audio;
-        listeningAudioWord = word;
-        audio.preload = "auto";
-        audio.oncanplay = () => {
-            if (requestId !== listeningAudioRequest || listeningAudio !== audio) return;
-            listeningAudioReady = true;
-            button.disabled = false;
-            button.textContent = "Play pronunciation";
-            status.textContent = "Online French pronunciation ready. Tap to listen.";
-        };
-        audio.onended = () => {
-            if (requestId !== listeningAudioRequest || listeningAudio !== audio) return;
-            status.textContent = "Listen again or choose the word you heard.";
-            button.textContent = "Replay pronunciation";
-        };
-        audio.onerror = () => {
-            if (requestId !== listeningAudioRequest || listeningAudio !== audio) return;
-            listeningAudioReady = false;
-            button.disabled = true;
-            status.textContent = "Online pronunciation is unavailable. This browser could not load either audio source.";
-        };
-        audio.src = url;
-        audio.load();
-    }
-
     async function prepareListeningAudio(word) {
         const requestId = ++listeningAudioRequest;
         const status = $("listening-audio-status");
         const button = $("study-audio-btn");
         button.disabled = true;
         button.textContent = "Preparing audio…";
-        status.textContent = "Preparing French pronunciation…";
+        status.textContent = "Generating French pronunciation…";
+
         try {
-            const response = await fetch(
-                "https://api.dictionaryapi.dev/api/v2/entries/fr/" + encodeURIComponent(word),
-                { headers: { "Accept": "application/json" } }
+            const { data, error } = await supabaseClient.functions.invoke(
+                "french-pronunciation",
+                { body: { word } }
             );
-            if (!response.ok) throw new Error("No dictionary entry");
-            const entries = await response.json();
-            const rawUrl = (entries || [])
-                .flatMap(entry => entry.phonetics || [])
-                .map(item => item.audio)
-                .find(url => typeof url === "string" && url.trim());
-            if (!rawUrl) throw new Error("No recorded pronunciation");
-            const audioUrl = rawUrl.startsWith("//") ? "https:" + rawUrl : rawUrl;
-            if (!/^https:\/\//i.test(audioUrl)) throw new Error("Unsupported audio URL");
             if (requestId !== listeningAudioRequest) return;
+            if (error) throw error;
+            if (!data || typeof data.audioUrl !== "string" || !data.audioUrl) {
+                throw new Error(data?.error || "The pronunciation service returned no audio URL.");
+            }
 
             const audio = new Audio();
             listeningAudio = audio;
@@ -418,7 +383,9 @@
                 listeningAudioReady = true;
                 button.disabled = false;
                 button.textContent = "Play pronunciation";
-                status.textContent = "Recorded French pronunciation ready. Tap to listen.";
+                status.textContent = data.cached
+                    ? "French pronunciation ready. Tap to listen."
+                    : "French pronunciation generated and saved. Tap to listen.";
             };
             audio.onended = () => {
                 if (requestId !== listeningAudioRequest || listeningAudio !== audio) return;
@@ -428,15 +395,18 @@
             audio.onerror = () => {
                 if (requestId !== listeningAudioRequest || listeningAudio !== audio) return;
                 listeningAudioReady = false;
-                status.textContent = "Dictionary recording unavailable. Trying online pronunciation…";
-                prepareRemoteTts(word, requestId);
+                button.disabled = true;
+                status.textContent = "The saved audio file could not be loaded. Please check Supabase Storage settings.";
             };
-            audio.src = audioUrl;
+            audio.src = data.audioUrl;
             audio.load();
         } catch (error) {
             if (requestId !== listeningAudioRequest) return;
-            console.warn("Dictionary pronunciation unavailable; trying online TTS:", error);
-            prepareRemoteTts(word, requestId);
+            console.error("French pronunciation service unavailable:", error);
+            listeningAudioReady = false;
+            button.disabled = true;
+            button.textContent = "Audio unavailable";
+            status.textContent = error?.message || "French audio service is not configured yet.";
         }
     }
 
