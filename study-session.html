@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f4f7f5">
+<title>LEXIQUE - Training Session</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/theme.css?v=20261126-3">
+<link rel="stylesheet" href="css/study-enhancements.css?v=20261126-4">
+<link rel="stylesheet" href="css/study-immersive.css?v=20261126-1">
+</head>
+<body data-study-page="session">
+<main class="study-immersive-shell">
+  <header class="immersive-topbar">
+    <a class="immersive-brand" href="study.html" aria-label="Back to Study setup">LEXIQUE<span> / STUDY</span></a>
+    <div class="immersive-session-label">FOCUS MODE <span aria-hidden="true">●</span></div>
+    <button class="study-text-button" id="exit-study-btn" type="button">Exit session</button>
+  </header>
+  <section class="study-session" id="study-session">
+    <div class="study-session-top">
+      <div>
+        <p class="study-eyebrow" id="session-category-label">ALL VOCABULARY</p>
+        <h3 id="session-mode-title">Flashcards</h3>
+      </div>
+    </div>
+    <div class="study-progress-line">
+      <div class="study-progress-track"><div id="study-progress-fill"></div></div>
+      <span id="study-progress-label">1 / 20</span>
+    </div>
+    <article class="study-flashcard" id="study-flashcard">
+      <div class="study-card-topline">
+        <span id="study-word-level">VOCABULARY</span>
+        <span id="study-word-category">GENERAL</span>
+      </div>
+      <div class="study-mode-prompt" id="study-mode-prompt" hidden></div>
+      <div class="study-card-front" id="study-card-front" aria-live="polite">
+        <p class="study-card-hint">FRENCH WORD</p>
+        <h1 id="study-word">—</h1>
+        <button class="study-audio-button" id="study-audio-btn" type="button" aria-label="Play French pronunciation">🔊 Listen</button>
+        <button class="study-reveal-button" id="reveal-answer-btn" type="button">Reveal meaning</button>
+        <div class="study-answer-input" id="study-answer-input" hidden>
+          <input id="study-answer" type="text" autocomplete="off" placeholder="Type the French word…">
+          <button type="button" id="check-answer-btn">Check answer</button>
+        </div>
+        <div class="study-choice-options" id="study-choice-options" hidden></div>
+        <p class="study-feedback" id="study-feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="study-card-back" id="study-card-back" aria-live="polite" hidden>
+        <div class="study-card-divider"></div>
+        <p class="study-card-hint">MEANING</p>
+        <p class="study-meaning" id="study-meaning"></p>
+      </div>
+    </article>
+    <section class="study-rating" id="study-rating" hidden>
+      <p>How well did you remember this word?</p>
+      <div class="study-rating-buttons">
+        <button type="button" data-rating="again" class="rating-again">Again</button>
+        <button type="button" data-rating="hard" class="rating-hard">Hard</button>
+        <button type="button" data-rating="good" class="rating-good">Good</button>
+        <button type="button" data-rating="easy" class="rating-easy">Easy</button>
+      </div>
+      <span class="study-rating-note">Your rating guides the next card in this session.</span>
+    </section>
+  </section>
+  <section class="study-complete" id="study-complete" hidden>
+    <p class="study-eyebrow">SESSION COMPLETE</p>
+    <h3>Well done.</h3>
+    <p id="study-complete-summary">You have finished this study session.</p>
+    <div class="study-result-grid">
+      <div><span>Accuracy</span><strong id="study-result-accuracy">—</strong></div>
+      <div><span>Reviewed</span><strong id="study-result-reviewed">0</strong></div>
+      <div><span>Time</span><strong id="study-result-time">0m</strong></div>
+    </div>
+    <button class="study-primary-button" id="study-again-btn" type="button">Back to Study</button>
+  </section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/auth-nav.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/app.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/study.js?v=20261126-5"></script>
+</body>
+</html>
