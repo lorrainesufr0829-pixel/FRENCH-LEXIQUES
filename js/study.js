@@ -223,6 +223,7 @@
             $("study-answer").disabled = false;
             $("check-answer-btn").disabled = false;
         } else if (mode === "listening") {
+            stopListeningAudio();
             $("listening-feedback").textContent = "";
             $("listening-feedback").className = "study-feedback listening-feedback";
             $("listening-correct-answer").textContent = "";
@@ -336,25 +337,88 @@
         }
     }
 
-    function speakWord() {
-        if (!currentWord || getMode() !== "listening") return;
-        const status = $("listening-audio-status");
-        const button = $("study-audio-btn");
+    let listeningAudio = null;
+
+    function stopListeningAudio() {
+        if (listeningAudio) {
+            listeningAudio.pause();
+            listeningAudio.removeAttribute("src");
+            listeningAudio.load();
+            listeningAudio = null;
+        }
+        if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    }
+
+    function playSpeechSynthesisFallback(word, status) {
         if (!("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") {
-            status.textContent = "Audio playback is not supported in this browser. Try another browser to use Listening practice.";
-            button.disabled = true;
+            status.textContent = "Audio could not be loaded. Check your connection and try again.";
             return;
         }
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(currentWord.word);
-        utterance.lang = "fr-FR";
-        utterance.rate = 0.82;
-        utterance.onstart = () => { status.textContent = "Playing French pronunciation…"; };
-        utterance.onend = () => { status.textContent = "Listen again or choose the word you heard."; };
-        utterance.onerror = () => { status.textContent = "Pronunciation could not be played. Tap to try again."; };
-        status.textContent = "Preparing French pronunciation…";
-        window.speechSynthesis.speak(utterance);
-        button.textContent = "Play again";
+        try {
+            const utterance = new SpeechSynthesisUtterance(word);
+            utterance.lang = "fr-FR";
+            utterance.rate = 0.82;
+            const frenchVoice = window.speechSynthesis.getVoices()
+                .find(voice => /^fr([-_]|$)/i.test(voice.lang));
+            if (frenchVoice) utterance.voice = frenchVoice;
+            utterance.onstart = () => { status.textContent = "Playing French pronunciation…"; };
+            utterance.onend = () => { status.textContent = "Listen again or choose the word you heard."; };
+            utterance.onerror = () => { status.textContent = "Audio playback failed. Check your device's media volume and try again."; };
+            status.textContent = "Using your device's French voice…";
+            window.speechSynthesis.speak(utterance);
+        } catch (error) {
+            console.warn("Speech synthesis fallback failed:", error);
+            status.textContent = "Audio playback is unavailable on this device.";
+        }
+    }
+
+    function speakWord() {
+        if (!currentWord || getMode() !== "listening") return;
+        const word = String(currentWord.word || "").trim();
+        if (!word) return;
+        const status = $("listening-audio-status");
+        const button = $("study-audio-btn");
+
+        stopListeningAudio();
+        status.textContent = "Loading French audio…";
+        button.textContent = "Loading audio…";
+        button.disabled = true;
+
+        // Use a real audio stream first; Web Speech is retained as a device-level fallback.
+        const audioUrl = "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=fr&q=" + encodeURIComponent(word);
+        const audio = new Audio(audioUrl);
+        listeningAudio = audio;
+        audio.preload = "auto";
+        audio.onplaying = () => {
+            status.textContent = "Playing French pronunciation…";
+            button.textContent = "Replay pronunciation";
+            button.disabled = false;
+        };
+        audio.onended = () => {
+            status.textContent = "Listen again or choose the word you heard.";
+            button.textContent = "Replay pronunciation";
+            button.disabled = false;
+        };
+        audio.onerror = () => {
+            if (listeningAudio !== audio) return;
+            listeningAudio = null;
+            playSpeechSynthesisFallback(word, status);
+            button.textContent = "Replay pronunciation";
+            button.disabled = false;
+        };
+        audio.play().then(() => {
+            if (listeningAudio === audio) {
+                button.textContent = "Replay pronunciation";
+                button.disabled = false;
+            }
+        }).catch(error => {
+            console.warn("French audio stream could not be played:", error);
+            if (listeningAudio !== audio) return;
+            listeningAudio = null;
+            playSpeechSynthesisFallback(word, status);
+            button.textContent = "Replay pronunciation";
+            button.disabled = false;
+        });
     }
 
     function revealAnswer() {
@@ -445,7 +509,7 @@
     }
 
     function exitSession() {
-        if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+        stopListeningAudio();
         session.hidden = true;
         complete.hidden = true;
         window.location.href = "study.html";
