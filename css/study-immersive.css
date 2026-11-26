@@ -381,3 +381,122 @@ body[data-study-page="session"] .study-complete > p:not(.study-eyebrow) { color:
     .mode-recall .recall-answer-form input { min-height: 54px; font-size: 16px; }
     .mode-recall .recall-answer-form button { min-height: 50px; width: 100%; }
 }
+
+
+/* Listening — audio-first recognition, with no visible target word */
+.mode-listening {
+    gap: 0;
+}
+.mode-listening .mode-kicker {
+    margin-bottom: 18px;
+}
+.mode-listening .listening-audio-orb {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: min(100%, 500px);
+    min-height: 205px;
+    margin: 0 auto 26px;
+    padding: 25px 22px;
+    border: 1px solid var(--lexique-border);
+    border-radius: 18px;
+    background: var(--lexique-accent-soft);
+}
+.listening-sound-icon {
+    display: block;
+    margin-bottom: 12px;
+    color: var(--lexique-accent);
+    font-size: 42px;
+    line-height: 1;
+}
+.mode-listening .study-audio-button {
+    min-height: 50px;
+    padding: 0 27px;
+    border: 1px solid var(--lexique-accent);
+    border-radius: 999px;
+    background: var(--lexique-accent);
+    color: #fff;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 750;
+    cursor: pointer;
+}
+.mode-listening .study-audio-button:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+.mode-listening .study-audio-button:focus-visible,
+.mode-listening .listening-word-options button:focus-visible {
+    outline: 3px solid var(--lexique-accent);
+    outline-offset: 3px;
+}
+.mode-listening .listening-audio-orb > p:not(.listening-audio-status) {
+    max-width: 390px;
+    margin: 13px 0 0;
+    color: var(--lexique-muted);
+    font-size: 13px;
+    line-height: 1.55;
+}
+.mode-listening .listening-audio-status {
+    min-height: 19px;
+    margin: 8px 0 0;
+    color: var(--lexique-muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+.listening-options-prompt {
+    margin: 0 0 4px;
+    color: var(--lexique-text);
+    font-size: 15px;
+    font-weight: 700;
+}
+.mode-listening .listening-word-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
+    max-width: 650px;
+    margin: 18px auto 0;
+}
+.mode-listening .listening-word-options .study-choice-option {
+    min-height: 66px;
+    padding: 15px 18px;
+    border-radius: 13px;
+    font-size: clamp(17px, 2.6vw, 21px);
+    font-weight: 700;
+    letter-spacing: .01em;
+}
+.mode-listening .listening-word-options .study-choice-option.is-correct {
+    border-color: var(--lexique-accent);
+}
+.mode-listening .listening-feedback {
+    max-width: 620px;
+    margin: 18px 0 0;
+    line-height: 1.6;
+}
+.mode-listening .listening-answer-reveal {
+    margin-top: 7px;
+    font-size: clamp(20px, 3.4vw, 26px);
+    line-height: 1.45;
+}
+@media (max-width: 600px) {
+    .mode-listening .listening-audio-orb {
+        min-height: 190px;
+        margin-bottom: 21px;
+        padding: 22px 16px;
+    }
+    .mode-listening .listening-word-options {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 9px;
+        margin-top: 14px;
+    }
+    .mode-listening .listening-word-options .study-choice-option {
+        min-height: 57px;
+        padding: 12px 14px;
+    }
+    .listening-options-prompt { font-size: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .mode-listening .study-audio-button { transition: none; }
+}
