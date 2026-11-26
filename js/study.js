@@ -228,10 +228,11 @@
             $("listening-feedback").className = "study-feedback listening-feedback";
             $("listening-correct-answer").textContent = "";
             $("listening-correct-answer").hidden = true;
-            $("listening-audio-status").textContent = "";
+            $("listening-audio-status").textContent = "Preparing pronunciation…";
             $("study-audio-btn").disabled = false;
             $("study-audio-btn").textContent = "Play pronunciation";
             renderChoices(mode);
+            prepareListeningAudio(String(currentWord.word || "").trim());
         }
         const position = Math.min(completedCount + 1, sessionTotal);
         $("study-progress-label").textContent = position + " / " + sessionTotal;
@@ -338,21 +339,26 @@
     }
 
     let listeningAudio = null;
+    let listeningAudioWord = "";
+    let listeningAudioReady = false;
+    let listeningAudioRequest = 0;
 
     function stopListeningAudio() {
+        listeningAudioRequest++;
         if (listeningAudio) {
             listeningAudio.pause();
-            listeningAudio.removeAttribute("src");
-            listeningAudio.load();
+            listeningAudio.currentTime = 0;
             listeningAudio = null;
         }
+        listeningAudioWord = "";
+        listeningAudioReady = false;
         if ("speechSynthesis" in window) window.speechSynthesis.cancel();
     }
 
     function playSpeechSynthesisFallback(word, status) {
         if (!("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") {
-            status.textContent = "Audio could not be loaded. Check your connection and try again.";
-            return;
+            status.textContent = "No playable audio is available. Check your connection or device audio settings.";
+            return false;
         }
         try {
             const utterance = new SpeechSynthesisUtterance(word);
@@ -361,73 +367,95 @@
             const frenchVoice = window.speechSynthesis.getVoices()
                 .find(voice => /^fr([-_]|$)/i.test(voice.lang));
             if (frenchVoice) utterance.voice = frenchVoice;
-            utterance.onstart = () => { status.textContent = "Playing French pronunciation…"; };
+            utterance.onstart = () => { status.textContent = "French pronunciation is playing."; };
             utterance.onend = () => { status.textContent = "Listen again or choose the word you heard."; };
-            utterance.onerror = () => { status.textContent = "Audio playback failed. Check your device's media volume and try again."; };
-            status.textContent = "Using your device's French voice…";
+            utterance.onerror = (event) => {
+                status.textContent = "Device speech failed (" + (event.error || "unknown error") + "). Check media volume or try another browser.";
+            };
+            status.textContent = "Starting your device's French voice…";
             window.speechSynthesis.speak(utterance);
+            return true;
         } catch (error) {
             console.warn("Speech synthesis fallback failed:", error);
             status.textContent = "Audio playback is unavailable on this device.";
+            return false;
         }
     }
 
-    async function speakWord() {
-        if (!currentWord || getMode() !== "listening") return;
-        const word = String(currentWord.word || "").trim();
-        if (!word) return;
+    async function prepareListeningAudio(word) {
+        const requestId = ++listeningAudioRequest;
         const status = $("listening-audio-status");
-        const button = $("study-audio-btn");
-
-        stopListeningAudio();
-        status.textContent = "Finding French pronunciation…";
-        button.textContent = "Loading audio…";
-        button.disabled = true;
-
-        // Prefer an actual recorded pronunciation from the French dictionary API.
+        status.textContent = "Preparing pronunciation…";
         try {
             const response = await fetch(
                 "https://api.dictionaryapi.dev/api/v2/entries/fr/" + encodeURIComponent(word),
                 { headers: { "Accept": "application/json" } }
             );
-            if (!response.ok) throw new Error("No dictionary audio entry");
+            if (!response.ok) throw new Error("No dictionary entry");
             const entries = await response.json();
-            const audioUrl = (entries || [])
+            const rawUrl = (entries || [])
                 .flatMap(entry => entry.phonetics || [])
                 .map(item => item.audio)
-                .find(url => typeof url === "string" && /^https:\/\//i.test(url));
+                .find(url => typeof url === "string" && url.trim());
+            if (!rawUrl) throw new Error("No recorded pronunciation for this word");
+            const audioUrl = rawUrl.startsWith("//") ? "https:" + rawUrl : rawUrl;
+            if (!/^https:\/\//i.test(audioUrl)) throw new Error("Unsupported audio URL");
 
-            if (audioUrl) {
-                const audio = new Audio(audioUrl);
-                listeningAudio = audio;
-                audio.preload = "auto";
-                audio.onplaying = () => {
-                    status.textContent = "Playing recorded French pronunciation…";
-                    button.textContent = "Replay pronunciation";
-                    button.disabled = false;
-                };
-                audio.onended = () => {
-                    status.textContent = "Listen again or choose the word you heard.";
-                    button.textContent = "Replay pronunciation";
-                    button.disabled = false;
-                };
-                audio.onerror = () => {
-                    if (listeningAudio !== audio) return;
-                    listeningAudio = null;
-                    playSpeechSynthesisFallback(word, status);
-                    button.textContent = "Replay pronunciation";
-                    button.disabled = false;
-                };
-                await audio.play();
+            const audio = new Audio();
+            audio.preload = "auto";
+            audio.src = audioUrl;
+            audio.load();
+            audio.oncanplay = () => {
+                if (requestId !== listeningAudioRequest || listeningAudioWord !== word) return;
+                listeningAudioReady = true;
+                status.textContent = "Pronunciation ready. Tap the button to listen.";
+            };
+            audio.onerror = () => {
+                if (requestId !== listeningAudioRequest || listeningAudioWord !== word) return;
+                listeningAudioReady = false;
+                status.textContent = "Recorded audio unavailable. Tap to try your device's French voice.";
+            };
+            if (requestId !== listeningAudioRequest) return;
+            listeningAudio = audio;
+            listeningAudioWord = word;
+        } catch (error) {
+            if (requestId !== listeningAudioRequest) return;
+            console.warn("Could not prepare recorded French pronunciation:", error);
+            status.textContent = "Recorded audio unavailable. Tap to try your device's French voice.";
+        }
+    }
+
+    function speakWord() {
+        if (!currentWord || getMode() !== "listening") return;
+        const word = String(currentWord.word || "").trim();
+        if (!word) return;
+        const status = $("listening-audio-status");
+        const button = $("study-audio-btn");
+        if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+
+        // The dictionary request is made before the tap. Playback itself starts directly
+        // in this click handler so mobile browsers retain the user's media-playback gesture.
+        if (listeningAudio && listeningAudioWord === word && listeningAudioReady) {
+            try {
+                listeningAudio.currentTime = 0;
+                const playback = listeningAudio.play();
                 button.textContent = "Replay pronunciation";
                 button.disabled = false;
+                if (playback && typeof playback.catch === "function") {
+                    playback.catch(error => {
+                        console.warn("Recorded audio playback was blocked:", error);
+                        listeningAudioReady = false;
+                        playSpeechSynthesisFallback(word, status);
+                    });
+                }
                 return;
+            } catch (error) {
+                console.warn("Recorded audio could not start:", error);
             }
-        } catch (error) {
-            console.warn("Recorded French pronunciation unavailable; trying device voice:", error);
         }
 
-        // Some words do not have a recording in the dictionary. Fall back to the device's French voice.
+        // If the recording is still loading or unavailable, invoke device TTS immediately
+        // from the same user gesture instead of awaiting another network request.
         playSpeechSynthesisFallback(word, status);
         button.textContent = "Replay pronunciation";
         button.disabled = false;
