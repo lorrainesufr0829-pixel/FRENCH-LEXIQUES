@@ -2,8 +2,6 @@
 // Required secrets:
 //   GOOGLE_TTS_API_KEY
 // Supabase supplies SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY automatically.
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
