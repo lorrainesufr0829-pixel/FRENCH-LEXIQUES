@@ -32,34 +32,49 @@
 </nav>
 
 <main class="study-container">
-  <section class="study-heading">
-    <p class="study-eyebrow">YOUR DAILY PRACTICE</p>
-    <h2>STUDY</h2>
-    <p>Build lasting vocabulary, one word at a time.</p>
+  <section class="study-heading" aria-labelledby="study-page-title">
+    <div class="study-heading-stamp" aria-hidden="true">LEARN<br>BY DOING</div>
+    <p class="study-eyebrow">LEXIQUE PRESENTS · YOUR DAILY PRACTICE</p>
+    <h2 id="study-page-title">VOCABULARY<br><span>TRAINING!</span></h2>
+    <p>One session. A handful of words. A stronger French vocabulary.</p>
+    <div class="study-heading-meta" aria-label="Study session highlights">
+      <span>THINK</span><i aria-hidden="true"></i><span>REMEMBER</span><i aria-hidden="true"></i><span>MASTER</span>
+    </div>
   </section>
 
-  <section class="study-setup" id="study-setup">
+  <section class="study-setup" id="study-setup" aria-labelledby="study-setup-title">
+    <div class="study-setup-topline">
+      <span class="study-setup-index">01</span>
+      <span class="study-setup-kicker">MISSION CONTROL</span>
+      <span class="study-setup-tag">SET YOUR SESSION</span>
+    </div>
     <div class="study-setup-copy">
-      <h3>Ready to study?</h3>
-      <p>Choose a collection and set the length of your session.</p>
+      <h3 id="study-setup-title">Ready for a new challenge?</h3>
+      <p>Choose what to practise and how many words to take on.</p>
     </div>
     <div class="study-setup-controls">
-      <label for="study-category">Collection</label>
-      <select id="study-category">
-        <option value="all">All Vocabulary</option>
-        <option value="Business French">Business French</option>
-        <option value="Legal French">Legal French</option>
-        <option value="Daily French">Daily French</option>
-      </select>
-      <label for="study-count">Words per session</label>
-      <select id="study-count">
-        <option value="10">10 words</option>
-        <option value="20" selected>20 words</option>
-        <option value="all">All available words</option>
-      </select>
-      <button class="study-primary-button" id="start-study-btn" type="button">Start studying</button>
+      <div class="study-field">
+        <label for="study-category"><span class="study-field-number">A</span> Collection</label>
+        <select id="study-category">
+          <option value="all">All Vocabulary</option>
+          <option value="Business French">Business French</option>
+          <option value="Legal French">Legal French</option>
+          <option value="Daily French">Daily French</option>
+        </select>
+      </div>
+      <div class="study-field">
+        <label for="study-count"><span class="study-field-number">B</span> Words per session</label>
+        <select id="study-count">
+          <option value="10">10 words</option>
+          <option value="20" selected>20 words</option>
+          <option value="all">All available words</option>
+        </select>
+      </div>
+      <button class="study-primary-button" id="start-study-btn" type="button">
+        <span>START TRAINING</span><span class="study-button-arrow" aria-hidden="true">→</span>
+      </button>
     </div>
-    <p class="study-message" id="study-load-message" role="status">Loading your vocabulary…</p>
+    <p class="study-message" id="study-load-message" role="status" aria-live="polite">Loading your vocabulary…</p>
   </section>
 
   <section class="study-session" id="study-session" hidden>
