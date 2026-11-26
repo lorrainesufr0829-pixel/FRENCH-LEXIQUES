@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/theme.css?v=20261126-3">
 <link rel="stylesheet" href="css/study-enhancements.css?v=20261126-4">
-<link rel="stylesheet" href="css/study-immersive.css?v=20261126-3">
+<link rel="stylesheet" href="css/study-immersive.css?v=20261126-4">
 </head>
 <body data-study-page="session">
 <main class="study-immersive-shell">
@@ -50,10 +50,17 @@
       <div class="study-choice-options choice-meaning-options" id="choice-options" role="group" aria-label="Meaning choices" hidden></div>
       <p class="study-feedback choice-feedback" id="choice-feedback" role="status" aria-live="polite"></p>
     </section>
-    <section class="mode-panel mode-recall" id="mode-recall" hidden>
-      <p class="mode-kicker">WRITE THE FRENCH WORD</p><h1 class="mode-meaning-prompt" id="recall-meaning">—</h1>
-      <div class="study-answer-input"><input id="study-answer" type="text" autocomplete="off" placeholder="Écrivez le mot en français…"><button type="button" id="check-answer-btn">Check</button></div>
-      <p class="study-feedback" id="recall-feedback" role="status" aria-live="polite"></p><p class="mode-answer-reveal" id="recall-correct-answer" hidden></p>
+    <section class="mode-panel mode-recall" id="mode-recall" hidden aria-label="Active recall practice">
+      <p class="mode-kicker">WRITE THE FRENCH WORD</p>
+      <h1 class="mode-meaning-prompt" id="recall-meaning" lang="zh">—</h1>
+      <p class="recall-instruction">Read the Chinese meaning and write the French word from memory.</p>
+      <form class="study-answer-input recall-answer-form" id="recall-answer-form">
+        <label class="sr-only" for="study-answer">Your answer in French</label>
+        <input id="study-answer" type="text" lang="fr" inputmode="text" autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="recall-feedback" placeholder="Écrivez le mot en français…">
+        <button type="submit" id="check-answer-btn">Check answer</button>
+      </form>
+      <p class="study-feedback recall-feedback" id="recall-feedback" role="status" aria-live="polite"></p>
+      <p class="mode-answer-reveal" id="recall-correct-answer" lang="fr" hidden></p>
     </section>
     <section class="mode-panel mode-listening" id="mode-listening" hidden>
       <p class="mode-kicker">LISTEN AND IDENTIFY</p><div class="listening-audio-orb"><span aria-hidden="true">♫</span><button class="study-audio-button" id="study-audio-btn" type="button">Play pronunciation</button><p>Listen carefully, then select the word you hear.</p></div>
@@ -89,6 +96,6 @@
 <script src="js/app.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/settings.js"></script>
-<script src="js/study.js?v=20261126-7"></script>
+<script src="js/study.js?v=20261126-8"></script>
 </body>
 </html>
