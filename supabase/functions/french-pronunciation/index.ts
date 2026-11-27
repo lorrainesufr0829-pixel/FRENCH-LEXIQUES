@@ -8,6 +8,9 @@ const COMMONS_API = "https://commons.wikimedia.org/w/api.php";
 const USER_AGENT = "LEXIQUE-French-Learning/1.0 (pronunciation lookup)";
 function json(body: unknown, status=200) { return new Response(JSON.stringify(body), {status,headers:{...corsHeaders,"Content-Type":"application/json"}}); }
 function cleanHtml(value: unknown): string { return String(value||"").replace(/<[^>]*>/g," ").replace(/&nbsp;/g," ").replace(/&amp;/g,"&").replace(/&#39;/g,"'").replace(/&quot;/g,'"').replace(/\s+/g," ").trim(); }
+function cleanInputWord(value: unknown): string {
+  return String(value ?? "").replace(/[\u00A0\u202F]/g, " ").replace(/[\u200B-\u200D\uFEFF]/g, "").normalize("NFC").trim();
+}
 function safeWord(word:string) { const safe=word.normalize("NFC").toLocaleLowerCase("fr-FR").trim().replace(/[’']/g,"-").replace(/\s+/g,"-").replace(/[^\p{L}\p{N}-]/gu,"").replace(/-+/g,"-").replace(/^-|-$/g,""); if(!safe||safe.length>80) throw new Error("Invalid French word"); return safe; }
 function extractFrenchAudioFile(wikitext:string,word:string):string|null {
   const templates=wikitext.matchAll(/\{\{\s*(écouter|audio)\s*\|([^{}]*?)\}\}/giu);
@@ -65,7 +68,7 @@ Deno.serve(async(req)=>{
   try{
     const supabaseUrl=Deno.env.get("SUPABASE_URL"), serviceKey=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     if(!supabaseUrl||!serviceKey)return json({error:"Supabase storage is not configured."},503);
-    const payload=await req.json(), word=typeof payload?.word==="string"?payload.word.trim():"";
+    const payload=await req.json(), word=typeof payload?.word==="string"?cleanInputWord(payload.word):"";
     if(!word||word.length>80||/[\r\n]/.test(word))return json({error:"Please provide one valid French word."},400);
     const safe=safeWord(word), base=`fr/${encodeURIComponent(safe)}`, metaPath=base+".json";
     const publicBase=`${supabaseUrl}/storage/v1/object/public/french-audio/`;
