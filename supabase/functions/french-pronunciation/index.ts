@@ -74,7 +74,13 @@ Deno.serve(async(req)=>{
     if(!supabaseUrl||!serviceKey)return json({error:"Supabase storage is not configured."},503);
     const payload=await req.json(), word=typeof payload?.word==="string"?cleanInputWord(payload.word):"";
     if(!word||word.length>80||/[\r\n]/.test(word))return json({error:"Please provide one valid French word."},400);
-    const safe=safeWord(word), base=`fr/${encodeURIComponent(safe)}`, metaPath=base+".json";
+    const safe=safeWord(word);
+    // Storage object keys use an ASCII-only slug; append a stable hash to avoid
+    // collisions between words such as "cote" and "côte".
+    const slug=safe.normalize("NFD").replace(/\\p{M}/gu,"").replace(/œ/g,"oe").replace(/æ/g,"ae").replace(/[^a-z0-9-]/g,"");
+    const digest=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(safe));
+    const suffix=Array.from(new Uint8Array(digest).slice(0,4),(byte)=>byte.toString(16).padStart(2,"0")).join("");
+    const base=`fr/${slug}-${suffix}`, metaPath=base+".json";
     const publicBase=`${supabaseUrl}/storage/v1/object/public/french-audio/`;
     // Use real media extensions. Bypass legacy ".audio" objects whose media type may be ambiguous.
     for(const extension of ["ogg","mp3","wav","flac","m4a","webm"]){
