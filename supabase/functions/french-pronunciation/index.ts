@@ -54,7 +54,11 @@ function audioExtension(mime:string):string {
 }
 async function uploadObject(url:string,key:string,body:Uint8Array,mime:string) {
   const response=await fetch(url,{method:"POST",headers:{"Authorization":`Bearer ${key}`,"apikey":key,"Content-Type":mime,"x-upsert":"true"},body});
-  if(!response.ok)throw new Error("Audio could not be saved to Supabase Storage.");
+  if(!response.ok){
+    const detail=(await response.text()).slice(0,1000);
+    console.error("Supabase Storage upload failed:",response.status,detail);
+    throw new Error(`Supabase Storage upload failed (${response.status}): ${detail || response.statusText}`);
+  }
 }
 async function googleAudio(word:string,key:string) {
   const response=await fetch(`https://texttospeech.googleapis.com/v1/text:synthesize?key=${encodeURIComponent(key)}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({input:{text:word},voice:{languageCode:"fr-FR",name:"fr-FR-Neural2-A"},audioConfig:{audioEncoding:"MP3",speakingRate:0.92}})});
