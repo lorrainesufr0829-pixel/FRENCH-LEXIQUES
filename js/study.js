@@ -427,15 +427,31 @@
             listeningAudio = audio;
             listeningAudioWord = word;
             audio.preload = "auto";
+            let autoPlayAttempted = false;
             audio.oncanplay = () => {
                 if (requestId !== listeningAudioRequest || listeningAudio !== audio) return;
                 listeningAudioReady = true;
                 button.disabled = false;
-                button.textContent = "Play pronunciation";
-                const humanRecording = String(data.source || "").includes("Wiktionnaire");
-                status.textContent = humanRecording
-                    ? "A recorded human pronunciation is ready. Tap to listen."
-                    : "Pronunciation audio is ready. Tap to listen.";
+                button.textContent = "Replay pronunciation";
+
+                // Try to play this question once as soon as its audio is ready.
+                // Browsers may block audible autoplay after a page navigation; in
+                // that case the enabled button remains available for a manual play.
+                if (!autoPlayAttempted) {
+                    autoPlayAttempted = true;
+                    const playback = audio.play();
+                    if (playback && typeof playback.then === "function") {
+                        playback.then(() => {
+                            if (requestId === listeningAudioRequest && listeningAudio === audio) {
+                                status.textContent = "Playing pronunciation…";
+                            }
+                        }).catch(error => {
+                            if (requestId !== listeningAudioRequest || listeningAudio !== audio) return;
+                            console.info("Automatic audio playback was blocked; manual playback is available.", error);
+                            status.textContent = "Audio is ready. Tap Replay pronunciation to listen.";
+                        });
+                    }
+                }
             };
             audio.onended = () => {
                 if (requestId !== listeningAudioRequest || listeningAudio !== audio) return;
