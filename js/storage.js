@@ -10,15 +10,34 @@ console.log("storage.js loaded");
 // Authentication context
 // =====================================
 
-async function getCurrentUserId() {
-    const { data, error } = await supabaseClient.auth.getUser();
+// Share one in-flight session lookup across all storage calls on this page.
+// getSession() reads the persisted Supabase session; unlike getUser(), it avoids
+// a separate Auth /user network request for every database helper.
+let currentUserIdPromise = null;
 
-    if (error || !data?.user?.id) {
-        console.error("Unable to get authenticated user:", error);
-        return null;
+supabaseClient.auth.onAuthStateChange(() => {
+    // A sign-in, sign-out, or token refresh may change the active user/session.
+    currentUserIdPromise = null;
+});
+
+async function getCurrentUserId() {
+    if (!currentUserIdPromise) {
+        currentUserIdPromise = supabaseClient.auth.getSession()
+            .then(({ data, error }) => {
+                if (error) {
+                    console.error("Unable to get authenticated session:", error);
+                    return null;
+                }
+                return data?.session?.user?.id || null;
+            })
+            .catch(error => {
+                currentUserIdPromise = null;
+                console.error("Unable to get authenticated session:", error);
+                return null;
+            });
     }
 
-    return data.user.id;
+    return currentUserIdPromise;
 }
 
 // =====================================
