@@ -82,12 +82,34 @@ Deno.serve(async(req)=>{
     const suffix=Array.from(new Uint8Array(digest).slice(0,4),(byte)=>byte.toString(16).padStart(2,"0")).join("");
     const base=`fr/${slug}-${suffix}`, metaPath=base+".json";
     const publicBase=`${supabaseUrl}/storage/v1/object/public/french-audio/`;
-    // Use real media extensions. Bypass legacy ".audio" objects whose media type may be ambiguous.
-    for(const extension of ["ogg","mp3","wav","flac","m4a","webm"]){
-      const cachedPath=base+"."+extension;
-      const cached=await fetch(publicBase+cachedPath,{method:"HEAD",cache:"no-store"});
-      if(cached.ok){let meta:Record<string,unknown>={};try{const mr=await fetch(publicBase+metaPath,{cache:"no-store"});if(mr.ok)meta=await mr.json();}catch(_){}return json({audioUrl:publicBase+cachedPath,cached:true,...meta});}
+    // Read metadata first. New cache entries record their exact media path, so
+    // subsequent lookups need only one metadata request and one existence check.
+    let cachedMeta:Record<string,unknown>={};
+    try {
+      const metadataResponse=await fetch(publicBase+metaPath,{cache:"no-store"});
+      if(metadataResponse.ok)cachedMeta=await metadataResponse.json();
+    } catch(_) {}
+
+    const allowedExtensions=["ogg","mp3","wav","flac","m4a","webm"];
+    const knownAudioPath=typeof cachedMeta.audioPath==="string" &&
+      cachedMeta.audioPath.startsWith(base+".") &&
+      allowedExtensions.some(extension=>cachedMeta.audioPath===base+"."+extension)
+      ? cachedMeta.audioPath : null;
+
+    if(knownAudioPath){
+      const cached=await fetch(publicBase+knownAudioPath,{method:"HEAD",cache:"no-store"});
+      if(cached.ok)return json({audioUrl:publicBase+knownAudioPath,cached:true,...cachedMeta});
     }
+
+    // Backward compatibility for audio uploaded before audioPath was added to metadata.
+    // Check legacy extensions concurrently instead of waiting through six serial HEAD requests.
+    const cacheChecks=await Promise.all(allowedExtensions.map(async extension=>{
+      const path=base+"."+extension;
+      const response=await fetch(publicBase+path,{method:"HEAD",cache:"no-store"});
+      return response.ok?path:null;
+    }));
+    const legacyAudioPath=cacheChecks.find(Boolean);
+    if(legacyAudioPath)return json({audioUrl:publicBase+legacyAudioPath,cached:true,...cachedMeta,audioPath:legacyAudioPath});
     const recording=await wiktionaryAudio(word);
     if(recording){
       const media=await fetch(recording.url,{headers:{"User-Agent":USER_AGENT}});
@@ -102,7 +124,7 @@ Deno.serve(async(req)=>{
       if(!mime.startsWith("audio/"))throw new Error("Wikimedia returned a file that is not recognized as audio.");
       const audioPath=base+"."+audioExtension(mime);
       await uploadObject(`${supabaseUrl}/storage/v1/object/french-audio/${audioPath}`,serviceKey,bytes,mime);
-      const metadata={source:"Wiktionnaire / Wikimedia Commons",sourceUrl:recording.descriptionUrl,attribution:recording.artist,license:recording.license,licenseUrl:recording.licenseUrl,audioMime:mime};
+      const metadata={source:"Wiktionnaire / Wikimedia Commons",sourceUrl:recording.descriptionUrl,attribution:recording.artist,license:recording.license,licenseUrl:recording.licenseUrl,audioMime:mime,audioPath};
       await uploadObject(`${supabaseUrl}/storage/v1/object/french-audio/${metaPath}`,serviceKey,new TextEncoder().encode(JSON.stringify(metadata)),"application/json");
       return json({audioUrl:publicBase+audioPath,cached:false,...metadata});
     }
@@ -111,7 +133,7 @@ Deno.serve(async(req)=>{
     const bytes=await googleAudio(word,googleKey);
     const audioPath=base+".mp3";
     await uploadObject(`${supabaseUrl}/storage/v1/object/french-audio/${audioPath}`,serviceKey,bytes,"audio/mpeg");
-    const metadata={source:"Google Cloud Text-to-Speech",sourceUrl:"https://cloud.google.com/text-to-speech",attribution:"Synthetic French voice",license:"Provider-generated audio",licenseUrl:"https://cloud.google.com/terms",audioMime:"audio/mpeg"};
+    const metadata={source:"Google Cloud Text-to-Speech",sourceUrl:"https://cloud.google.com/text-to-speech",attribution:"Synthetic French voice",license:"Provider-generated audio",licenseUrl:"https://cloud.google.com/terms",audioMime:"audio/mpeg",audioPath};
     await uploadObject(`${supabaseUrl}/storage/v1/object/french-audio/${metaPath}`,serviceKey,new TextEncoder().encode(JSON.stringify(metadata)),"application/json");
     return json({audioUrl:publicBase+audioPath,cached:false,...metadata});
   }catch(error){console.error("Pronunciation function error:",error);return json({error:error instanceof Error?error.message:"Unexpected pronunciation service error."},500);}
