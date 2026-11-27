@@ -94,7 +94,11 @@ Deno.serve(async(req)=>{
       if(!media.ok)throw new Error("Wiktionary recording could not be downloaded.");
       const bytes=new Uint8Array(await media.arrayBuffer());
       const responseMime=(media.headers.get("content-type")||"").split(";")[0].trim().toLowerCase();
-      const mime=(responseMime.startsWith("audio/")?responseMime:recording.mime||"audio/ogg").split(";")[0].trim().toLowerCase();
+      const declaredMime=(recording.mime||"").split(";")[0].trim().toLowerCase();
+      const mimeCandidates=[responseMime,declaredMime];
+      // Wikimedia Commons may label Ogg Vorbis audio as application/ogg rather than audio/ogg.
+      const isOggFile=/\\.ogg$/i.test(new URL(recording.url).pathname);
+      const mime=mimeCandidates.find((type)=>type.startsWith("audio/"))||(isOggFile&&mimeCandidates.includes("application/ogg")?"audio/ogg":mimeCandidates.find(Boolean)||"application/octet-stream");
       if(!mime.startsWith("audio/"))throw new Error("Wikimedia returned a file that is not recognized as audio.");
       const audioPath=base+"."+audioExtension(mime);
       await uploadObject(`${supabaseUrl}/storage/v1/object/french-audio/${audioPath}`,serviceKey,bytes,mime);
