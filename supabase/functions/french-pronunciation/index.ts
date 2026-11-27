@@ -97,7 +97,7 @@ Deno.serve(async(req)=>{
       const declaredMime=(recording.mime||"").split(";")[0].trim().toLowerCase();
       const mimeCandidates=[responseMime,declaredMime];
       // Wikimedia Commons may label Ogg Vorbis audio as application/ogg rather than audio/ogg.
-      const isOggFile=/\\.ogg$/i.test(new URL(recording.url).pathname);
+      const isOggFile=/\.ogg$/i.test(new URL(recording.url).pathname);
       const mime=mimeCandidates.find((type)=>type.startsWith("audio/"))||(isOggFile&&mimeCandidates.includes("application/ogg")?"audio/ogg":mimeCandidates.find(Boolean)||"application/octet-stream");
       if(!mime.startsWith("audio/"))throw new Error("Wikimedia returned a file that is not recognized as audio.");
       const audioPath=base+"."+audioExtension(mime);
