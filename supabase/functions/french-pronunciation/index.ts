@@ -42,6 +42,13 @@ async function wiktionaryAudio(word:string) {
   if(!license)return null;
   return {url:info.url,mime:info.mime||"audio/ogg",descriptionUrl:info.descriptionurl||("https://commons.wikimedia.org/wiki/File:"+encodeURIComponent(filename.replace(/ /g,"_"))),license,licenseUrl:cleanHtml(meta.LicenseUrl?.value),artist:cleanHtml(meta.Artist?.value||meta.Credit?.value)};
 }
+function audioExtension(mime:string):string {
+  const type=mime.toLowerCase().split(";")[0].trim();
+  const extensions:Record<string,string>={"audio/mpeg":"mp3","audio/mp3":"mp3","audio/ogg":"ogg","audio/wav":"wav","audio/x-wav":"wav","audio/flac":"flac","audio/mp4":"m4a","audio/webm":"webm"};
+  const extension=extensions[type];
+  if(!extension)throw new Error("Unsupported pronunciation audio format: "+type);
+  return extension;
+}
 async function uploadObject(url:string,key:string,body:Uint8Array,mime:string) {
   const response=await fetch(url,{method:"POST",headers:{"Authorization":`Bearer ${key}`,"apikey":key,"Content-Type":mime,"x-upsert":"true"},body});
   if(!response.ok)throw new Error("Audio could not be saved to Supabase Storage.");
@@ -60,16 +67,23 @@ Deno.serve(async(req)=>{
     if(!supabaseUrl||!serviceKey)return json({error:"Supabase storage is not configured."},503);
     const payload=await req.json(), word=typeof payload?.word==="string"?payload.word.trim():"";
     if(!word||word.length>80||/[\r\n]/.test(word))return json({error:"Please provide one valid French word."},400);
-    const safe=safeWord(word), base=`fr/${encodeURIComponent(safe)}`, audioPath=base+".audio", metaPath=base+".json";
+    const safe=safeWord(word), base=`fr/${encodeURIComponent(safe)}`, metaPath=base+".json";
     const publicBase=`${supabaseUrl}/storage/v1/object/public/french-audio/`;
-    const cached=await fetch(publicBase+audioPath,{method:"HEAD"});
-    if(cached.ok){let meta:Record<string,unknown>={};try{const mr=await fetch(publicBase+metaPath);if(mr.ok)meta=await mr.json();}catch(_){}return json({audioUrl:publicBase+audioPath,cached:true,...meta});}
+    // Use real media extensions. Bypass legacy ".audio" objects whose media type may be ambiguous.
+    for(const extension of ["ogg","mp3","wav","flac","m4a","webm"]){
+      const cachedPath=base+"."+extension;
+      const cached=await fetch(publicBase+cachedPath,{method:"HEAD",cache:"no-store"});
+      if(cached.ok){let meta:Record<string,unknown>={};try{const mr=await fetch(publicBase+metaPath,{cache:"no-store"});if(mr.ok)meta=await mr.json();}catch(_){}return json({audioUrl:publicBase+cachedPath,cached:true,...meta});}
+    }
     const recording=await wiktionaryAudio(word);
     if(recording){
       const media=await fetch(recording.url,{headers:{"User-Agent":USER_AGENT}});
       if(!media.ok)throw new Error("Wiktionary recording could not be downloaded.");
-      const bytes=new Uint8Array(await media.arrayBuffer()), mime=(media.headers.get("content-type")||recording.mime||"audio/ogg").split(";")[0];
+      const bytes=new Uint8Array(await media.arrayBuffer());
+      const responseMime=(media.headers.get("content-type")||"").split(";")[0].trim().toLowerCase();
+      const mime=(responseMime.startsWith("audio/")?responseMime:recording.mime||"audio/ogg").split(";")[0].trim().toLowerCase();
       if(!mime.startsWith("audio/"))throw new Error("Wikimedia returned a file that is not recognized as audio.");
+      const audioPath=base+"."+audioExtension(mime);
       await uploadObject(`${supabaseUrl}/storage/v1/object/french-audio/${audioPath}`,serviceKey,bytes,mime);
       const metadata={source:"Wiktionnaire / Wikimedia Commons",sourceUrl:recording.descriptionUrl,attribution:recording.artist,license:recording.license,licenseUrl:recording.licenseUrl,audioMime:mime};
       await uploadObject(`${supabaseUrl}/storage/v1/object/french-audio/${metaPath}`,serviceKey,new TextEncoder().encode(JSON.stringify(metadata)),"application/json");
@@ -78,6 +92,7 @@ Deno.serve(async(req)=>{
     const googleKey=Deno.env.get("GOOGLE_TTS_API_KEY");
     if(!googleKey)return json({error:"No human recording was found for this word. Optional TTS fallback is not configured."},404);
     const bytes=await googleAudio(word,googleKey);
+    const audioPath=base+".mp3";
     await uploadObject(`${supabaseUrl}/storage/v1/object/french-audio/${audioPath}`,serviceKey,bytes,"audio/mpeg");
     const metadata={source:"Google Cloud Text-to-Speech",sourceUrl:"https://cloud.google.com/text-to-speech",attribution:"Synthetic French voice",license:"Provider-generated audio",licenseUrl:"https://cloud.google.com/terms",audioMime:"audio/mpeg"};
     await uploadObject(`${supabaseUrl}/storage/v1/object/french-audio/${metaPath}`,serviceKey,new TextEncoder().encode(JSON.stringify(metadata)),"application/json");
