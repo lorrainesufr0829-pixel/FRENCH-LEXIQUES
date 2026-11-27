@@ -77,19 +77,30 @@
         if (startButton) startButton.disabled = true;
         if (loadMessage) loadMessage.textContent = "Loading your personal vocabulary and review schedule…";
         try {
-            vocabulary = (await getVocabulary() || []).filter(word =>
+            // Vocabulary and review schedules are independent reads. Start both
+            // together so page readiness is not delayed by sequential round trips.
+            const [loadedVocabulary, reviewResult] = await Promise.all([
+                getVocabulary(),
+                getStudyReviewStates()
+                    .then(data => ({ data }))
+                    .catch(error => ({ error }))
+            ]);
+
+            vocabulary = (loadedVocabulary || []).filter(word =>
                 String(word.word || "").trim() && String(word.meaning || "").trim()
             );
-            try {
-                reviewStates = await getStudyReviewStates();
-                scheduleReady = true;
-            } catch (error) {
+
+            if (reviewResult.error) {
+                const error = reviewResult.error;
                 scheduleReady = false;
                 reviewStates = {};
                 console.warn("Spaced repetition schedule unavailable:", error);
                 if (loadMessage) loadMessage.textContent = error.message === "STUDY_REVIEW_TABLE_MISSING"
                     ? "Vocabulary loaded. Run the Supabase migration to activate long-term review scheduling."
                     : "Vocabulary loaded, but review schedules could not be retrieved.";
+            } else {
+                reviewStates = reviewResult.data || {};
+                scheduleReady = true;
             }
             if (categorySelect) {
                 populateCategories();
