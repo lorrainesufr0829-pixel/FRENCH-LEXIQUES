@@ -77,7 +77,7 @@ Deno.serve(async(req)=>{
     const safe=safeWord(word);
     // Storage object keys use an ASCII-only slug; append a stable hash to avoid
     // collisions between words such as "cote" and "côte".
-    const slug=safe.normalize("NFD").replace(/\\p{M}/gu,"").replace(/œ/g,"oe").replace(/æ/g,"ae").replace(/[^a-z0-9-]/g,"");
+    const slug=safe.normalize("NFD").replace(/\p{M}/gu,"").replace(/œ/g,"oe").replace(/æ/g,"ae").replace(/[^a-z0-9-]/g,"");
     const digest=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(safe));
     const suffix=Array.from(new Uint8Array(digest).slice(0,4),(byte)=>byte.toString(16).padStart(2,"0")).join("");
     const base=`fr/${slug}-${suffix}`, metaPath=base+".json";
