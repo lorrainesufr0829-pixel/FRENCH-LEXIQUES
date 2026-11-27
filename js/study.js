@@ -49,6 +49,10 @@
         ...(Array.isArray(word.categories) ? word.categories.map(item => item.name) : []),
         word.category
     ].filter(Boolean).map(String);
+    const cleanPronunciationWord = value => String(value ?? "")
+        .replace(/[\u00A0\u202F]/g, " ")
+        .replace(/[\u200B-\u200D\uFEFF]/g, "")
+        .normalize("NFC").trim();
     const normalize = value => String(value || "").trim().toLocaleLowerCase()
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
         .replace(/[’']/g, "'").replace(/[^\p{L}\p{N}' -]/gu, "").replace(/\s+/g, " ");
@@ -233,7 +237,7 @@
             $("study-audio-btn").disabled = true;
             $("study-audio-btn").textContent = "Preparing audio…";
             renderChoices(mode);
-            prepareListeningAudio(String(currentWord.word || "").trim());
+            prepareListeningAudio(cleanPronunciationWord(currentWord.word));
         }
         const position = Math.min(completedCount + 1, sessionTotal);
         $("study-progress-label").textContent = position + " / " + sessionTotal;
@@ -447,7 +451,7 @@
 
     function speakWord() {
         if (!currentWord || getMode() !== "listening") return;
-        const word = String(currentWord.word || "").trim();
+        const word = cleanPronunciationWord(currentWord.word);
         if (!word) return;
         const status = $("listening-audio-status");
         const button = $("study-audio-btn");
