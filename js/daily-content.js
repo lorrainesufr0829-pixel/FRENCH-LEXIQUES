@@ -73,6 +73,7 @@
       readingIntro:"An original French reading selection for B2–C1 learners.",
       listeningIntro:"An editor-selected RFI audio resource for B2–C1 learners.",
       preparing:"The next editorial selection is being prepared.",
+      loginToAdd:"Log in to add this word to your library.",added:"Added to your library ✓",alreadyAdded:"This word is already in your library.",addFailed:"Could not add this word. Please try again.",
       openArticle:"Read in LEXIQUE",listen:"Listen to the episode",transcript:"Episode and transcript",
       source:"SOURCE",published:"PUBLISHED",duration:"DURATION",empty:"No selection published yet."
     },
@@ -84,6 +85,7 @@
       readingIntro:"Un texte français sélectionné pour les niveaux B2–C1.",
       listeningIntro:"Une ressource audio de RFI sélectionnée pour les niveaux B2–C1.",
       preparing:"La prochaine sélection éditoriale est en préparation.",
+      loginToAdd:"Connectez-vous pour ajouter ce mot à votre bibliothèque.",added:"Ajouté à votre bibliothèque ✓",alreadyAdded:"Ce mot est déjà dans votre bibliothèque.",addFailed:"Impossible d’ajouter ce mot. Réessayez.",
       openArticle:"Lire dans LEXIQUE",listen:"Écouter l'émission",transcript:"Émission et transcription",
       source:"SOURCE",published:"DATE",duration:"DURÉE",empty:"Aucune sélection n'a encore été publiée."
     },
@@ -95,6 +97,7 @@
       readingIntro:"为 B2–C1 学习者准备的法语阅读材料。",
       listeningIntro:"人工精选的 RFI 听力材料，适合 B2–C1 学习者。",
       preparing:"下一期人工精选内容正在准备中。",
+      loginToAdd:"请先登录，再将这个单词加入个人词库。",added:"已加入我的词库 ✓",alreadyAdded:"这个单词已经在你的词库中了。",addFailed:"添加失败，请稍后重试。",
       openArticle:"站内阅读",listen:"收听节目",transcript:"收听节目并查看文字稿",
       source:"内容来源",published:"发布日期",duration:"时长",empty:"暂未发布本期精选内容。"
     }
@@ -120,8 +123,53 @@
       <p class="daily-ipa">${escapeHtml(item.ipa)} <span>·</span> ${escapeHtml(item.pos[language])}</p>
       <div class="daily-word-detail"><span class="daily-field-label">${t.meaning}</span><p>${escapeHtml(item.meaning[language])}</p></div>
       <div class="daily-word-example"><span class="daily-field-label">${t.example}</span><p lang="fr">${escapeHtml(item.example)}</p><p class="daily-example-translation">${escapeHtml(item.exampleMeaning[language])}</p></div>
-      <div class="daily-card-actions"><button type="button" class="daily-text-button" data-speak-word="${escapeHtml(item.word)}">${t.play}</button></div>`;
+      <div class="daily-card-actions"><button type="button" class="daily-text-button" data-speak-word="${escapeHtml(item.word)}">${t.play}</button><button type="button" class="daily-add-button" data-add-word>${t.add}</button></div><p class="daily-add-status" role="status" aria-live="polite"></p>`;
     const speak = root.querySelector("[data-speak-word]");
+    const addButton = root.querySelector("[data-add-word]");
+    const addStatus = root.querySelector(".daily-add-status");
+    addButton?.addEventListener("click", async () => {
+      if (addButton.dataset.saved === "true") return;
+      addButton.disabled = true;
+      addButton.textContent = language === "zh" ? "正在添加…" : language === "fr" ? "Ajout…" : "Adding…";
+      try {
+        const { data: sessionData, error: sessionError } = await window.supabaseClient.auth.getSession();
+        const user = sessionData?.session?.user;
+        if (sessionError || !user) {
+          addStatus.textContent = t.loginToAdd;
+          addButton.textContent = t.add;
+          addButton.disabled = false;
+          const login = document.createElement("a");
+          login.href = "auth.html?redirect=index.html";
+          login.textContent = language === "zh" ? "登录" : language === "fr" ? "Se connecter" : "Log in";
+          login.className = "daily-login-link";
+          addStatus.append(" ", login);
+          return;
+        }
+        const { data: existing, error: lookupError } = await window.supabaseClient
+          .from("vocabulary").select("id").eq("user_id", user.id).ilike("word", item.word).limit(1);
+        if (lookupError) throw lookupError;
+        if (existing?.length) {
+          addStatus.textContent = t.alreadyAdded;
+          addButton.textContent = t.alreadyAdded;
+          addButton.dataset.saved = "true";
+          return;
+        }
+        const { error: insertError } = await window.supabaseClient.from("vocabulary").insert({
+          user_id: user.id,
+          word: item.word,
+          meaning: item.meaning[language] || item.meaning.en || item.meaning.fr
+        });
+        if (insertError) throw insertError;
+        addStatus.textContent = t.added;
+        addButton.textContent = t.added;
+        addButton.dataset.saved = "true";
+      } catch (error) {
+        console.error("Add featured word to library failed:", error);
+        addStatus.textContent = t.addFailed;
+        addButton.textContent = t.add;
+        addButton.disabled = false;
+      }
+    });
     speak?.addEventListener("click", () => {
       if (!("speechSynthesis" in window)) return;
       window.speechSynthesis.cancel();
