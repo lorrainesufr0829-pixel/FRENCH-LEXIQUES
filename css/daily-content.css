@@ -1,0 +1,17 @@
+/* HOME — Daily editorial cards */
+.daily-word-topline,.daily-card-actions,.daily-editorial-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.daily-word-topline{margin-bottom:12px}
+.daily-pill{display:inline-flex;padding:4px 9px;border-radius:999px;background:var(--lexique-accent-soft);color:var(--lexique-accent);font-size:10px;font-weight:700;letter-spacing:.5px}
+.daily-topic,.daily-editorial-meta{color:var(--lexique-muted);font-size:11px}
+.daily-ipa{margin:0 0 13px!important;color:var(--lexique-muted);font-size:12px!important}
+.daily-ipa span{padding:0 5px}
+.daily-field-label{display:block;margin-bottom:4px;color:var(--lexique-muted);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.daily-word-detail p,.daily-word-example p{margin:0 0 10px!important;color:var(--lexique-text);font-size:13px!important;line-height:1.6}
+.daily-example-translation{color:var(--lexique-muted)!important}
+.daily-text-button,.daily-action-link{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:8px 13px;border:1px solid var(--lexique-accent);border-radius:7px;background:var(--lexique-accent);color:#fff;text-decoration:none;font:inherit;font-size:11px;font-weight:700;cursor:pointer;transition:transform .18s ease,background .18s ease}
+.daily-text-button:hover,.daily-action-link:hover{background:var(--lexique-accent-strong);transform:translateY(-1px)}
+.daily-action-link.secondary{background:transparent;color:var(--lexique-accent)}
+.daily-editorial-meta{margin:0 0 9px}
+.daily-content-entry audio{display:block;width:min(100%,520px);margin:14px 0}
+@media(min-width:761px){.featured-word .word-card{height:auto!important;min-height:220px!important;justify-content:flex-start!important}.featured-word .word-card h3{font-size:27px!important}}
+@media(max-width:760px){.daily-card-actions{gap:8px}.daily-text-button,.daily-action-link{min-height:40px}}
