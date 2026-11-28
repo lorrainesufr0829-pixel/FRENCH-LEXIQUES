@@ -50,6 +50,11 @@
         root.style.setProperty("--lexique-font-current", fontFamilies[activeFont]);
         document.body.dataset.interfaceLanguage = language;
 
+        // Apply the active interface font directly as well as through CSS variables.
+        // This prevents legacy page rules from masking the user's font selection.
+        document.body.style.setProperty("font-family", fontFamilies[activeFont], "important");
+        document.body.style.setProperty("-webkit-font-smoothing", "antialiased");
+
         if (englishFontSelect) englishFontSelect.value = fonts.english;
         if (frenchFontSelect) frenchFontSelect.value = fonts.french;
         if (chineseFontSelect) chineseFontSelect.value = fonts.chinese;
