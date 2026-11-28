@@ -160,7 +160,15 @@
     renderEditorial("daily-listening-entry", listening, "listening", language);
   }
 
-  async function loadDailyReading() {\n    if (!window.supabaseClient) { render(); return; }\n    const result = await window.supabaseClient.from("daily_readings").select("id,title,title_en,title_zh,published_at,level,topic,summary_zh,source_name").eq("status","published").order("published_at",{ascending:false}).limit(1);\n    if (result.error) { console.error("Daily Reading load failed:", result.error); article=null; }\n    else if (result.data && result.data[0]) { const x=result.data[0]; article={...x,summary:{zh:x.summary_zh || "",en:x.summary_zh || "",fr:""}}; }\n    else article=null;\n    render();\n  }\n  document.addEventListener("DOMContentLoaded", loadDailyReading);
+  async function loadDailyReading() {
+    if (!window.supabaseClient) { render(); return; }
+    const result = await window.supabaseClient.from("daily_readings").select("id,title,title_en,title_zh,published_at,level,topic,summary_zh,source_name").eq("status","published").order("published_at",{ascending:false}).limit(1);
+    if (result.error) { console.error("Daily Reading load failed:", result.error); article=null; }
+    else if (result.data && result.data[0]) { const x=result.data[0]; article={...x,summary:{zh:x.summary_zh || "",en:x.summary_zh || "",fr:""}}; }
+    else article=null;
+    render();
+  }
+  document.addEventListener("DOMContentLoaded", loadDailyReading);
   document.addEventListener("change", event => {
     if (event.target?.id === "language-select") setTimeout(render, 0);
   });
