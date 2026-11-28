@@ -418,13 +418,13 @@
 
 
   Object.assign(dictionaries.zh, {
-    "LEXIQUE - Library":"LEXIQUE - 词库","LEXIQUE - Study":"LEXIQUE - 学习","LEXIQUE - Import":"LEXIQUE - 导入",
+    "LEXIQUE - Training Session":"LEXIQUE - 训练课程","LEXIQUE - Library":"LEXIQUE - 词库","LEXIQUE - Study":"LEXIQUE - 学习","LEXIQUE - Import":"LEXIQUE - 导入",
     "Statistics | LEXIQUE":"学习统计 | LEXIQUE","Settings | LEXIQUE":"设置 | LEXIQUE","Account | LEXIQUE":"账户 | LEXIQUE",
     "Study training setup":"学习训练设置","Study session highlights":"学习环节重点","Account actions":"账户操作",
     "Search vocabulary":"搜索词汇","Search vocabulary":"搜索词汇","0 Words":"0 个单词","0 Days":"0 天"
   });
   Object.assign(dictionaries.fr, {
-    "LEXIQUE - Library":"LEXIQUE - Lexique","LEXIQUE - Study":"LEXIQUE - Apprentissage","LEXIQUE - Import":"LEXIQUE - Importer",
+    "LEXIQUE - Training Session":"LEXIQUE - Séance d’entraînement","LEXIQUE - Library":"LEXIQUE - Lexique","LEXIQUE - Study":"LEXIQUE - Apprentissage","LEXIQUE - Import":"LEXIQUE - Importer",
     "Statistics | LEXIQUE":"Statistiques | LEXIQUE","Settings | LEXIQUE":"Paramètres | LEXIQUE","Account | LEXIQUE":"Compte | LEXIQUE",
     "Study training setup":"Configuration de l’entraînement","Study session highlights":"Points clés de la séance","Account actions":"Actions du compte"
   });
@@ -702,7 +702,7 @@
   function translateNode(node, language) {
     if (!node || node.nodeType !== Node.TEXT_NODE) return;
     const parent = node.parentElement;
-    if (parent?.closest('[data-no-translate], .word-info, #study-word, #study-meaning, .daily-content-entry h3, .daily-content-entry a')) return;
+    if (parent?.closest('[data-no-translate], .word-info, #study-word, #study-meaning')) return;
 
     const currentValue = node.nodeValue;
     if (!originalText.has(node)) originalText.set(node, currentValue);
