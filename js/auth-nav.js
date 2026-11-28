@@ -26,6 +26,13 @@
             <button class="account-logout" type="button">LOG OUT</button>
         `;
         accountControl.querySelector(".account-signed-in").title = user?.email || "Signed in";
+        if ((user?.email || "").toLowerCase() === "lorrainesufr@outlook.com") {
+            const adminLink = document.createElement("a");
+            adminLink.className = "account-login";
+            adminLink.href = "admin-reading.html";
+            adminLink.textContent = "DAILY READING ADMIN";
+            accountControl.insertBefore(adminLink, accountControl.querySelector(".account-logout"));
+        }
         accountControl.querySelector(".account-logout").addEventListener("click", async () => {
             const button = accountControl.querySelector(".account-logout");
             button.disabled = true;
