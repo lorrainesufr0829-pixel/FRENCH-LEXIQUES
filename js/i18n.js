@@ -1268,6 +1268,38 @@
 
   function translateDynamicText(value, language) {
     let match;
+    if (/^(新增 |已有单词 |添加分类关联 |重复单词 |新增分类关联 |无效记录 |未匹配到分类目录：|未匹配分类：)/.test(value)) {
+      const segments = value.replace(/。$/, "").split("；");
+      const translatedSegments = segments.map(segment => {
+        let item;
+        if ((item = segment.match(/^新增 (\\d+) 个单词$/))) {
+          return language === "zh" ? segment : language === "fr" ? `${item[1]} mots ajoutés` : `${item[1]} words added`;
+        }
+        if ((item = segment.match(/^已有单词 (\\d+) 个$/))) {
+          return language === "zh" ? segment : language === "fr" ? `${item[1]} mots déjà présents` : `${item[1]} existing words`;
+        }
+        if ((item = segment.match(/^添加分类关联 (\\d+) 条$/))) {
+          return language === "zh" ? segment : language === "fr" ? `${item[1]} associations de catégories ajoutées` : `${item[1]} category links added`;
+        }
+        if ((item = segment.match(/^重复单词 (\\d+) 个$/))) {
+          return language === "zh" ? segment : language === "fr" ? `${item[1]} doublons` : `${item[1]} duplicate words`;
+        }
+        if ((item = segment.match(/^新增分类关联 (\\d+) 条$/))) {
+          return language === "zh" ? segment : language === "fr" ? `${item[1]} associations de catégories ajoutées` : `${item[1]} new category links`;
+        }
+        if ((item = segment.match(/^无效记录 (\\d+) 条$/))) {
+          return language === "zh" ? segment : language === "fr" ? `${item[1]} lignes invalides` : `${item[1]} invalid records`;
+        }
+        if ((item = segment.match(/^未匹配到分类目录：(.+)$/)) || (item = segment.match(/^未匹配分类：(.+)$/))) {
+          return language === "zh" ? segment : language === "fr" ? `Catégories introuvables : ${item[1]}` : `Unmatched categories: ${item[1]}`;
+        }
+        return segment;
+      });
+      if (translatedSegments.some((part, index) => part !== segments[index])) {
+        const joined = translatedSegments.join(language === "zh" ? "；" : "; ");
+        return joined + (value.endsWith("。") ? (language === "zh" ? "。" : ".") : "");
+      }
+    }
     if ((match = value.match(/^(\\d+) (Words|words|Days|days)$/))) {
       const count = Number(match[1]);
       const isDays = match[2].toLowerCase().includes("day");
