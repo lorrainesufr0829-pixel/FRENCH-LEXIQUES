@@ -1310,10 +1310,10 @@
     }
     if ((match = value.match(/^Ratings: (.*?)(\\. Your next reviews have been scheduled\\.|\\. Run the database migration to save review schedules\\.)$/))) {
       const ratings = match[1]
-        .replace(/again/g, language === "zh" ? "重学" : "À revoir")
-        .replace(/hard/g, language === "zh" ? "困难" : "Difficile")
-        .replace(/good/g, language === "zh" ? "良好" : "Bien")
-        .replace(/easy/g, language === "zh" ? "简单" : "Facile");
+        .replace(/again/gi, language === "zh" ? "重学" : "À revoir")
+        .replace(/hard/gi, language === "zh" ? "困难" : "Difficile")
+        .replace(/good/gi, language === "zh" ? "良好" : "Bien")
+        .replace(/easy/gi, language === "zh" ? "简单" : "Facile");
       const ending = match[2].includes("scheduled")
         ? (language === "zh" ? "。已安排后续复习。" : ". Vos prochaines révisions ont été planifiées.")
         : (language === "zh" ? "。请运行数据库迁移以保存复习计划。" : ". Exécutez la migration de la base de données pour enregistrer le calendrier des révisions.");
