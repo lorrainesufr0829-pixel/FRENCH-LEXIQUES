@@ -70,10 +70,10 @@
       wordIntro:"A shared word selection for all LEXIQUE learners.",
       pronunciation:"Pronunciation",meaning:"Meaning",example:"Example",translation:"Translation",
       level:"LEVEL",topic:"THEME",play:"Play pronunciation",add:"Add to my library",
-      readingIntro:"An editor-selected France 24 article for B2–C1 learners.",
+      readingIntro:"An original French reading selection for B2–C1 learners.",
       listeningIntro:"An editor-selected RFI audio resource for B2–C1 learners.",
       preparing:"The next editorial selection is being prepared.",
-      openArticle:"Read the article",listen:"Listen to the episode",transcript:"Episode and transcript",
+      openArticle:"Read in LEXIQUE",listen:"Listen to the episode",transcript:"Episode and transcript",
       source:"SOURCE",published:"PUBLISHED",duration:"DURATION",empty:"No selection published yet."
     },
     fr:{
@@ -81,10 +81,10 @@
       wordIntro:"Un mot commun à tous les apprenants de LEXIQUE.",
       pronunciation:"Prononciation",meaning:"Sens",example:"Exemple",translation:"Traduction",
       level:"NIVEAU",topic:"THÈME",play:"Écouter la prononciation",add:"Ajouter à ma bibliothèque",
-      readingIntro:"Un article de France 24 sélectionné pour les niveaux B2–C1.",
+      readingIntro:"Un texte français sélectionné pour les niveaux B2–C1.",
       listeningIntro:"Une ressource audio de RFI sélectionnée pour les niveaux B2–C1.",
       preparing:"La prochaine sélection éditoriale est en préparation.",
-      openArticle:"Lire l'article",listen:"Écouter l'émission",transcript:"Émission et transcription",
+      openArticle:"Lire dans LEXIQUE",listen:"Écouter l'émission",transcript:"Émission et transcription",
       source:"SOURCE",published:"DATE",duration:"DURÉE",empty:"Aucune sélection n'a encore été publiée."
     },
     zh:{
@@ -92,10 +92,10 @@
       wordIntro:"LEXIQUE 全体学习者共享的每日精选词汇。",
       pronunciation:"音标",meaning:"释义",example:"例句",translation:"例句翻译",
       level:"难度",topic:"主题",play:"播放发音",add:"加入我的词库",
-      readingIntro:"人工精选的 France 24 文章，适合 B2–C1 学习者。",
+      readingIntro:"为 B2–C1 学习者准备的法语阅读材料。",
       listeningIntro:"人工精选的 RFI 听力材料，适合 B2–C1 学习者。",
       preparing:"下一期人工精选内容正在准备中。",
-      openArticle:"阅读原文",listen:"收听节目",transcript:"收听节目并查看文字稿",
+      openArticle:"站内阅读",listen:"收听节目",transcript:"收听节目并查看文字稿",
       source:"内容来源",published:"发布日期",duration:"时长",empty:"暂未发布本期精选内容。"
     }
   };
