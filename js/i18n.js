@@ -416,6 +416,19 @@
     }
   };
 
+
+  Object.assign(dictionaries.zh, {
+    "LEXIQUE - Library":"LEXIQUE - 词库","LEXIQUE - Study":"LEXIQUE - 学习","LEXIQUE - Import":"LEXIQUE - 导入",
+    "Statistics | LEXIQUE":"学习统计 | LEXIQUE","Settings | LEXIQUE":"设置 | LEXIQUE","Account | LEXIQUE":"账户 | LEXIQUE",
+    "Study training setup":"学习训练设置","Study session highlights":"学习环节重点","Account actions":"账户操作",
+    "Search vocabulary":"搜索词汇","Search vocabulary":"搜索词汇","0 Words":"0 个单词","0 Days":"0 天"
+  });
+  Object.assign(dictionaries.fr, {
+    "LEXIQUE - Library":"LEXIQUE - Lexique","LEXIQUE - Study":"LEXIQUE - Apprentissage","LEXIQUE - Import":"LEXIQUE - Importer",
+    "Statistics | LEXIQUE":"Statistiques | LEXIQUE","Settings | LEXIQUE":"Paramètres | LEXIQUE","Account | LEXIQUE":"Compte | LEXIQUE",
+    "Study training setup":"Configuration de l’entraînement","Study session highlights":"Points clés de la séance","Account actions":"Actions du compte"
+  });
+
   const storageKey = "lexique_language";
   dictionaries.en = { ...(dictionaries.en || {}), ...{"关闭提示":"Close message","该单词已存在；保存时会为它添加所选分类。":"This word already exists; the selected category will be linked when saved.","暂时无法查重，请检查网络后重试。":"Duplicate check unavailable. Check your connection and try again.","先补充完整信息哦！":"Please complete the information!","请填写单词和释义。":"Enter both the word and its meaning.","成功！离大师又进一步！":"Success! One step closer to mastery!","分类已更新！":"Category updated!","这个单词已经在词库中，所选分类无需重复添加。":"This word is already in your library; no additional category link was needed.","再检查一下！":"Please check again.","请确认单词和释义都已填写。":"Make sure both the word and meaning are filled in.","哎呀，保存没有成功！":"Oops, saving failed!","请检查网络连接或稍后重试。":"Check your connection or try again later.","文件读取组件暂不可用！":"The file reader is currently unavailable.","请刷新页面后重试。":"Refresh the page and try again.","这次导入遇到一点小麻烦！":"There was a small problem importing this file!","请确认文件格式、登录状态及网络连接后重试。":"Check the file format, sign-in status and connection, then try again."} };
   const current = () => localStorage.getItem(storageKey) || "en";
