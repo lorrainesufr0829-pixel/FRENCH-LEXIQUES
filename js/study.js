@@ -318,7 +318,7 @@
             }
 
             button.addEventListener("click", () => {
-                if (saving || button.disabled) return;
+                if (button.disabled) return;
                 const correct = option.id === currentWord.id;
                 answerCount++;
                 if (correct) correctCount++;
