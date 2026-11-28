@@ -46,7 +46,23 @@
 
   // Editorially selected records. Keep the original source URL and publication date with every item.
   const article = null;
-  const listening = null;
+  const listening = {
+    title: {
+      fr: "France : l'économie recule / Israël : à quand un nouveau gouvernement ?",
+      en: "France: the economy slows / Israel: when will there be a new government?",
+      zh: "法国经济出现下滑；以色列何时组建新政府？"
+    },
+    summary: {
+      fr: "Un journal d'actualité internationale consacré notamment à la situation économique en France et à l'actualité politique israélienne. L'épisode comprend une transcription synchronisée et des exercices pédagogiques sur le site de RFI.",
+      en: "An international news bulletin covering, among other topics, the economic situation in France and political developments in Israel. A synchronized transcript and learning exercises are available on RFI's website.",
+      zh: "本期国际新闻聚焦法国经济形势与以色列政局等话题。RFI 网站提供同步文字稿及配套学习练习。"
+    },
+    level: "B2–C1",
+    publishedAt: "2026-11-27",
+    duration: "10 min",
+    episodeUrl: "https://rfi.my/DG2g.A",
+    transcriptUrl: "https://rfi.my/DG2g.A"
+  };
 
   const copy = {
     en:{
@@ -57,7 +73,7 @@
       readingIntro:"An editor-selected France 24 article for B2–C1 learners.",
       listeningIntro:"An editor-selected RFI audio resource for B2–C1 learners.",
       preparing:"The next editorial selection is being prepared.",
-      openArticle:"Read the article",listen:"Listen",transcript:"Read transcript",
+      openArticle:"Read the article",listen:"Listen to the episode",transcript:"Episode and transcript",
       source:"SOURCE",published:"PUBLISHED",duration:"DURATION",empty:"No selection published yet."
     },
     fr:{
@@ -68,7 +84,7 @@
       readingIntro:"Un article de France 24 sélectionné pour les niveaux B2–C1.",
       listeningIntro:"Une ressource audio de RFI sélectionnée pour les niveaux B2–C1.",
       preparing:"La prochaine sélection éditoriale est en préparation.",
-      openArticle:"Lire l'article",listen:"Écouter",transcript:"Lire la transcription",
+      openArticle:"Lire l'article",listen:"Écouter l'émission",transcript:"Émission et transcription",
       source:"SOURCE",published:"DATE",duration:"DURÉE",empty:"Aucune sélection n'a encore été publiée."
     },
     zh:{
@@ -79,7 +95,7 @@
       readingIntro:"人工精选的 France 24 文章，适合 B2–C1 学习者。",
       listeningIntro:"人工精选的 RFI 听力材料，适合 B2–C1 学习者。",
       preparing:"下一期人工精选内容正在准备中。",
-      openArticle:"阅读原文",listen:"播放音频",transcript:"查看文字稿",
+      openArticle:"阅读原文",listen:"收听节目",transcript:"收听节目并查看文字稿",
       source:"内容来源",published:"发布日期",duration:"时长",empty:"暂未发布本期精选内容。"
     }
   };
@@ -131,7 +147,7 @@
     const summary = item.summary?.[language] || item.summary?.en || "";
     const links = isArticle
       ? `<a class="daily-action-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">${action}</a>`
-      : `<audio controls preload="none" src="${escapeHtml(item.audioUrl)}"></audio><div class="daily-card-actions">${item.transcriptUrl ? `<a class="daily-action-link secondary" href="${escapeHtml(item.transcriptUrl)}" target="_blank" rel="noopener noreferrer">${t.transcript}</a>` : ""}</div>`;
+      : `<div class="daily-card-actions">${item.audioUrl ? `<audio controls preload="none" src="${escapeHtml(item.audioUrl)}"></audio>` : ""}${item.episodeUrl ? `<a class="daily-action-link" href="${escapeHtml(item.episodeUrl)}" target="_blank" rel="noopener noreferrer">${t.listen}</a>` : ""}${item.transcriptUrl ? `<a class="daily-action-link secondary" href="${escapeHtml(item.transcriptUrl)}" target="_blank" rel="noopener noreferrer">${t.transcript}</a>` : ""}</div>`;
     root.innerHTML = `<p class="daily-content-source">${source}</p><p class="daily-editorial-meta">${escapeHtml(item.level || "B2–C1")} · ${escapeHtml(item.publishedAt || "")}${item.duration ? " · "+escapeHtml(item.duration) : ""}</p><h3>${escapeHtml(item.title?.[language] || item.title?.fr || "")}</h3><p class="daily-content-description">${escapeHtml(summary)}</p>${links}`;
   }
 
