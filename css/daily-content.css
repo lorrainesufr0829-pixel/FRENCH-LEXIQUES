@@ -15,3 +15,11 @@
 .daily-content-entry audio{display:block;width:min(100%,520px);margin:14px 0}
 @media(min-width:761px){.featured-word .word-card{height:auto!important;min-height:220px!important;justify-content:flex-start!important}.featured-word .word-card h3{font-size:27px!important}}
 @media(max-width:760px){.daily-card-actions{gap:8px}.daily-text-button,.daily-action-link{min-height:40px}}
+
+
+/* HOME — Add featured vocabulary to personal library */
+.daily-add-button{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:8px 13px;border:1px solid var(--lexique-accent);border-radius:7px;background:var(--lexique-accent);color:#fff;font:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:opacity .18s ease,transform .18s ease}
+.daily-add-button:hover:not(:disabled){transform:translateY(-1px);opacity:.9}
+.daily-add-button:disabled{opacity:.65;cursor:default}
+.daily-add-status{min-height:16px;margin:7px 0 0;color:var(--lexique-muted);font-size:11px}
+.daily-login-link{color:var(--lexique-accent);font-weight:700;margin-left:4px}
