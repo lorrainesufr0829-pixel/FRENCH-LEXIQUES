@@ -1229,6 +1229,36 @@
     "GENERAL":"GÉNÉRAL"
   });
 
+
+  Object.assign(dictionaries.zh, {
+  "🎨 Appearance": "🎨 外观",
+  "🌐 Language": "🌐 语言",
+  "🖥 Display": "🖥 显示",
+  "📚 Learning": "📚 学习",
+  "☁ Synchronization": "☁ 数据同步",
+  "💾 Library": "💾 词库",
+  "ℹ About": "ℹ 关于",
+  "🟢 Connected": "🟢 已连接",
+  "/ STUDY": "/ 学习",
+  "← Back to Home": "← 返回首页",
+  "/ 3,000 mastered words": "/ 3,000 个已掌握单词",
+  "Loading vocabulary…": "正在加载词汇…"
+});
+  Object.assign(dictionaries.fr, {
+  "🎨 Appearance": "🎨 Apparence",
+  "🌐 Language": "🌐 Langue",
+  "🖥 Display": "🖥 Affichage",
+  "📚 Learning": "📚 Apprentissage",
+  "☁ Synchronization": "☁ Synchronisation",
+  "💾 Library": "💾 Lexique",
+  "ℹ About": "ℹ À propos",
+  "🟢 Connected": "🟢 Connecté",
+  "/ STUDY": "/ APPRENTISSAGE",
+  "← Back to Home": "← Retour à l’accueil",
+  "/ 3,000 mastered words": "/ 3 000 mots maîtrisés",
+  "Loading vocabulary…": "Chargement du vocabulaire…"
+});
+
   const storageKey = "lexique_language";
   dictionaries.en = { ...(dictionaries.en || {}), ...{"关闭提示":"Close message","该单词已存在；保存时会为它添加所选分类。":"This word already exists; the selected category will be linked when saved.","暂时无法查重，请检查网络后重试。":"Duplicate check unavailable. Check your connection and try again.","先补充完整信息哦！":"Please complete the information!","请填写单词和释义。":"Enter both the word and its meaning.","成功！离大师又进一步！":"Success! One step closer to mastery!","分类已更新！":"Category updated!","这个单词已经在词库中，所选分类无需重复添加。":"This word is already in your library; no additional category link was needed.","再检查一下！":"Please check again.","请确认单词和释义都已填写。":"Make sure both the word and meaning are filled in.","哎呀，保存没有成功！":"Oops, saving failed!","请检查网络连接或稍后重试。":"Check your connection or try again later.","文件读取组件暂不可用！":"The file reader is currently unavailable.","请刷新页面后重试。":"Refresh the page and try again.","这次导入遇到一点小麻烦！":"There was a small problem importing this file!","请确认文件格式、登录状态及网络连接后重试。":"Check the file format, sign-in status and connection, then try again."} };
   const current = () => localStorage.getItem(storageKey) || "en";
