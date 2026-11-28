@@ -1355,6 +1355,13 @@
     return null;
   }
 
+  function translateCompositeText(value, language) {
+    if (!value.includes(" · ")) return null;
+    const parts = value.split(" · ");
+    const translated = parts.map(part => dictionaries[language]?.[part] || dictionaries[language]?.[part.toUpperCase()]);
+    return translated.every(Boolean) ? translated.join(" · ") : null;
+  }
+
   function translateNode(node, language) {
     if (!node || node.nodeType !== Node.TEXT_NODE) return;
     const parent = node.parentElement;
@@ -1378,7 +1385,7 @@
 
     const trimmed = original.trim();
     if (!trimmed) return;
-    let translated = translateDynamicText(trimmed, language) || dictionaries[language]?.[trimmed] || trimmed;
+    let translated = translateDynamicText(trimmed, language) || dictionaries[language]?.[trimmed] || translateCompositeText(trimmed, language) || trimmed;
     const countMatch = trimmed.match(/^(\\d+) (Words|words|Days|days)$/);
     if (countMatch) {
       const count = Number(countMatch[1]);
