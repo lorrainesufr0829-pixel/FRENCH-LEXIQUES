@@ -2333,3 +2333,144 @@ body[data-theme="dark"] .study-container .study-launch-panel > .study-setup {
         padding: 0 17px 22px !important;
     }
 }
+
+/* =========================================
+   LEXIQUE — Consistent, readable typography
+   Standard desktop body text: 16px.
+   Keep display typography expressive while
+   normalizing navigation, labels and controls.
+========================================= */
+:root {
+    --lexique-font-size-base: 16px;
+    --lexique-font-size-small: 14px;
+    --lexique-font-size-caption: 12px;
+    --lexique-line-height-body: 1.6;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    font-family: var(--lexique-font);
+    font-size: var(--lexique-font-size-base);
+    line-height: var(--lexique-line-height-body);
+}
+
+/* Clear, conventional heading hierarchy */
+h1 {
+    font-size: clamp(32px, 3.4vw, 42px);
+    line-height: 1.2;
+}
+h2 {
+    font-size: clamp(25px, 2.5vw, 32px);
+    line-height: 1.3;
+}
+h3 {
+    font-size: clamp(20px, 2vw, 24px);
+    line-height: 1.35;
+}
+h4 {
+    font-size: 18px;
+    line-height: 1.4;
+}
+p, li {
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* Brand title remains a display element, not body text */
+.site-header h1 {
+    font-size: clamp(36px, 4vw, 48px);
+    line-height: 1.15;
+    letter-spacing: .18em;
+}
+.site-header p {
+    font-size: 14px;
+    line-height: 1.5;
+}
+.main-navigation a {
+    font-size: 14px;
+    letter-spacing: .035em;
+}
+.progress-item span {
+    font-size: 12px;
+    line-height: 1.4;
+}
+.progress-item strong {
+    font-size: 22px;
+    line-height: 1.25;
+}
+
+/* Content labels and supporting information */
+.library-sidebar li,
+.library-header span,
+.word-info p,
+.setting-item label,
+.settings-tab,
+.study-field label,
+.study-setup-controls label {
+    font-size: 14px;
+}
+.library-header h2,
+.library-sidebar h2 {
+    font-size: 26px;
+}
+.word-info h3 {
+    font-size: 21px;
+}
+.word-tag span,
+.word-meta span,
+.status-badge,
+.format-list div {
+    font-size: 13px;
+}
+.study-eyebrow,
+.study-card-hint,
+.study-message,
+.study-setup-kicker,
+.study-setup-tag,
+.study-heading-meta {
+    font-size: 12px;
+}
+.study-setup-copy p,
+.study-complete > p,
+.study-heading > p:last-of-type {
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+/* Inputs and actions use comfortable, consistent sizing */
+input, select, textarea, button {
+    font-family: inherit;
+}
+input, select, textarea {
+    font-size: 16px;
+    line-height: 1.4;
+}
+.primary-button,
+.secondary-button,
+.study-primary-button,
+.study-reveal-button,
+.study-rating-buttons button {
+    font-size: 15px;
+    line-height: 1.35;
+}
+.setting-item select,
+.setting-item input[type="number"],
+.study-setup-controls select {
+    font-size: 15px;
+}
+
+/* Avoid tiny text on narrow screens while preserving hierarchy */
+@media (max-width: 760px) {
+    html { font-size: 15px; }
+    body { font-size: 15px; }
+    p, li { font-size: 15px; }
+    .main-navigation a { font-size: 13px; }
+    .progress-item span { font-size: 11px; }
+    .progress-item strong { font-size: 20px; }
+    .site-header h1 { font-size: clamp(34px, 8vw, 42px); }
+    input, select, textarea { font-size: 16px; }
+}
+
