@@ -2,7 +2,7 @@
 "use strict";
 const ADMIN="lorrainesufr@outlook.com", db=window.supabaseClient, $=id=>document.getElementById(id);
 let editing=null;
-const say=m=>{$("admin-status").textContent=m};
+const say=m=>{$("admin-message").textContent=m};
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function reset(){editing=null;$("reading-form").reset();$("reading-date").value=new Date().toISOString().slice(0,10);$("reading-vocabulary").value="[]";$("reading-status").value="draft";$("form-heading").textContent="Create a reading";}
 function edit(x){editing=x.id;for(const [id,key] of Object.entries({"reading-title":"title","reading-title-en":"title_en","reading-title-zh":"title_zh","reading-date":"published_at","reading-level":"level","reading-topic":"topic","reading-content":"content_fr","reading-summary-zh":"summary_zh","reading-source":"source_name","reading-source-title":"source_title","reading-source-url":"source_url","reading-status":"status"}))$(id).value=x[key]||"";$("reading-vocabulary").value=JSON.stringify(x.vocabulary||[],null,2);$("form-heading").textContent="Edit reading";window.scrollTo({top:0,behavior:"smooth"});}
