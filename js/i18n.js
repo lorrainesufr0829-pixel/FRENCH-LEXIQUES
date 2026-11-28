@@ -1,7 +1,6 @@
 // LEXIQUE interface language controller
 (() => {
   const dictionaries = {
-,
     zh: {
       "French Vocabulary Learning Platform":"法语词汇学习平台",
       "Words Learned":"已掌握词汇","Today's Review":"今日复习","Memory Streak":"连续学习","Level":"学习等级",
