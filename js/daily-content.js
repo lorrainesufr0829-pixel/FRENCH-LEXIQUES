@@ -123,12 +123,27 @@
       <p class="daily-ipa">${escapeHtml(item.ipa)} <span>·</span> ${escapeHtml(item.pos[language])}</p>
       <div class="daily-word-detail"><span class="daily-field-label">${t.meaning}</span><p>${escapeHtml(item.meaning[language])}</p></div>
       <div class="daily-word-example"><span class="daily-field-label">${t.example}</span><p lang="fr">${escapeHtml(item.example)}</p><p class="daily-example-translation">${escapeHtml(item.exampleMeaning[language])}</p></div>
-      <div class="daily-card-actions"><button type="button" class="daily-text-button" data-speak-word="${escapeHtml(item.word)}">${t.play}</button><button type="button" class="daily-add-button" data-add-word>${t.add}</button></div><p class="daily-add-status" role="status" aria-live="polite"></p>`;
+      <div class="daily-card-actions"><button type="button" class="daily-text-button" data-speak-word="${escapeHtml(item.word)}">${t.play}</button></div>
+      <div class="daily-library-controls">
+        <label>${language === "zh" ? "词汇类别" : language === "fr" ? "Catégorie" : "Category"}
+          <select data-library-category><option value="">${language === "zh" ? "选择类别" : "Select category"}</option><option>Business French</option><option>Legal French</option><option>Daily French</option></select>
+        </label>
+        <label>${language === "zh" ? "学习等级" : language === "fr" ? "Niveau" : "Level"}
+          <select data-library-level><option value="">${language === "zh" ? "选择等级" : "Select level"}</option><option>DELF A1</option><option>DELF A2</option><option>DELF B1</option><option>DELF B2</option><option>DALF C1</option><option>DALF C2</option></select>
+        </label>
+        <button type="button" class="daily-add-button" data-add-word>${t.add}</button>
+      </div><p class="daily-add-status" role="status" aria-live="polite"></p>`;
     const speak = root.querySelector("[data-speak-word]");
     const addButton = root.querySelector("[data-add-word]");
     const addStatus = root.querySelector(".daily-add-status");
     addButton?.addEventListener("click", async () => {
       if (addButton.dataset.saved === "true") return;
+      const category = root.querySelector("[data-library-category]")?.value || "";
+      const level = root.querySelector("[data-library-level]")?.value || "";
+      if (!category || !level) {
+        addStatus.textContent = language === "zh" ? "请先选择词汇类别和学习等级。" : "Please select both a category and a level.";
+        return;
+      }
       addButton.disabled = true;
       addButton.textContent = language === "zh" ? "正在添加…" : language === "fr" ? "Ajout…" : "Adding…";
       try {
@@ -148,24 +163,41 @@
         const { data: existing, error: lookupError } = await window.supabaseClient
           .from("vocabulary").select("id").eq("user_id", user.id).ilike("word", item.word).limit(1);
         if (lookupError) throw lookupError;
+        let vocabularyId;
         if (existing?.length) {
-          addStatus.textContent = t.alreadyAdded;
-          addButton.textContent = t.alreadyAdded;
-          addButton.dataset.saved = "true";
-          return;
+          vocabularyId = existing[0].id;
+        } else {
+          const { data: inserted, error: insertError } = await window.supabaseClient.from("vocabulary").insert({
+            user_id: user.id,
+            word: item.word,
+            meaning: item.meaning[language] || item.meaning.en || item.meaning.fr
+          }).select("id").single();
+          if (insertError) throw insertError;
+          vocabularyId = inserted.id;
         }
-        const { error: insertError } = await window.supabaseClient.from("vocabulary").insert({
-          user_id: user.id,
-          word: item.word,
-          meaning: item.meaning[language] || item.meaning.en || item.meaning.fr
-        });
-        if (insertError) throw insertError;
-        addStatus.textContent = t.added;
-        addButton.textContent = t.added;
+        const { data: categoryRows, error: categoryError } = await window.supabaseClient
+          .from("vocabulary_categories").select("id,name,category_type").in("name", [category, level]);
+        if (categoryError) throw categoryError;
+        const categoryId = categoryRows?.find(x => x.name === category && x.category_type === "collection")?.id;
+        const levelId = categoryRows?.find(x => x.name === level && x.category_type === "level")?.id;
+        if (!categoryId || !levelId) throw new Error("The selected Library category or level could not be found.");
+        const links = [{vocabulary_id:vocabularyId,category_id:categoryId},{vocabulary_id:vocabularyId,category_id:levelId}];
+        const {error: linkError} = await window.supabaseClient.from("vocabulary_category_links")
+          .upsert(links,{onConflict:"vocabulary_id,category_id",ignoreDuplicates:true});
+        if (linkError) throw linkError;
+        const {data:savedLinks,error:verifyError} = await window.supabaseClient.from("vocabulary_category_links")
+          .select("category_id").eq("vocabulary_id",vocabularyId).in("category_id",[categoryId,levelId]);
+        if (verifyError) throw verifyError;
+        const savedIds = new Set((savedLinks || []).map(x => x.category_id));
+        if (!savedIds.has(categoryId) || !savedIds.has(levelId)) throw new Error("Could not verify Library category links.");
+        addStatus.textContent = existing?.length
+          ? (language === "zh" ? "单词已存在，已补充所选分类 ✓" : "Word already existed; selected categories added ✓")
+          : t.added;
+        addButton.textContent = language === "zh" ? "已加入 ✓" : "Added ✓";
         addButton.dataset.saved = "true";
       } catch (error) {
         console.error("Add featured word to library failed:", error);
-        addStatus.textContent = t.addFailed;
+        addStatus.textContent = t.addFailed + " " + (error.message || "");
         addButton.textContent = t.add;
         addButton.disabled = false;
       }
