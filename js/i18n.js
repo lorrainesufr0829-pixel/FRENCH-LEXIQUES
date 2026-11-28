@@ -113,7 +113,6 @@
       "LOG IN / SIGN UP":"登录 / 注册","SIGNED IN":"已登录","LOG OUT":"退出登录","LOGGING OUT…":"正在退出…","Signed in":"已登录",
       "新增 ":"新增 "," 个单词":" 个单词","已有单词 ":"已有单词 ","添加分类关联 ":"添加分类关联 ",
       "导入完成：":"导入完成：","导入失败，请确认文件格式、登录状态及 Supabase 数据库权限。":"导入失败，请确认文件格式、登录状态及数据库权限。"
-    },
       "Daily Featured Word": "每日精选词汇",
       "Daily Reading": "每日阅读",
       "Daily Listening": "每日听力",
@@ -243,6 +242,7 @@
       "请刷新页面后重试。": "请刷新页面后重试。",
       "这次导入遇到一点小麻烦！": "这次导入遇到一点小麻烦！",
       "请确认文件格式、登录状态及网络连接后重试。": "请确认文件格式、登录状态及网络连接后重试。",
+    },
     fr: {
       "French Vocabulary Learning Platform":"Plateforme d’apprentissage du vocabulaire français",
       "Words Learned":"Mots maîtrisés","Today's Review":"Révisions du jour","Memory Streak":"Série d’apprentissage","Level":"Niveau",
