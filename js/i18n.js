@@ -457,7 +457,7 @@
     const trimmed = original.trim();
     if (!trimmed) return;
     let translated = dictionaries[language]?.[trimmed] || trimmed;
-    const countMatch = trimmed.match(/^(\\d+) (Words|words|Days|days)$/);
+    const countMatch = trimmed.match(/^(\d+) (Words|words|Days|days)$/);
     if (countMatch) {
       const count = Number(countMatch[1]);
       if (language === "zh") translated = `${count}${countMatch[2].toLowerCase().includes("day") ? " 天" : " 个单词"}`;
