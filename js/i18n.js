@@ -283,7 +283,7 @@
       "+ Choose Vocabulary File":"Choisir un fichier","Required Data Format":"Format des données requis",
       "Your file should include the following fields:":"Votre fichier doit contenir les champs suivants :","Import History":"Historique des imports",
       "No recent imports.":"Aucun import récent.","Search vocabulary...":"Rechercher un mot…","Vocabulary List":"Liste de vocabulaire",
-      "Business French":"Français des affaires","Legal French":"Français juridique","Daily French":"Français courant"
+      "Business French":"Français des affaires","Legal French":"Français juridique","Daily French":"Français courant",
       "Daily Featured Word": "Mot du jour",
       "Daily Reading": "Lecture du jour",
       "Daily Listening": "Écoute du jour",
