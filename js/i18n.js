@@ -1272,22 +1272,22 @@
       const segments = value.replace(/。$/, "").split("；");
       const translatedSegments = segments.map(segment => {
         let item;
-        if ((item = segment.match(/^新增 (\\d+) 个单词$/))) {
+        if ((item = segment.match(/^新增 (\d+) 个单词$/))) {
           return language === "zh" ? segment : language === "fr" ? `${item[1]} mots ajoutés` : `${item[1]} words added`;
         }
-        if ((item = segment.match(/^已有单词 (\\d+) 个$/))) {
+        if ((item = segment.match(/^已有单词 (\d+) 个$/))) {
           return language === "zh" ? segment : language === "fr" ? `${item[1]} mots déjà présents` : `${item[1]} existing words`;
         }
-        if ((item = segment.match(/^添加分类关联 (\\d+) 条$/))) {
+        if ((item = segment.match(/^添加分类关联 (\d+) 条$/))) {
           return language === "zh" ? segment : language === "fr" ? `${item[1]} associations de catégories ajoutées` : `${item[1]} category links added`;
         }
-        if ((item = segment.match(/^重复单词 (\\d+) 个$/))) {
+        if ((item = segment.match(/^重复单词 (\d+) 个$/))) {
           return language === "zh" ? segment : language === "fr" ? `${item[1]} doublons` : `${item[1]} duplicate words`;
         }
-        if ((item = segment.match(/^新增分类关联 (\\d+) 条$/))) {
+        if ((item = segment.match(/^新增分类关联 (\d+) 条$/))) {
           return language === "zh" ? segment : language === "fr" ? `${item[1]} associations de catégories ajoutées` : `${item[1]} new category links`;
         }
-        if ((item = segment.match(/^无效记录 (\\d+) 条$/))) {
+        if ((item = segment.match(/^无效记录 (\d+) 条$/))) {
           return language === "zh" ? segment : language === "fr" ? `${item[1]} lignes invalides` : `${item[1]} invalid records`;
         }
         if ((item = segment.match(/^未匹配到分类目录：(.+)$/)) || (item = segment.match(/^未匹配分类：(.+)$/))) {
@@ -1300,23 +1300,23 @@
         return joined + (value.endsWith("。") ? (language === "zh" ? "。" : ".") : "");
       }
     }
-    if ((match = value.match(/^(\\d+) (Words|words|Days|days)$/))) {
+    if ((match = value.match(/^(\d+) (Words|words|Days|days)$/))) {
       const count = Number(match[1]);
       const isDays = match[2].toLowerCase().includes("day");
       if (language === "zh") return isDays ? `${count} 天` : `${count} 个单词`;
       if (language === "fr") return isDays ? `${count} ${count === 1 ? "jour" : "jours"}` : `${count} ${count === 1 ? "mot" : "mots"}`;
     }
-    if ((match = value.match(/^(\\d+) words available(?: · (\\d+) due for review)?$/i))) {
+    if ((match = value.match(/^(\d+) words available(?: · (\d+) due for review)?$/i))) {
       const words = Number(match[1]);
       const due = match[2] === undefined ? null : Number(match[2]);
       if (language === "zh") return due === null ? `${words} 个可用单词` : `${words} 个可用单词 · ${due} 个待复习`;
       if (language === "fr") return due === null ? `${words} mots disponibles` : `${words} mots disponibles · ${due} à réviser`;
     }
-    if ((match = value.match(/^(\\d+)% completed$/i))) {
+    if ((match = value.match(/^(\d+)% completed$/i))) {
       if (language === "zh") return `已完成 ${match[1]}%`;
       if (language === "fr") return `${match[1]} % terminé`;
     }
-    if ((match = value.match(/^(\\d+)m$/))) {
+    if ((match = value.match(/^(\d+)m$/))) {
       if (language === "zh") return `${match[1]} 分钟`;
       if (language === "fr") return `${match[1]} min`;
     }
@@ -1324,15 +1324,15 @@
       if (language === "zh") return `今天 · ${match[1]}`;
       if (language === "fr") return `Aujourd’hui · ${match[1]}`;
     }
-    if ((match = value.match(/^Not quite\\. Your answer: (.*)$/))) {
+    if ((match = value.match(/^Not quite\. Your answer: (.*)$/))) {
       if (language === "zh") return `不完全正确。你的答案：${match[1]}`;
       if (language === "fr") return `Pas tout à fait. Votre réponse : ${match[1]}`;
     }
-    if ((match = value.match(/^Not quite\\. Correct meaning: (.*)$/))) {
+    if ((match = value.match(/^Not quite\. Correct meaning: (.*)$/))) {
       if (language === "zh") return `不完全正确。正确释义：${match[1]}`;
       if (language === "fr") return `Pas tout à fait. Sens correct : ${match[1]}`;
     }
-    if ((match = value.match(/^Not quite\\. The word you heard was (.*)\\.$/))) {
+    if ((match = value.match(/^Not quite\. The word you heard was (.*)\.$/))) {
       if (language === "zh") return `不完全正确。你听到的单词是 ${match[1]}。`;
       if (language === "fr") return `Pas tout à fait. Le mot entendu était ${match[1]}.`;
     }
@@ -1340,7 +1340,7 @@
       if (language === "zh") return `正确拼写：${match[1]}`;
       if (language === "fr") return `Orthographe correcte : ${match[1]}`;
     }
-    if ((match = value.match(/^Ratings: (.*?)(\\. Your next reviews have been scheduled\\.|\\. Run the database migration to save review schedules\\.)$/))) {
+    if ((match = value.match(/^Ratings: (.*?)(\. Your next reviews have been scheduled\.|\. Run the database migration to save review schedules\.)$/))) {
       const ratings = match[1]
         .replace(/again/gi, language === "zh" ? "重学" : "À revoir")
         .replace(/hard/gi, language === "zh" ? "困难" : "Difficile")
