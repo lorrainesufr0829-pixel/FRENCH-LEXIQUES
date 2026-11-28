@@ -583,7 +583,7 @@
     }
 
     async function rateCard(rating) {
-        if (!currentWord || saving || !ratings.includes(rating)) return;
+        if (!currentWord || !ratings.includes(rating)) return;
         saving = true;
         const buttons = [...ratingPanel.querySelectorAll("[data-rating]")];
         buttons.forEach(button => button.disabled = true);
