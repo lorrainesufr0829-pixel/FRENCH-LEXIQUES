@@ -45,7 +45,21 @@
   ];
 
   // Editorially selected records. Keep the original source URL and publication date with every item.
-  const article = null;
+  const article = {
+    title: {
+      fr: "Au moins 2 100 jeunes étrangers en France en attente d’une décision sur leur minorité",
+      en: "At least 2,100 young foreign nationals in France are awaiting a decision on whether they are minors",
+      zh: "至少 2100 名在法外国未成年人等待年龄认定结果"
+    },
+    summary: {
+      fr: "La Coordination nationale jeunes exilés en danger alerte sur les délais de décision concernant l’évaluation de l’âge de jeunes étrangers isolés et sur la précarité de leurs conditions de vie pendant cette attente.",
+      en: "The National Coordination for Young Exiles in Danger raises concerns about delays in age assessments for unaccompanied young foreign nationals and the precarious living conditions they face while waiting.",
+      zh: "法国“处境危险的流亡青年全国协调组织”指出，部分孤身外国青年的年龄认定程序仍需等待，等待期间的生活条件也十分脆弱。文章适合结合未成年人保护、移民政策与社会保障议题进行阅读。"
+    },
+    level: "B2–C1",
+    publishedAt: "2026-11-19",
+    url: "https://www.lemonde.fr/societe/article/2026/11/19/au-moins-2-100-jeunes-etrangers-en-france-en-attente-d-une-decision-sur-leur-minorite_6813238_3224.html"
+  };
   const listening = {
     title: {
       fr: "France : l'économie recule / Israël : à quand un nouveau gouvernement ?",
@@ -138,7 +152,7 @@
     const isArticle = type === "article";
     const title = isArticle ? t.readingTitle : t.listeningTitle;
     const intro = isArticle ? t.readingIntro : t.listeningIntro;
-    const source = isArticle ? "FRANCE 24 · FRANÇAIS" : "RFI · PODCASTS";
+    const source = isArticle ? "LE MONDE · FRANÇAIS" : "RFI · PODCASTS";
     const action = isArticle ? t.openArticle : t.listen;
     if (!item) {
       root.innerHTML = `<p class="daily-content-source">${source}</p><h3>${title}</h3><p class="daily-content-description">${intro}</p><p class="daily-content-status">${t.preparing}</p>`;
