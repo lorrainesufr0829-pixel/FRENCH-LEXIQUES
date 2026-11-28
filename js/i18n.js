@@ -1206,6 +1206,29 @@
   ". Run the database migration to save review schedules.": ". Exécutez la migration de la base de données pour enregistrer le calendrier des révisions."
 });
 
+
+  Object.assign(dictionaries.zh, {
+    "Statistics | Lexique":"学习统计 | LEXIQUE",
+    "LEXIQUE - Training Session":"LEXIQUE - 训练课程",
+    "Active recall":"主动回忆",
+    "Listening":"听力",
+    "BUSINESS FRENCH":"商务法语",
+    "LEGAL FRENCH":"法律法语",
+    "DAILY FRENCH":"日常法语",
+    "GENERAL":"通用",
+    "Study session highlights":"学习环节重点",
+    "Study training setup":"学习训练设置"
+  });
+  Object.assign(dictionaries.fr, {
+    "Statistics | Lexique":"Statistiques | LEXIQUE",
+    "Active recall":"Rappel actif",
+    "Listening":"Compréhension orale",
+    "BUSINESS FRENCH":"FRANÇAIS DES AFFAIRES",
+    "LEGAL FRENCH":"FRANÇAIS JURIDIQUE",
+    "DAILY FRENCH":"FRANÇAIS COURANT",
+    "GENERAL":"GÉNÉRAL"
+  });
+
   const storageKey = "lexique_language";
   dictionaries.en = { ...(dictionaries.en || {}), ...{"关闭提示":"Close message","该单词已存在；保存时会为它添加所选分类。":"This word already exists; the selected category will be linked when saved.","暂时无法查重，请检查网络后重试。":"Duplicate check unavailable. Check your connection and try again.","先补充完整信息哦！":"Please complete the information!","请填写单词和释义。":"Enter both the word and its meaning.","成功！离大师又进一步！":"Success! One step closer to mastery!","分类已更新！":"Category updated!","这个单词已经在词库中，所选分类无需重复添加。":"This word is already in your library; no additional category link was needed.","再检查一下！":"Please check again.","请确认单词和释义都已填写。":"Make sure both the word and meaning are filled in.","哎呀，保存没有成功！":"Oops, saving failed!","请检查网络连接或稍后重试。":"Check your connection or try again later.","文件读取组件暂不可用！":"The file reader is currently unavailable.","请刷新页面后重试。":"Refresh the page and try again.","这次导入遇到一点小麻烦！":"There was a small problem importing this file!","请确认文件格式、登录状态及网络连接后重试。":"Check the file format, sign-in status and connection, then try again."} };
   const current = () => localStorage.getItem(storageKey) || "en";
@@ -1220,6 +1243,18 @@
       const due = match[2] === undefined ? null : Number(match[2]);
       if (language === "zh") return due === null ? `${words} 个可用单词` : `${words} 个可用单词 · ${due} 个待复习`;
       if (language === "fr") return due === null ? `${words} mots disponibles` : `${words} mots disponibles · ${due} à réviser`;
+    }
+    if ((match = value.match(/^(\\d+)% completed$/i))) {
+      if (language === "zh") return `已完成 ${match[1]}%`;
+      if (language === "fr") return `${match[1]} % terminé`;
+    }
+    if ((match = value.match(/^(\\d+)m$/))) {
+      if (language === "zh") return `${match[1]} 分钟`;
+      if (language === "fr") return `${match[1]} min`;
+    }
+    if ((match = value.match(/^Today · (.+)$/))) {
+      if (language === "zh") return `今天 · ${match[1]}`;
+      if (language === "fr") return `Aujourd’hui · ${match[1]}`;
     }
     if ((match = value.match(/^Not quite\\. Your answer: (.*)$/))) {
       if (language === "zh") return `不完全正确。你的答案：${match[1]}`;
@@ -1297,10 +1332,8 @@
         saved[attr] = currentValue;
       }
       const translated = dictionaries[language]?.[saved[attr]] || saved[attr];
-      if (currentValue !== translated) {
-        last[attr] = translated;
-        element.setAttribute(attr, translated);
-      }
+      last[attr] = translated;
+      if (currentValue !== translated) element.setAttribute(attr, translated);
     });
   }
 
