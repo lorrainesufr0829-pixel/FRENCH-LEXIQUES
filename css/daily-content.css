@@ -23,3 +23,12 @@
 .daily-add-button:disabled{opacity:.65;cursor:default}
 .daily-add-status{min-height:16px;margin:7px 0 0;color:var(--lexique-muted);font-size:11px}
 .daily-login-link{color:var(--lexique-accent);font-weight:700;margin-left:4px}
+
+
+/* Library classification controls for the daily featured word */
+.daily-library-controls{display:flex;flex-wrap:wrap;align-items:end;gap:12px;margin-top:14px}
+.daily-library-controls label{display:flex;flex-direction:column;gap:6px;min-width:150px;flex:1;font-size:13px;font-weight:600}
+.daily-library-controls select{width:100%;min-height:42px;padding:9px 11px;border:1px solid var(--lexique-border,#ccc);border-radius:8px;background:var(--lexique-card,#fff);color:inherit;font:inherit}
+.daily-library-controls .daily-add-button{min-height:42px}
+.daily-add-status{margin-top:8px;font-size:13px}
+@media(max-width:600px){.daily-library-controls{flex-direction:column;align-items:stretch}.daily-library-controls label,.daily-library-controls .daily-add-button{width:100%}}
