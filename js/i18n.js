@@ -1211,6 +1211,47 @@
   const current = () => localStorage.getItem(storageKey) || "en";
   const originalText = new WeakMap();
   const originalAttributes = new WeakMap();
+  const lastTranslatedAttributes = new WeakMap();
+
+  function translateDynamicText(value, language) {
+    let match;
+    if ((match = value.match(/^(\\d+) words available(?: · (\\d+) due for review)?$/i))) {
+      const words = Number(match[1]);
+      const due = match[2] === undefined ? null : Number(match[2]);
+      if (language === "zh") return due === null ? `${words} 个可用单词` : `${words} 个可用单词 · ${due} 个待复习`;
+      if (language === "fr") return due === null ? `${words} mots disponibles` : `${words} mots disponibles · ${due} à réviser`;
+    }
+    if ((match = value.match(/^Not quite\\. Your answer: (.*)$/))) {
+      if (language === "zh") return `不完全正确。你的答案：${match[1]}`;
+      if (language === "fr") return `Pas tout à fait. Votre réponse : ${match[1]}`;
+    }
+    if ((match = value.match(/^Not quite\\. Correct meaning: (.*)$/))) {
+      if (language === "zh") return `不完全正确。正确释义：${match[1]}`;
+      if (language === "fr") return `Pas tout à fait. Sens correct : ${match[1]}`;
+    }
+    if ((match = value.match(/^Not quite\\. The word you heard was (.*)\\.$/))) {
+      if (language === "zh") return `不完全正确。你听到的单词是 ${match[1]}。`;
+      if (language === "fr") return `Pas tout à fait. Le mot entendu était ${match[1]}.`;
+    }
+    if ((match = value.match(/^Correct spelling: (.*)$/))) {
+      if (language === "zh") return `正确拼写：${match[1]}`;
+      if (language === "fr") return `Orthographe correcte : ${match[1]}`;
+    }
+    if ((match = value.match(/^Ratings: (.*?)(\\. Your next reviews have been scheduled\\.|\\. Run the database migration to save review schedules\\.)$/))) {
+      const ratings = match[1]
+        .replace(/again/g, language === "zh" ? "重学" : "À revoir")
+        .replace(/hard/g, language === "zh" ? "困难" : "Difficile")
+        .replace(/good/g, language === "zh" ? "良好" : "Bien")
+        .replace(/easy/g, language === "zh" ? "简单" : "Facile");
+      const ending = match[2].includes("scheduled")
+        ? (language === "zh" ? "。已安排后续复习。" : ". Vos prochaines révisions ont été planifiées.")
+        : (language === "zh" ? "。请运行数据库迁移以保存复习计划。" : ". Exécutez la migration de la base de données pour enregistrer le calendrier des révisions.");
+      if (language === "zh") return `评价统计：${ratings}${ending}`;
+      if (language === "fr") return `Évaluations : ${ratings}${ending}`;
+    }
+    return null;
+  }
+
   function translateNode(node, language) {
     if (!node || node.nodeType !== Node.TEXT_NODE) return;
     const parent = node.parentElement;
@@ -1224,8 +1265,6 @@
       dict => dict && dict[originalTrimmed] === currentValue.trim()
     );
 
-    // Detect text replaced by dynamic UI scripts, while preserving the source
-    // text when switching between English, French and Chinese.
     if (currentValue.trim() && currentValue.trim() !== originalTrimmed && !isExistingTranslation) {
       original = currentValue;
       originalText.set(node, original);
@@ -1233,8 +1272,8 @@
 
     const trimmed = original.trim();
     if (!trimmed) return;
-    let translated = dictionaries[language]?.[trimmed] || trimmed;
-    const countMatch = trimmed.match(/^(\d+) (Words|words|Days|days)$/);
+    let translated = translateDynamicText(trimmed, language) || dictionaries[language]?.[trimmed] || trimmed;
+    const countMatch = trimmed.match(/^(\\d+) (Words|words|Days|days)$/);
     if (countMatch) {
       const count = Number(countMatch[1]);
       if (language === "zh") translated = `${count}${countMatch[2].toLowerCase().includes("day") ? " 天" : " 个单词"}`;
@@ -1243,21 +1282,33 @@
     const nextValue = original.replace(trimmed, translated);
     if (node.nodeValue !== nextValue) node.nodeValue = nextValue;
   }
+
+  function translateAttributes(element, language) {
+    const attrs = ["placeholder", "aria-label", "title", "alt"];
+    if (element.matches('input[type="button"], input[type="submit"], input[type="reset"]')) attrs.push("value");
+    if (!originalAttributes.has(element)) originalAttributes.set(element, {});
+    if (!lastTranslatedAttributes.has(element)) lastTranslatedAttributes.set(element, {});
+    const saved = originalAttributes.get(element);
+    const last = lastTranslatedAttributes.get(element);
+    attrs.forEach(attr => {
+      if (!element.hasAttribute(attr)) return;
+      const currentValue = element.getAttribute(attr);
+      if (saved[attr] === undefined || (last[attr] !== undefined && currentValue !== last[attr])) {
+        saved[attr] = currentValue;
+      }
+      const translated = dictionaries[language]?.[saved[attr]] || saved[attr];
+      if (currentValue !== translated) {
+        last[attr] = translated;
+        element.setAttribute(attr, translated);
+      }
+    });
+  }
+
   function translateTree(root, language) {
     if (root.nodeType === Node.TEXT_NODE) { translateNode(root, language); return; }
     if (root.nodeType !== Node.ELEMENT_NODE && root !== document) return;
     root.childNodes.forEach(child => translateTree(child, language));
-    if (root.nodeType === Node.ELEMENT_NODE) {
-      ["placeholder", "aria-label", "title"].forEach(attr => {
-        if (!originalAttributes.has(root)) originalAttributes.set(root, {});
-        const saved = originalAttributes.get(root);
-        if (root.hasAttribute(attr) && saved[attr] === undefined) saved[attr] = root.getAttribute(attr);
-        if (saved[attr] !== undefined) {
-          const value = saved[attr];
-          root.setAttribute(attr, dictionaries[language]?.[value] || value);
-        }
-      });
-    }
+    if (root.nodeType === Node.ELEMENT_NODE) translateAttributes(root, language);
   }
   function applyLanguage(language = current()) {
     const lang = ["en", "fr", "zh"].includes(language) ? language : "en";
@@ -1281,7 +1332,8 @@
     for (const record of records) {
       if (record.type === "characterData") translateNode(record.target, current());
       record.addedNodes.forEach(node => translateTree(node, current()));
+      if (record.type === "attributes") translateAttributes(record.target, current());
     }
   });
-  observer.observe(document.documentElement, { childList: true, characterData: true, subtree: true });
+  observer.observe(document.documentElement, { childList: true, characterData: true, attributes: true, attributeFilter: ["placeholder", "aria-label", "title", "alt", "value"], subtree: true });
 })();
