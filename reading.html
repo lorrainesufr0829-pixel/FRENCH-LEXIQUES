@@ -1,1 +1,125 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Daily Reading · LEXIQUE</title><link rel="stylesheet" href="css/style.css"><link rel="stylesheet" href="css/theme.css?v=20261128-fontfix1"><style>.reading-page{max-width:900px;margin:36px auto;padding:0 22px}.reading-body{white-space:pre-wrap;line-height:1.95;font-size:17px}.reading-vocab,.reading-summary{margin:24px 0;padding:18px;border-radius:12px;background:var(--lexique-surface,#f5f5f5)}.reading-vocab li{margin:14px 0}.reading-vocab .vocab-example{margin:6px 0 2px;font-style:italic}.reading-vocab .vocab-translation{margin:2px 0;color:var(--lexique-muted,#777);font-size:14px}</style></head><body><header class="site-header"><h1>LEXIQUE</h1><p>Daily Reading</p></header><main class="reading-page"><p><a href="index.html">← Home</a></p><article id="reading-article">Loading…</article></main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/supabase.js"></script><script>(async()=>{const id=new URLSearchParams(location.search).get("id"),root=document.getElementById("reading-article");if(!id){root.textContent="Reading not found.";return;}const {data,error}=await supabaseClient.from("daily_readings").select("*").eq("id",id).eq("status","published").maybeSingle();if(error||!data){root.textContent="This reading is unavailable.";return;}const e=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));root.innerHTML='<p>'+e(data.source_name||"LEXIQUE · DAILY READING")+'</p><p>'+e(data.level)+' · '+e(data.published_at)+'</p><h1>'+e(data.title)+'</h1>'+(data.summary_zh?'<div class="reading-summary">'+e(data.summary_zh)+'</div>':'')+'<div class="reading-body" lang="fr">'+e(data.content_fr)+'</div>'+(data.vocabulary?.length?'<section class="reading-vocab"><h2>Vocabulary</h2><ul>'+data.vocabulary.map(v=>'<li><strong>'+e(v.word)+'</strong> — '+e(v.meaning)+(v.example?'<p class="vocab-example">'+e(v.example)+'</p>':'')+(v.translation?'<p class="vocab-translation">'+e(v.translation)+'</p>':'')+'</li>').join("")+'</ul></section>':'')+(data.source_url?'<p>Source: '+e(data.source_title||data.source_name||"Original source")+'</p>':'');})();</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daily Reading · LEXIQUE</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/theme.css?v=20261128-fontfix1">
+<style>
+.reading-page{max-width:900px;margin:36px auto;padding:0 22px}
+.reading-body{white-space:pre-wrap;line-height:1.95;font-size:17px}
+.reading-vocab,.reading-summary{margin:24px 0;padding:18px;border-radius:12px;background:var(--lexique-surface,#f5f5f5)}
+.reading-vocab-list{list-style:none;padding:0}
+.reading-vocab-item{padding:16px 0;border-bottom:1px solid var(--lexique-border,#ddd)}
+.reading-vocab-item:last-child{border-bottom:0}
+.reading-vocab-item h3{margin:0 0 8px}
+.reading-vocab-item .vocab-example{margin:6px 0 2px;font-style:italic}
+.reading-vocab-item .vocab-translation{margin:2px 0;color:var(--lexique-muted,#777);font-size:14px}
+.reading-vocab-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+.reading-vocab-actions select{min-width:145px;max-width:100%;padding:9px;border:1px solid var(--lexique-border,#ccc);border-radius:8px;background:var(--lexique-card,#fff);color:inherit}
+.reading-add-button{padding:9px 14px;border:0;border-radius:8px;cursor:pointer;background:var(--lexique-primary,var(--primary-color,#6554c0));color:#fff;font-weight:600}
+.reading-add-button:disabled{opacity:.55;cursor:not-allowed}
+.reading-vocab-status{flex-basis:100%;margin:0;font-size:13px}
+.reading-login-link{margin-left:8px}
+@media(max-width:600px){.reading-vocab-actions{align-items:stretch;flex-direction:column}.reading-vocab-actions select,.reading-add-button{width:100%}}
+</style>
+</head>
+<body>
+<header class="site-header"><h1>LEXIQUE</h1><p>Daily Reading</p></header>
+<main class="reading-page">
+<p><a href="index.html">← Home</a></p>
+<article id="reading-article">Loading…</article>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script>
+(async()=>{
+"use strict";
+const id=new URLSearchParams(location.search).get("id");
+const root=document.getElementById("reading-article");
+const categories=["Business French","Legal French","Daily French"];
+const levels=["DELF A1","DELF A2","DELF B1","DELF B2","DALF C1","DALF C2"];
+const e=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const optionList=(items,label)=>'<option value="">'+label+'</option>'+items.map(x=>'<option value="'+e(x)+'">'+e(x)+'</option>').join("");
+function showLogin(status,button){
+ status.textContent="Please log in to add words to your personal Library.";
+ button.textContent="Log in to continue";
+ button.disabled=false;
+ const link=document.createElement("a");
+ link.href="auth.html?redirect="+encodeURIComponent(location.pathname+location.search);
+ link.textContent="Log in";
+ link.className="reading-login-link";
+ status.append(" ",link);
+}
+async function addWordToLibrary(item,category,level,button,status){
+ if(!category||!level){status.textContent="Please select both a category and a level.";return;}
+ button.disabled=true;
+ button.textContent="Adding…";
+ status.textContent="";
+ try{
+  const {data:sessionData,error:sessionError}=await window.supabaseClient.auth.getSession();
+  const user=sessionData?.session?.user;
+  if(sessionError||!user){showLogin(status,button);return;}
+  const {data:existing,error:lookupError}=await window.supabaseClient.from("vocabulary")
+   .select("id").eq("user_id",user.id).ilike("word",item.word).limit(1);
+  if(lookupError)throw lookupError;
+  let vocabularyId;
+  if(existing?.length){
+   vocabularyId=existing[0].id;
+  }else{
+   const {data:inserted,error:insertError}=await window.supabaseClient.from("vocabulary")
+    .insert({user_id:user.id,word:item.word,meaning:item.meaning}).select("id").single();
+   if(insertError)throw insertError;
+   vocabularyId=inserted.id;
+  }
+  const {data:categoryRows,error:categoryError}=await window.supabaseClient.from("vocabulary_categories")
+   .select("id,name,category_type").in("name",[category,level]);
+  if(categoryError)throw categoryError;
+  const categoryId=categoryRows?.find(x=>x.name===category&&x.category_type==="collection")?.id;
+  const levelId=categoryRows?.find(x=>x.name===level&&x.category_type==="level")?.id;
+  if(!categoryId||!levelId)throw new Error("The selected Library category or level could not be found.");
+  const links=[{vocabulary_id:vocabularyId,category_id:categoryId},{vocabulary_id:vocabularyId,category_id:levelId}];
+  const {error:linkError}=await window.supabaseClient.from("vocabulary_category_links")
+   .upsert(links,{onConflict:"vocabulary_id,category_id",ignoreDuplicates:true});
+  if(linkError)throw linkError;
+  const {data:savedLinks,error:verifyError}=await window.supabaseClient.from("vocabulary_category_links")
+   .select("category_id").eq("vocabulary_id",vocabularyId).in("category_id",[categoryId,levelId]);
+  if(verifyError)throw verifyError;
+  const savedIds=new Set((savedLinks||[]).map(x=>x.category_id));
+  if(!savedIds.has(categoryId)||!savedIds.has(levelId))throw new Error("The Library category links could not be verified.");
+  status.textContent=existing?.length?"This word was already in your Library. The selected categories have been added.":"Added to your Library with both selected categories ✓";
+  button.textContent="Added ✓";
+  button.dataset.saved="true";
+ }catch(error){
+  console.error("Add reading vocabulary failed:",error);
+  status.textContent="Could not add this word: "+(error.message||"Please try again.");
+  button.textContent="Add to my Library";
+  button.disabled=false;
+ }
+}
+if(!id){root.textContent="Reading not found.";return;}
+const {data,error}=await window.supabaseClient.from("daily_readings").select("*").eq("id",id).eq("status","published").maybeSingle();
+if(error||!data){root.textContent="This reading is unavailable.";return;}
+const vocabulary=Array.isArray(data.vocabulary)?data.vocabulary:[];
+const vocabHtml=vocabulary.length?'<section class="reading-vocab"><h2>Vocabulary</h2><ul class="reading-vocab-list">'+vocabulary.map((v,i)=>
+ '<li class="reading-vocab-item" data-vocab-index="'+i+'"><h3>'+e(v.word)+'</h3><p>'+e(v.meaning)+'</p>'+
+ (v.example?'<p class="vocab-example">'+e(v.example)+'</p>':'')+
+ (v.translation?'<p class="vocab-translation">'+e(v.translation)+'</p>':'')+
+ '<div class="reading-vocab-actions"><select class="reading-category" aria-label="Library category">'+optionList(categories,"Select category")+'</select>'+
+ '<select class="reading-level" aria-label="Library level">'+optionList(levels,"Select level")+'</select>'+
+ '<button type="button" class="reading-add-button">Add to my Library</button>'+
+ '<p class="reading-vocab-status" role="status" aria-live="polite"></p></div></li>'
+ ).join("")+'</ul></section>':'';
+root.innerHTML='<p>'+e(data.source_name||"LEXIQUE · DAILY READING")+'</p><p>'+e(data.level)+' · '+e(data.published_at)+'</p><h1>'+e(data.title)+'</h1>'+
+ (data.summary_zh?'<div class="reading-summary">'+e(data.summary_zh)+'</div>':'')+
+ '<div class="reading-body" lang="fr">'+e(data.content_fr)+'</div>'+vocabHtml+
+ (data.source_url?'<p>Source: '+e(data.source_title||data.source_name||"Original source")+'</p>':'');
+root.querySelectorAll(".reading-vocab-item").forEach((row,i)=>{
+ const button=row.querySelector(".reading-add-button");
+ button.addEventListener("click",()=>addWordToLibrary(vocabulary[i],row.querySelector(".reading-category").value,row.querySelector(".reading-level").value,button,row.querySelector(".reading-vocab-status")));
+});
+})();
+</script>
+</body>
+</html>
