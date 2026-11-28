@@ -44,22 +44,8 @@
       level:"B2",topic:"Current affairs" }
   ];
 
-  // Editorially selected records. Keep the original source URL and publication date with every item.
-  const article = {
-    title: {
-      fr: "Au moins 2 100 jeunes étrangers en France en attente d’une décision sur leur minorité",
-      en: "At least 2,100 young foreign nationals in France are awaiting a decision on whether they are minors",
-      zh: "至少 2100 名在法外国未成年人等待年龄认定结果"
-    },
-    summary: {
-      fr: "La Coordination nationale jeunes exilés en danger alerte sur les délais de décision concernant l’évaluation de l’âge de jeunes étrangers isolés et sur la précarité de leurs conditions de vie pendant cette attente.",
-      en: "The National Coordination for Young Exiles in Danger raises concerns about delays in age assessments for unaccompanied young foreign nationals and the precarious living conditions they face while waiting.",
-      zh: "法国“处境危险的流亡青年全国协调组织”指出，部分孤身外国青年的年龄认定程序仍需等待，等待期间的生活条件也十分脆弱。文章适合结合未成年人保护、移民政策与社会保障议题进行阅读。"
-    },
-    level: "B2–C1",
-    publishedAt: "2026-11-19",
-    url: "https://www.lemonde.fr/societe/article/2026/11/19/au-moins-2-100-jeunes-etrangers-en-france-en-attente-d-une-decision-sur-leur-minorite_6813238_3224.html"
-  };
+  // Daily Reading is loaded from Supabase.
+  let article = null;
   const listening = {
     title: {
       fr: "France : l'économie recule / Israël : à quand un nouveau gouvernement ?",
@@ -152,7 +138,7 @@
     const isArticle = type === "article";
     const title = isArticle ? t.readingTitle : t.listeningTitle;
     const intro = isArticle ? t.readingIntro : t.listeningIntro;
-    const source = isArticle ? "LE MONDE · FRANÇAIS" : "RFI · PODCASTS";
+    const source = isArticle ? escapeHtml(item.source_name || "LEXIQUE · DAILY READING") : "RFI · PODCASTS";
     const action = isArticle ? t.openArticle : t.listen;
     if (!item) {
       root.innerHTML = `<p class="daily-content-source">${source}</p><h3>${title}</h3><p class="daily-content-description">${intro}</p><p class="daily-content-status">${t.preparing}</p>`;
@@ -160,9 +146,11 @@
     }
     const summary = item.summary?.[language] || item.summary?.en || "";
     const links = isArticle
-      ? `<a class="daily-action-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">${action}</a>`
+      ? `<a class="daily-action-link" href="reading.html?id=${encodeURIComponent(item.id)}">${action}</a>`
       : `<div class="daily-card-actions">${item.audioUrl ? `<audio controls preload="none" src="${escapeHtml(item.audioUrl)}"></audio>` : ""}${item.episodeUrl ? `<a class="daily-action-link" href="${escapeHtml(item.episodeUrl)}" target="_blank" rel="noopener noreferrer">${t.listen}</a>` : ""}${item.transcriptUrl ? `<a class="daily-action-link secondary" href="${escapeHtml(item.transcriptUrl)}" target="_blank" rel="noopener noreferrer">${t.transcript}</a>` : ""}</div>`;
-    root.innerHTML = `<p class="daily-content-source">${source}</p><p class="daily-editorial-meta">${escapeHtml(item.level || "B2–C1")} · ${escapeHtml(item.publishedAt || "")}${item.duration ? " · "+escapeHtml(item.duration) : ""}</p><h3>${escapeHtml(item.title?.[language] || item.title?.fr || "")}</h3><p class="daily-content-description">${escapeHtml(summary)}</p>${links}`;
+    const displayTitle = isArticle ? (({en:item.title_en,fr:item.title,zh:item.title_zh})[language] || item.title) : (item.title?.[language] || item.title?.fr || "");
+    const displayDate = item.published_at || item.publishedAt || "";
+    root.innerHTML = `<p class="daily-content-source">${source}</p><p class="daily-editorial-meta">${escapeHtml(item.level || "B2–C1")} · ${escapeHtml(displayDate)}${item.duration ? " · "+escapeHtml(item.duration) : ""}</p><h3>${escapeHtml(displayTitle)}</h3><p class="daily-content-description">${escapeHtml(summary)}</p>${links}`;
   }
 
   function render() {
@@ -172,7 +160,7 @@
     renderEditorial("daily-listening-entry", listening, "listening", language);
   }
 
-  document.addEventListener("DOMContentLoaded", render);
+  async function loadDailyReading() {\n    if (!window.supabaseClient) { render(); return; }\n    const result = await window.supabaseClient.from("daily_readings").select("id,title,title_en,title_zh,published_at,level,topic,summary_zh,source_name").eq("status","published").order("published_at",{ascending:false}).limit(1);\n    if (result.error) { console.error("Daily Reading load failed:", result.error); article=null; }\n    else if (result.data && result.data[0]) { const x=result.data[0]; article={...x,summary:{zh:x.summary_zh || "",en:x.summary_zh || "",fr:""}}; }\n    else article=null;\n    render();\n  }\n  document.addEventListener("DOMContentLoaded", loadDailyReading);
   document.addEventListener("change", event => {
     if (event.target?.id === "language-select") setTimeout(render, 0);
   });
