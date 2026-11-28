@@ -16,7 +16,9 @@ function refreshVocabRows(){
   const rows=[...$("vocab-editor").querySelectorAll(".vocab-editor-row")];
   rows.forEach((row,i)=>row.querySelector(".vocab-row-number").textContent="Word "+(i+1));
   $("vocab-editor").classList.toggle("is-empty",rows.length===0);
-  if(!rows.length)$("vocab-editor").innerHTML='<p class="vocab-empty">No vocabulary added yet. Click “Add a word” to create your list.</p>';
+  const empty=$("vocab-editor").querySelector(".vocab-empty");
+  if(rows.length&&empty)empty.remove();
+  if(!rows.length&&!empty)$("vocab-editor").innerHTML='<p class="vocab-empty">No vocabulary added yet. Click “Add a word” to create your list.</p>';
 }
 function readVocabulary(){
   const result=[];
