@@ -249,6 +249,7 @@
             $("study-audio-btn").textContent = "Preparing audio…";
             renderChoices(mode);
             prepareListeningAudio(cleanPronunciationWord(currentWord.word));
+            prefetchNextListeningAudio();
         }
         const position = Math.min(completedCount + 1, sessionTotal);
         $("study-progress-label").textContent = position + " / " + sessionTotal;
@@ -398,6 +399,47 @@
         panel.hidden = false;
     }
 
+    const listeningAudioAssets = new Map();
+
+    function getListeningAudioAsset(word) {
+        const key = cleanPronunciationWord(word);
+        if (!key) return Promise.reject(new Error("Invalid pronunciation word."));
+        if (listeningAudioAssets.has(key)) return listeningAudioAssets.get(key);
+
+        const assetPromise = (async () => {
+            const { data, error } = await supabaseClient.functions.invoke(
+                "french-pronunciation",
+                { body: { word: key } }
+            );
+            if (error) throw error;
+            if (!data || typeof data.audioUrl !== "string" || !data.audioUrl) {
+                throw new Error(data?.error || "No pronunciation audio is available for this word.");
+            }
+            const audio = new Audio();
+            audio.preload = "auto";
+            audio.src = data.audioUrl;
+            audio.load();
+            return { data, audio };
+        })().catch(error => {
+            listeningAudioAssets.delete(key);
+            throw error;
+        });
+
+        listeningAudioAssets.set(key, assetPromise);
+        return assetPromise;
+    }
+
+    function prefetchNextListeningAudio() {
+        if (getMode() !== "listening" || queue.length < 2) return;
+        const nextWord = cleanPronunciationWord(queue[1].word.word);
+        if (!nextWord || listeningAudioAssets.has(nextWord)) return;
+        // Warm the Edge Function/cache and browser media cache while the
+        // learner is answering the current question. Never block the UI.
+        getListeningAudioAsset(nextWord).catch(error => {
+            console.info("Next-question audio prefetch failed; it will retry when needed.", error);
+        });
+    }
+
     async function prepareListeningAudio(word) {
         const requestId = ++listeningAudioRequest;
         const status = $("listening-audio-status");
@@ -409,34 +451,23 @@
         }
         button.disabled = true;
         button.textContent = "Preparing audio…";
-        status.textContent = "Searching for an existing French pronunciation…";
+        status.textContent = "Preparing pronunciation…";
 
         try {
-            const { data, error } = await supabaseClient.functions.invoke(
-                "french-pronunciation",
-                { body: { word } }
-            );
+            const { data, audio } = await getListeningAudioAsset(word);
             if (requestId !== listeningAudioRequest) return;
-            if (error) throw error;
-            if (!data || typeof data.audioUrl !== "string" || !data.audioUrl) {
-                throw new Error(data?.error || "No pronunciation audio is available for this word.");
-            }
 
             renderAudioAttribution(data);
-            const audio = new Audio();
             listeningAudio = audio;
-            listeningAudioWord = word;
-            audio.preload = "auto";
+            listeningAudioWord = cleanPronunciationWord(word);
+            listeningAudioReady = false;
             let autoPlayAttempted = false;
-            audio.oncanplay = () => {
+
+            const markReady = () => {
                 if (requestId !== listeningAudioRequest || listeningAudio !== audio) return;
                 listeningAudioReady = true;
                 button.disabled = false;
                 button.textContent = "Replay pronunciation";
-
-                // Try to play this question once as soon as its audio is ready.
-                // Browsers may block audible autoplay after a page navigation; in
-                // that case the enabled button remains available for a manual play.
                 if (!autoPlayAttempted) {
                     autoPlayAttempted = true;
                     const playback = audio.play();
@@ -453,6 +484,8 @@
                     }
                 }
             };
+
+            audio.oncanplay = markReady;
             audio.onended = () => {
                 if (requestId !== listeningAudioRequest || listeningAudio !== audio) return;
                 status.textContent = "Listen again or choose the word you heard.";
@@ -464,8 +497,14 @@
                 button.disabled = true;
                 status.textContent = "The audio file could not be loaded. Please check the Supabase Storage bucket.";
             };
-            audio.src = data.audioUrl;
-            audio.load();
+
+            if (audio.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
+                markReady();
+            } else {
+                // The prefetched media may already be downloading; avoid resetting
+                // its src or calling load() a second time.
+                audio.load();
+            }
         } catch (error) {
             if (requestId !== listeningAudioRequest) return;
             console.error("French pronunciation service unavailable:", error);
@@ -549,29 +588,41 @@
         const buttons = [...ratingPanel.querySelectorAll("[data-rating]")];
         buttons.forEach(button => button.disabled = true);
         const reviewed = currentWord;
+        const current = queue.shift();
+        if (rating === "again" && current.retries < 1) {
+            current.retries++;
+            queue.push(current);
+        }
+        sessionRatings[rating]++;
+        completedCount++;
+        currentWord = null;
+
+        // Render the next question immediately. Persistence continues in the
+        // background so database round-trips do not hold the learner at this card.
+        renderCard();
+
         try {
             if (scheduleReady) {
                 const state = await saveSpacedRepetitionReview(reviewed, rating);
                 reviewStates[reviewed.id] = state;
             }
             await recordStudyReview(reviewed, rating);
-            sessionRatings[rating]++;
-            const current = queue.shift();
-            if (rating === "again" && current.retries < 1) {
-                current.retries++;
-                queue.push(current);
+            if (typeof window.updateProgress === "function") {
+                Promise.resolve(window.updateProgress()).catch(error =>
+                    console.warn("Background study progress refresh failed:", error)
+                );
             }
-            completedCount++;
-            currentWord = null;
-            if (typeof window.updateProgress === "function") await window.updateProgress();
-            renderCard();
         } catch (error) {
             console.error("Unable to save study review:", error);
-            const feedbackId = getMode() === "flashcards" ? "flashcard-feedback" : getMode() === "recall" ? "recall-feedback" : getMode() === "listening" ? "listening-feedback" : "choice-feedback";
-            $(feedbackId).textContent = error.message === "STUDY_REVIEW_TABLE_MISSING"
+            const message = error.message === "STUDY_REVIEW_TABLE_MISSING"
                 ? "Run the Supabase migration before using long-term review scheduling."
                 : "Could not save this review. Check your connection and try again.";
-            buttons.forEach(button => button.disabled = false);
+            const feedbackId = getMode() === "flashcards" ? "flashcard-feedback" : getMode() === "recall" ? "recall-feedback" : getMode() === "listening" ? "listening-feedback" : "choice-feedback";
+            const feedback = $(feedbackId);
+            if (feedback) {
+                feedback.textContent = message;
+                feedback.className = "study-feedback is-incorrect";
+            }
         } finally {
             saving = false;
         }
