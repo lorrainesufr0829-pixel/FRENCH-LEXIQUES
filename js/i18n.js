@@ -1298,7 +1298,10 @@
     const originalTrimmed = original.trim();
     const isExistingTranslation = Object.values(dictionaries).some(
       dict => dict && dict[originalTrimmed] === currentValue.trim()
-    );
+    ) || ["en", "fr", "zh"].some(lang => {
+      const translated = translateDynamicText(originalTrimmed, lang);
+      return translated !== null && translated === currentValue.trim();
+    });
 
     if (currentValue.trim() && currentValue.trim() !== originalTrimmed && !isExistingTranslation) {
       original = currentValue;
