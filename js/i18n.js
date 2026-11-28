@@ -1261,6 +1261,35 @@
 
   const storageKey = "lexique_language";
   dictionaries.en = { ...(dictionaries.en || {}), ...{"关闭提示":"Close message","该单词已存在；保存时会为它添加所选分类。":"This word already exists; the selected category will be linked when saved.","暂时无法查重，请检查网络后重试。":"Duplicate check unavailable. Check your connection and try again.","先补充完整信息哦！":"Please complete the information!","请填写单词和释义。":"Enter both the word and its meaning.","成功！离大师又进一步！":"Success! One step closer to mastery!","分类已更新！":"Category updated!","这个单词已经在词库中，所选分类无需重复添加。":"This word is already in your library; no additional category link was needed.","再检查一下！":"Please check again.","请确认单词和释义都已填写。":"Make sure both the word and meaning are filled in.","哎呀，保存没有成功！":"Oops, saving failed!","请检查网络连接或稍后重试。":"Check your connection or try again later.","文件读取组件暂不可用！":"The file reader is currently unavailable.","请刷新页面后重试。":"Refresh the page and try again.","这次导入遇到一点小麻烦！":"There was a small problem importing this file!","请确认文件格式、登录状态及网络连接后重试。":"Check the file format, sign-in status and connection, then try again."} };
+
+  Object.assign(dictionaries.en, {
+  "Écrivez le mot en français…": "Write the French word…",
+  "Invalid login credentials": "The email or password is incorrect.",
+  "Email not confirmed": "Please confirm your email address before signing in.",
+  "User already registered": "An account with this email already exists.",
+  "Password should be at least 6 characters": "Password must contain at least 6 characters.",
+  "Unable to validate email address: invalid format": "Please enter a valid email address.",
+  "Email rate limit exceeded": "Too many email requests. Please try again later."
+});
+  Object.assign(dictionaries.zh, {
+  "Écrivez le mot en français…": "请用法语写出单词…",
+  "Invalid login credentials": "邮箱或密码错误。",
+  "Email not confirmed": "请先验证邮箱，再登录。",
+  "User already registered": "该邮箱已注册账户。",
+  "Password should be at least 6 characters": "密码至少需要 6 个字符。",
+  "Unable to validate email address: invalid format": "请输入有效的电子邮箱地址。",
+  "Email rate limit exceeded": "邮箱请求次数过多，请稍后重试。"
+});
+  Object.assign(dictionaries.fr, {
+  "Écrivez le mot en français…": "Écrivez le mot en français…",
+  "Invalid login credentials": "Adresse e-mail ou mot de passe incorrect.",
+  "Email not confirmed": "Veuillez confirmer votre adresse e-mail avant de vous connecter.",
+  "User already registered": "Un compte existe déjà avec cette adresse e-mail.",
+  "Password should be at least 6 characters": "Le mot de passe doit comporter au moins 6 caractères.",
+  "Unable to validate email address: invalid format": "Veuillez saisir une adresse e-mail valide.",
+  "Email rate limit exceeded": "Trop de demandes par e-mail. Veuillez réessayer plus tard."
+});
+
   const current = () => localStorage.getItem(storageKey) || "en";
   const originalText = new WeakMap();
   const originalAttributes = new WeakMap();
