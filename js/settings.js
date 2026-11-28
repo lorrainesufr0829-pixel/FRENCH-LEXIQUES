@@ -3,6 +3,57 @@
     const themeSelect = document.getElementById("theme-select");
     const accentSelect = document.getElementById("accent-select");
     const languageSelect = document.getElementById("language-select");
+    const englishFontSelect = document.getElementById("english-font-select");
+    const frenchFontSelect = document.getElementById("french-font-select");
+    const chineseFontSelect = document.getElementById("chinese-font-select");
+
+    const fontOptions = {
+        english: ["Inter", "Poppins", "Roboto"],
+        french: ["EB Garamond", "Libre Baskerville", "Cormorant Garamond"],
+        chinese: ["Noto Sans SC", "Source Han Sans", "LXGW WenKai"]
+    };
+    const fontStorageKeys = {
+        english: "lexique_font_english",
+        french: "lexique_font_french",
+        chinese: "lexique_font_chinese"
+    };
+    const fontFamilies = {
+        "Inter": 'Inter, "Segoe UI", Arial, sans-serif',
+        "Poppins": 'Poppins, "Segoe UI", sans-serif',
+        "Roboto": 'Roboto, Arial, sans-serif',
+        "EB Garamond": '"EB Garamond", Georgia, serif',
+        "Libre Baskerville": '"Libre Baskerville", Georgia, serif',
+        "Cormorant Garamond": '"Cormorant Garamond", Georgia, serif',
+        "Noto Sans SC": '"Noto Sans SC", "Microsoft YaHei", sans-serif',
+        "Source Han Sans": '"Source Han Sans SC", "Noto Sans SC", "Microsoft YaHei", sans-serif',
+        "LXGW WenKai": '"LXGW WenKai", "Kaiti SC", KaiTi, serif'
+    };
+
+    function getFont(language) {
+        const saved = localStorage.getItem(fontStorageKeys[language]);
+        return fontOptions[language].includes(saved) ? saved : fontOptions[language][0];
+    }
+
+    function applyFonts() {
+        const root = document.documentElement;
+        const fonts = {
+            english: getFont("english"),
+            french: getFont("french"),
+            chinese: getFont("chinese")
+        };
+        root.style.setProperty("--lexique-font-en", fontFamilies[fonts.english]);
+        root.style.setProperty("--lexique-font-fr", fontFamilies[fonts.french]);
+        root.style.setProperty("--lexique-font-zh", fontFamilies[fonts.chinese]);
+
+        const language = window.lexiqueI18n?.getLanguage?.() || "en";
+        const activeFont = language === "zh" ? fonts.chinese : language === "fr" ? fonts.french : fonts.english;
+        root.style.setProperty("--lexique-font-current", fontFamilies[activeFont]);
+        document.body.dataset.interfaceLanguage = language;
+
+        if (englishFontSelect) englishFontSelect.value = fonts.english;
+        if (frenchFontSelect) frenchFontSelect.value = fonts.french;
+        if (chineseFontSelect) chineseFontSelect.value = fonts.chinese;
+    }
 
     const palettes = {
         green: {
@@ -136,6 +187,7 @@
         if (languageSelect && window.lexiqueI18n) {
             languageSelect.value = window.lexiqueI18n.getLanguage();
         }
+        applyFonts();
     }
 
     applyPreferences();
@@ -150,5 +202,21 @@
         const accent = Object.keys(palettes)[accentSelect.selectedIndex] || "green";
         localStorage.setItem("lexique_accent", accent);
         applyPreferences();
+    });
+
+    [
+        [englishFontSelect, "english"],
+        [frenchFontSelect, "french"],
+        [chineseFontSelect, "chinese"]
+    ].forEach(([select, language]) => {
+        select?.addEventListener("change", () => {
+            if (!fontOptions[language].includes(select.value)) return;
+            localStorage.setItem(fontStorageKeys[language], select.value);
+            applyFonts();
+        });
+    });
+
+    document.addEventListener("change", event => {
+        if (event.target?.id === "language-select") window.setTimeout(applyFonts, 0);
     });
 })();
