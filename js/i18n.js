@@ -112,7 +112,7 @@
       "If an account exists for this address, a password reset email has been sent.":"如果该邮箱对应的账户存在，密码重置邮件已发送。",
       "LOG IN / SIGN UP":"登录 / 注册","SIGNED IN":"已登录","LOG OUT":"退出登录","LOGGING OUT…":"正在退出…","Signed in":"已登录",
       "新增 ":"新增 "," 个单词":" 个单词","已有单词 ":"已有单词 ","添加分类关联 ":"添加分类关联 ",
-      "导入完成：":"导入完成：","导入失败，请确认文件格式、登录状态及 Supabase 数据库权限。":"导入失败，请确认文件格式、登录状态及数据库权限。"
+      "导入完成：":"导入完成：","导入失败，请确认文件格式、登录状态及 Supabase 数据库权限。":"导入失败，请确认文件格式、登录状态及数据库权限。",
       "Daily Featured Word": "每日精选词汇",
       "Daily Reading": "每日阅读",
       "Daily Listening": "每日听力",
@@ -443,8 +443,15 @@
 
     const trimmed = original.trim();
     if (!trimmed) return;
-    const translated = dictionaries[language]?.[trimmed] || trimmed;
-    node.nodeValue = original.replace(trimmed, translated);
+    let translated = dictionaries[language]?.[trimmed] || trimmed;
+    const countMatch = trimmed.match(/^(\\d+) (Words|words|Days|days)$/);
+    if (countMatch) {
+      const count = Number(countMatch[1]);
+      if (language === "zh") translated = `${count}${countMatch[2].toLowerCase().includes("day") ? " 天" : " 个单词"}`;
+      if (language === "fr") translated = `${count} ${countMatch[2].toLowerCase().includes("day") ? (count === 1 ? "jour" : "jours") : (count === 1 ? "mot" : "mots")}`;
+    }
+    const nextValue = original.replace(trimmed, translated);
+    if (node.nodeValue !== nextValue) node.nodeValue = nextValue;
   }
   function translateTree(root, language) {
     if (root.nodeType === Node.TEXT_NODE) { translateNode(root, language); return; }
