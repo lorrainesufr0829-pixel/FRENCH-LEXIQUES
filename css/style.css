@@ -3170,3 +3170,44 @@ body[data-theme="dark"] .daily-content-entry h3 {
         justify-content: center;
     }
 }
+
+
+/* HOME — More generous spacing for the three daily content cards */
+.main-content > .featured-word,
+.main-content > .daily-content-section {
+    margin-top: 42px;
+}
+.main-content > .featured-word:first-child {
+    margin-top: 0;
+}
+.main-content > .featured-word .word-card,
+.main-content > .daily-content-section .daily-content-entry {
+    padding: 32px 36px;
+}
+@media (min-width: 761px) {
+    .main-content > .featured-word .word-card,
+    .main-content > .daily-content-section .daily-content-entry {
+        height: 200px;
+        min-height: 200px;
+    }
+}
+@media (max-width: 760px) {
+    .main-content > .featured-word,
+    .main-content > .daily-content-section {
+        margin-top: 34px;
+    }
+    .main-content > .featured-word:first-child {
+        margin-top: 0;
+    }
+    .main-content > .featured-word .word-card,
+    .main-content > .daily-content-section .daily-content-entry {
+        min-height: 170px;
+        padding: 25px 23px;
+    }
+}
+@media (max-width: 480px) {
+    .main-content > .featured-word .word-card,
+    .main-content > .daily-content-section .daily-content-entry {
+        padding: 22px 20px;
+    }
+}
