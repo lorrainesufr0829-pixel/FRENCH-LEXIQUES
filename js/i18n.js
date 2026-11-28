@@ -1268,6 +1268,12 @@
 
   function translateDynamicText(value, language) {
     let match;
+    if ((match = value.match(/^(\\d+) (Words|words|Days|days)$/))) {
+      const count = Number(match[1]);
+      const isDays = match[2].toLowerCase().includes("day");
+      if (language === "zh") return isDays ? `${count} 天` : `${count} 个单词`;
+      if (language === "fr") return isDays ? `${count} ${count === 1 ? "jour" : "jours"}` : `${count} ${count === 1 ? "mot" : "mots"}`;
+    }
     if ((match = value.match(/^(\\d+) words available(?: · (\\d+) due for review)?$/i))) {
       const words = Number(match[1]);
       const due = match[2] === undefined ? null : Number(match[2]);
